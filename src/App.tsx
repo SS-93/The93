@@ -4,6 +4,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from './lib/stripeClient'
 import { AuthProvider } from './hooks/useAuth'
 import BucketDemo from './routes/bucket-demo'
+import LockerDemo from './routes/locker-demo'
 import BucketTemplateUI from './components/BucketTemplateUI'
 import ErrorBoundary from './components/ErrorBoundary'
 
@@ -54,6 +55,9 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
         <a href="/BTI" className="text-accent-yellow hover:underline block">
           → View BTI Artist Page
         </a>
+        <a href="/locker-demo" className="text-accent-yellow hover:underline block">
+          → Try Locker A/B/C Demo
+        </a>
       </div>
     </div>
   </div>
@@ -68,6 +72,11 @@ const router = createBrowserRouter([
   {
     path: '/bucket-demo',
     element: <BucketDemo />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/locker-demo',
+    element: <LockerDemo />,
     errorElement: <ErrorBoundary />
   },
   {
