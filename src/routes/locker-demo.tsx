@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import LockerTemplateA from '../components/LockerTemplateA'
 import LockerTemplateB from '../components/LockerTemplateB'
-import LockerTemplateC from '../components/LockerTemplateC'
-import LockerTemplateD from '../components/LockerTemplateD'
+// import LockerTemplateC from '../components/LockerTemplateC'
+// import LockerTemplateD from '../components/LockerTemplateD'
 import ArtistDashboardTemplateUI from '../components/ArtistDashboardTemplateUI'
 import BrandDashboardTemplateUI from '../components/BrandDashboardTemplateUI'
 import ArtistDashboardSpacious from '../components/ArtistDashboardSpacious'
 import BrandDashboardSpacious from '../components/BrandDashboardSpacious'
+import MessageCenterTemplateUI from '../components/MessageCenterTemplateUI'
+import CulturalCollabPortal from '../components/CulturalCollabPortal'
 
 // Mock data for testing
 const mockLockerItemsA = [
@@ -258,7 +260,7 @@ const mockCollectionsD = [
 ]
 
 const LockerDemo: React.FC = () => {
-  const [activeDemo, setActiveDemo] = useState<'A' | 'B' | 'C' | 'D' | 'artist-dashboard' | 'brand-dashboard' | 'artist-spacious' | 'brand-spacious'>('A')
+  const [activeDemo, setActiveDemo] = useState<'A' | 'B' | 'C' | 'D' | 'message-center' | 'collab-portal' | 'artist-dashboard' | 'brand-dashboard' | 'artist-spacious' | 'brand-spacious'>('A')
   const [selectedCollection, setSelectedCollection] = useState(mockCollectionsD[0])
 
   const handleMockAction = (action: string, ...args: any[]) => {
@@ -294,7 +296,7 @@ const LockerDemo: React.FC = () => {
       <div className="fixed top-4 left-4 right-4 z-50 bg-gray-900/90 backdrop-blur-md rounded-xl p-4 border border-gray-700">
         <h1 className="text-white text-lg font-bold mb-3 text-center">Bucket Platform Demo</h1>
         <div className="grid grid-cols-8 gap-2">
-          {['A', 'B', 'C', 'D'].map((option) => (
+          {['A', 'B', /* 'C', 'D' */].map((option) => (
             <button
               key={option}
               onClick={() => setActiveDemo(option as any)}
@@ -309,12 +311,38 @@ const LockerDemo: React.FC = () => {
                 <div className="text-xs">
                   {option === 'A' && '3D Carousel'}
                   {option === 'B' && 'Daily Calendar'}
-                  {option === 'C' && 'Gaming Loot'}
-                  {option === 'D' && 'Wishlist Style'}
+                  {/* {option === 'C' && 'Gaming Loot'}
+                  {option === 'D' && 'Wishlist Style'} */}
                 </div>
               </div>
             </button>
           ))}
+          <button
+            onClick={() => setActiveDemo('message-center')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              activeDemo === 'message-center'
+                ? 'bg-purple-500 text-black'
+                : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div className="font-bold">Messages</div>
+              <div className="text-xs">Center</div>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveDemo('collab-portal')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              activeDemo === 'collab-portal'
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div className="font-bold">Cultural</div>
+              <div className="text-xs">Collab</div>
+            </div>
+          </button>
           <button
             onClick={() => setActiveDemo('artist-dashboard')}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
@@ -404,6 +432,7 @@ const LockerDemo: React.FC = () => {
             />
           )}
           
+          {/* Commented out for now - C and D templates
           {activeDemo === 'C' && (
             <LockerTemplateC
               userLevel={8}
@@ -432,6 +461,11 @@ const LockerDemo: React.FC = () => {
               onCreatePlaylist={handleCreatePlaylist}
             />
           )}
+          */}
+
+          {activeDemo === 'message-center' && <MessageCenterTemplateUI />}
+
+          {activeDemo === 'collab-portal' && <CulturalCollabPortal />}
 
           {activeDemo === 'artist-dashboard' && <ArtistDashboardTemplateUI />}
           
