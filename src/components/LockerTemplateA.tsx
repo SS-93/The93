@@ -182,136 +182,213 @@ const LockerTemplateA: React.FC<LockerTemplateAProps> = ({
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="pt-20 pb-20">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentItem.id}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.3 }}
-            className="px-4 py-6"
-          >
-            {/* Card */}
-            <div className={`bg-gray-900/50 backdrop-blur-md rounded-3xl p-6 mx-auto max-w-md border-2 ${getRarityColor(currentItem.rarity)} shadow-2xl ${getRarityGlow(currentItem.rarity)}`}>
-              
-              {/* New Badge */}
-              {currentItem.isNew && (
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
-                  NEW
-                </div>
-              )}
-
-              {/* Time Left */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  {getTypeIcon(currentItem.type)}
-                  <span className="text-sm font-medium text-gray-300">{currentItem.type.toUpperCase()}</span>
-                </div>
-                <div className={`text-sm font-bold px-3 py-1 rounded-full ${
-                  timeLeft <= 60 ? 'bg-red-500/20 text-red-400' :
-                  timeLeft <= 180 ? 'bg-yellow-500/20 text-yellow-400' :
-                  'bg-green-500/20 text-green-400'
-                }`}>
-                  {formatTimeLeft(timeLeft)}
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="mb-6">
-                <div className="w-full h-48 bg-gray-800 rounded-2xl mb-4 flex items-center justify-center">
-                  <img src={currentItem.thumbnail} alt={currentItem.title} className="w-full h-full object-cover rounded-2xl" />
-                </div>
-                
-                <h3 className="text-xl font-bold mb-2">{currentItem.title}</h3>
-                <p className="text-gray-400 text-sm mb-2">by {currentItem.artist}</p>
-                <p className="text-gray-300">{currentItem.description}</p>
-
-                {/* Brand Code */}
-                {currentItem.type === 'code' && (
-                  <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-green-400 font-bold">{currentItem.brandName} Code</p>
-                        <p className="text-sm text-gray-400">Tap to reveal</p>
-                      </div>
-                      <button
-                        onClick={() => onClaimCode(currentItem.id)}
-                        className="bg-green-500 text-black px-4 py-2 rounded-lg font-bold hover:bg-green-400 transition-colors"
-                      >
-                        CLAIM
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Reactions */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => onReact(currentItem.id, 'heart')}
-                    className={`flex items-center space-x-1 ${currentItem.userReaction === 'heart' ? 'text-red-400' : 'text-gray-400'} hover:text-red-400 transition-colors`}
-                  >
-                    <span className="text-lg">❤️</span>
-                    <span className="text-sm">{currentItem.reactions.heart}</span>
-                  </button>
-                  <button
-                    onClick={() => onReact(currentItem.id, 'fire')}
-                    className={`flex items-center space-x-1 ${currentItem.userReaction === 'fire' ? 'text-orange-400' : 'text-gray-400'} hover:text-orange-400 transition-colors`}
-                  >
-                    <span className="text-lg">🔥</span>
-                    <span className="text-sm">{currentItem.reactions.fire}</span>
-                  </button>
-                  <button
-                    onClick={() => onReact(currentItem.id, 'star')}
-                    className={`flex items-center space-x-1 ${currentItem.userReaction === 'star' ? 'text-yellow-400' : 'text-gray-400'} hover:text-yellow-400 transition-colors`}
-                  >
-                    <span className="text-lg">⭐</span>
-                    <span className="text-sm">{currentItem.reactions.star}</span>
-                  </button>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => onSave(currentItem.id)}
-                    className={`${currentItem.isSaved ? 'text-accent-yellow' : 'text-gray-400'} hover:text-accent-yellow transition-colors`}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="currentColor" strokeWidth="2" fill={currentItem.isSaved ? 'currentColor' : 'none'}/>
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => onShare(currentItem.id)}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" strokeWidth="2"/>
-                      <polyline points="16,6 12,2 8,6" stroke="currentColor" strokeWidth="2"/>
-                      <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" strokeWidth="2"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Comments Button */}
-              <button
-                onClick={() => onComment(currentItem.id)}
-                disabled={currentItem.fanTierRequired ? userTier < currentItem.fanTierRequired : false}
-                className={`w-full py-3 rounded-xl font-medium transition-colors ${
-                  currentItem.fanTierRequired && userTier < currentItem.fanTierRequired
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                }`}
+      {/* Main Content - 3D Carousel Effect */}
+      <div className="pt-20 pb-20 relative overflow-hidden">
+        <div className="relative h-[600px] flex items-center justify-center">
+          {/* Render 3 cards: previous, current, next */}
+          {[-1, 0, 1].map((offset) => {
+            const cardIndex = (currentIndex + offset + lockerItems.length) % lockerItems.length
+            const item = lockerItems[cardIndex]
+            const isCenter = offset === 0
+            
+            return (
+              <motion.div
+                key={`${item.id}-${offset}`}
+                className="absolute"
+                animate={{
+                  x: offset * 280, // Spread cards horizontally
+                  scale: isCenter ? 1 : 0.85, // Center card full size, others smaller
+                  opacity: isCenter ? 1 : 0.6, // Center card full opacity
+                  zIndex: isCenter ? 10 : 5, // Center card on top
+                  rotateY: `${offset * 15}deg`, // Slight 3D rotation effect
+                }}
+                transition={{ 
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30
+                }}
+                style={{
+                  perspective: '1000px',
+                  transformStyle: 'preserve-3d'
+                }}
               >
-                {currentItem.fanTierRequired && userTier < currentItem.fanTierRequired
-                  ? `Tier ${currentItem.fanTierRequired}+ Required to Comment`
-                  : `View Comments (${currentItem.commentCount})`
-                }
-              </button>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+                {/* Card */}
+                <div 
+                  className={`bg-gray-900/50 backdrop-blur-md rounded-3xl p-6 w-80 border-2 shadow-2xl ${
+                    isCenter 
+                      ? `${getRarityColor(item.rarity)} ${getRarityGlow(item.rarity)}` 
+                      : 'border-gray-600 shadow-gray-800/30'
+                  } ${!isCenter ? 'pointer-events-none' : 'cursor-pointer'}`}
+                  onClick={() => isCenter ? null : setCurrentIndex(cardIndex)}
+                >
+              
+                  {/* New Badge */}
+                  {item.isNew && isCenter && (
+                    <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+                      NEW
+                    </div>
+                  )}
+
+                  {/* Time Left */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      {getTypeIcon(item.type)}
+                      <span className="text-sm font-medium text-gray-300">{item.type.toUpperCase()}</span>
+                    </div>
+                    {isCenter && (
+                      <div className={`text-sm font-bold px-3 py-1 rounded-full ${
+                        timeLefts[item.id] <= 60 ? 'bg-red-500/20 text-red-400' :
+                        timeLefts[item.id] <= 180 ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-green-500/20 text-green-400'
+                      }`}>
+                        {formatTimeLeft(timeLefts[item.id] || 0)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="mb-6">
+                    <div className="w-full h-48 bg-gray-800 rounded-2xl mb-4 flex items-center justify-center overflow-hidden relative">
+                      <img 
+                        src={item.thumbnail} 
+                        alt={item.title} 
+                        className={`w-full h-full object-cover rounded-2xl transition-all duration-300 ${
+                          isCenter ? '' : 'filter blur-sm'
+                        }`} 
+                      />
+                      {!isCenter && (
+                        <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center">
+                          <div className="text-white/80 text-sm font-medium">
+                            {offset === -1 ? 'Previous' : 'Next'}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <h3 className={`text-xl font-bold mb-2 transition-colors ${isCenter ? '' : 'text-gray-400'}`}>
+                      {item.title}
+                    </h3>
+                    <p className={`text-sm mb-2 transition-colors ${isCenter ? 'text-gray-400' : 'text-gray-500'}`}>
+                      by {item.artist}
+                    </p>
+                    {isCenter && (
+                      <p className="text-gray-300">{item.description}</p>
+                    )}
+
+                    {/* Brand Code - Only show on center card */}
+                    {item.type === 'code' && isCenter && (
+                      <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-green-400 font-bold">{item.brandName} Code</p>
+                            <p className="text-sm text-gray-400">Tap to reveal</p>
+                          </div>
+                          <button
+                            onClick={() => onClaimCode(item.id)}
+                            className="bg-green-500 text-black px-4 py-2 rounded-lg font-bold hover:bg-green-400 transition-colors"
+                          >
+                            CLAIM
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reactions - Only show on center card */}
+                  {isCenter && (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                          <button
+                            onClick={() => onReact(item.id, 'heart')}
+                            className={`flex items-center space-x-1 ${item.userReaction === 'heart' ? 'text-red-400' : 'text-gray-400'} hover:text-red-400 transition-colors`}
+                          >
+                            <span className="text-lg">❤️</span>
+                            <span className="text-sm">{item.reactions.heart}</span>
+                          </button>
+                          <button
+                            onClick={() => onReact(item.id, 'fire')}
+                            className={`flex items-center space-x-1 ${item.userReaction === 'fire' ? 'text-orange-400' : 'text-gray-400'} hover:text-orange-400 transition-colors`}
+                          >
+                            <span className="text-lg">🔥</span>
+                            <span className="text-sm">{item.reactions.fire}</span>
+                          </button>
+                          <button
+                            onClick={() => onReact(item.id, 'star')}
+                            className={`flex items-center space-x-1 ${item.userReaction === 'star' ? 'text-yellow-400' : 'text-gray-400'} hover:text-yellow-400 transition-colors`}
+                          >
+                            <span className="text-lg">⭐</span>
+                            <span className="text-sm">{item.reactions.star}</span>
+                          </button>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <button
+                            onClick={() => onSave(item.id)}
+                            className={`${item.isSaved ? 'text-accent-yellow' : 'text-gray-400'} hover:text-accent-yellow transition-colors`}
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="currentColor" strokeWidth="2" fill={item.isSaved ? 'currentColor' : 'none'}/>
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => onShare(item.id)}
+                            className="text-gray-400 hover:text-white transition-colors"
+                          >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" strokeWidth="2"/>
+                              <polyline points="16,6 12,2 8,6" stroke="currentColor" strokeWidth="2"/>
+                              <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Comments Button - Only show on center card */}
+                      <button
+                        onClick={() => onComment(item.id)}
+                        disabled={item.fanTierRequired ? userTier < item.fanTierRequired : false}
+                        className={`w-full py-3 rounded-xl font-medium transition-colors ${
+                          item.fanTierRequired && userTier < item.fanTierRequired
+                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                            : 'bg-gray-800 text-white hover:bg-gray-700'
+                        }`}
+                      >
+                        {item.fanTierRequired && userTier < item.fanTierRequired
+                          ? `Tier ${item.fanTierRequired}+ Required to Comment`
+                          : `View Comments (${item.commentCount})`
+                        }
+                      </button>
+                    </>
+                  )}
+
+                  {/* Side card click hint */}
+                  {!isCenter && (
+                    <div className="text-center mt-4">
+                      <div className="text-gray-500 text-xs">Tap to view</div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {/* Swipe Indicators */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 text-gray-400">
+          <div className="flex items-center space-x-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15,18 9,12 15,6"/>
+            </svg>
+            <span className="text-xs">Swipe</span>
+          </div>
+          <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+          <div className="flex items-center space-x-1">
+            <span className="text-xs">Swipe</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9,18 15,12 9,6"/>
+            </svg>
+          </div>
+        </div>
       </div>
 
       {/* Navigation Dots */}

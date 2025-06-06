@@ -4,6 +4,10 @@ import LockerTemplateA from '../components/LockerTemplateA'
 import LockerTemplateB from '../components/LockerTemplateB'
 import LockerTemplateC from '../components/LockerTemplateC'
 import LockerTemplateD from '../components/LockerTemplateD'
+import ArtistDashboardTemplateUI from '../components/ArtistDashboardTemplateUI'
+import BrandDashboardTemplateUI from '../components/BrandDashboardTemplateUI'
+import ArtistDashboardSpacious from '../components/ArtistDashboardSpacious'
+import BrandDashboardSpacious from '../components/BrandDashboardSpacious'
 
 // Mock data for testing
 const mockLockerItemsA = [
@@ -254,7 +258,7 @@ const mockCollectionsD = [
 ]
 
 const LockerDemo: React.FC = () => {
-  const [activeDemo, setActiveDemo] = useState<'A' | 'B' | 'C' | 'D'>('A')
+  const [activeDemo, setActiveDemo] = useState<'A' | 'B' | 'C' | 'D' | 'artist-dashboard' | 'brand-dashboard' | 'artist-spacious' | 'brand-spacious'>('A')
   const [selectedCollection, setSelectedCollection] = useState(mockCollectionsD[0])
 
   const handleMockAction = (action: string, ...args: any[]) => {
@@ -288,8 +292,8 @@ const LockerDemo: React.FC = () => {
     <div className="min-h-screen bg-black">
       {/* Demo Selector */}
       <div className="fixed top-4 left-4 right-4 z-50 bg-gray-900/90 backdrop-blur-md rounded-xl p-4 border border-gray-700">
-        <h1 className="text-white text-lg font-bold mb-3 text-center">Locker Template A/B/C/D Testing</h1>
-        <div className="grid grid-cols-4 gap-2">
+        <h1 className="text-white text-lg font-bold mb-3 text-center">Bucket Platform Demo</h1>
+        <div className="grid grid-cols-8 gap-2">
           {['A', 'B', 'C', 'D'].map((option) => (
             <button
               key={option}
@@ -301,9 +305,9 @@ const LockerDemo: React.FC = () => {
               }`}
             >
               <div className="text-center">
-                <div className="font-bold">Option {option}</div>
+                <div className="font-bold">Locker {option}</div>
                 <div className="text-xs">
-                  {option === 'A' && 'Card Timeline'}
+                  {option === 'A' && '3D Carousel'}
                   {option === 'B' && 'Daily Calendar'}
                   {option === 'C' && 'Gaming Loot'}
                   {option === 'D' && 'Wishlist Style'}
@@ -311,6 +315,58 @@ const LockerDemo: React.FC = () => {
               </div>
             </button>
           ))}
+          <button
+            onClick={() => setActiveDemo('artist-dashboard')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              activeDemo === 'artist-dashboard'
+                ? 'bg-green-500 text-black'
+                : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div className="font-bold">Artist</div>
+              <div className="text-xs">Dashboard</div>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveDemo('brand-dashboard')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              activeDemo === 'brand-dashboard'
+                ? 'bg-blue-500 text-black'
+                : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div className="font-bold">Brand</div>
+              <div className="text-xs">Dashboard</div>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveDemo('artist-spacious')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              activeDemo === 'artist-spacious'
+                ? 'bg-green-400 text-black'
+                : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div className="font-bold">Artist+</div>
+              <div className="text-xs">Spacious</div>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveDemo('brand-spacious')}
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              activeDemo === 'brand-spacious'
+                ? 'bg-blue-400 text-black'
+                : 'bg-gray-800 text-gray-400 hover:text-white'
+            }`}
+          >
+            <div className="text-center">
+              <div className="font-bold">Brand+</div>
+              <div className="text-xs">Spacious</div>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -376,6 +432,14 @@ const LockerDemo: React.FC = () => {
               onCreatePlaylist={handleCreatePlaylist}
             />
           )}
+
+          {activeDemo === 'artist-dashboard' && <ArtistDashboardTemplateUI />}
+          
+          {activeDemo === 'brand-dashboard' && <BrandDashboardTemplateUI />}
+
+          {activeDemo === 'artist-spacious' && <ArtistDashboardSpacious />}
+          
+          {activeDemo === 'brand-spacious' && <BrandDashboardSpacious />}
         </motion.div>
       </div>
     </div>
