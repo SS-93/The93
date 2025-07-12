@@ -5,15 +5,16 @@ import { signUp, signInWithOAuth } from '../../lib/auth'
 interface SignUpFormProps {
   onSuccess: (user: any) => void
   onBack: () => void
+  defaultRole?: 'fan' | 'artist' | 'brand'
 }
 
-const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack }) => {
+const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole = 'fan' }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
     displayName: '',
-    role: 'fan' as 'fan' | 'artist' | 'brand'
+    role: defaultRole
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -39,8 +40,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack }) => {
 
     setLoading(true)
     try {
-      // First create the Supabase user
-      const { data, error } = await signUp(formData.email, formData.password)
+      // Create user with metadata
+      const userMetadata = {
+        display_name: formData.displayName,
+        role: formData.role
+      }
+      
+      const { data, error } = await signUp(formData.email, formData.password, userMetadata)
       if (error) throw error
       
       // User created successfully, trigger MediaID setup

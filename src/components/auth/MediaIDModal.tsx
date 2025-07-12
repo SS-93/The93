@@ -79,24 +79,62 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
         throw new Error('Authentication required. Please sign in again.')
       }
 
-      // Use Supabase client's function invocation instead of direct fetch
-      const { data, error } = await supabase.functions.invoke('mediaid-setup', {
-        body: {
-          interests: formData.interests,
-          genre_preferences: formData.genres,
-          privacy_settings: formData.privacySettings
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      })
-
-      if (error) {
-        console.error('MediaID setup error:', error)
-        throw new Error(error.message || 'Failed to setup MediaID')
+      // Direct MediaID setup using Supabase client calls (bypassing Edge Function)
+      
+      // Validate interests (3-5 required)
+      if (!formData.interests || formData.interests.length < 3 || formData.interests.length > 5) {
+        throw new Error('Please select 3-5 interests')
       }
 
-      onComplete(data)
+      // Update MediaID with user preferences
+      const { error: mediaIdError } = await supabase
+        .from('media_ids')
+        .upsert({
+          user_uuid: user.id,
+          interests: formData.interests,
+          genre_preferences: formData.genres || [],
+          privacy_settings: formData.privacySettings,
+          content_flags: {},
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_uuid'
+        })
+
+      if (mediaIdError) {
+        console.error('MediaID update error:', mediaIdError)
+        throw new Error('Failed to update MediaID preferences')
+      }
+
+      // Update onboarding status
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        })
+
+      if (profileError) {
+        console.error('Profile update error:', profileError)
+        throw new Error('Failed to complete onboarding')
+      }
+
+      // Log the setup completion (anonymous)
+      await supabase
+        .from('media_engagement_log')
+        .insert({
+          user_id: user.id,
+          event_type: 'mediaid_setup_completed',
+          is_anonymous: formData.privacySettings.anonymous_logging,
+          metadata: {
+            interests_count: formData.interests.length,
+            privacy_level: Object.values(formData.privacySettings).filter(Boolean).length
+          }
+        })
+
+      onComplete({ success: true, message: 'MediaID setup completed successfully' })
     } catch (error) {
       console.error('MediaID setup error:', error)
       // Show user-friendly error message

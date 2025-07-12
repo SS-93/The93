@@ -11,10 +11,13 @@ import UserCatalog from './components/UserCatalog'
 import ArtistDashboardTemplateUI from './components/ArtistDashboardTemplateUI'
 import BrandDashboardTemplateUI from './components/BrandDashboardTemplateUI'
 import ErrorBoundary from './components/ErrorBoundary'
-import { RouteGuard } from './components/RouteGuard'
+import { SmartRouteGuard } from './components/SmartRouteGuard'
+import { AutoRouter } from './components/AutoRouter'
 import OnboardingFlow from './components/OnboardingFlow'
 import WelcomePage from './components/auth/WelcomePage'
 import SignInForm from './components/auth/SignInForm'
+import ArtistLogin from './components/auth/ArtistLogin'
+import BrandLogin from './components/auth/BrandLogin'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -64,25 +67,34 @@ const LandingPage: React.FC = () => (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         <div className="glass p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Fans</h3>
-          <p className="text-gray-400">Discover underground artists and unlock exclusive content</p>
+          <p className="text-gray-400 mb-6">Discover underground artists and unlock exclusive content</p>
+          <a href="/welcome" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold hover:bg-accent-yellow/90 transition-colors inline-block">
+            Fan Login
+          </a>
         </div>
         <div className="glass p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Artists</h3>
-          <p className="text-gray-400">Monetize your work with daily drops and subscriber tiers</p>
+          <p className="text-gray-400 mb-6">Monetize your work with daily drops and subscriber tiers</p>
+          <a href="/artist/login" className="bg-green-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-green-600 transition-colors inline-block">
+            Artist Portal
+          </a>
         </div>
         <div className="glass p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Brands</h3>
-          <p className="text-gray-400">Connect with engaged communities through MediaID</p>
+          <p className="text-gray-400 mb-6">Connect with engaged communities through MediaID</p>
+          <a href="/brand/login" className="bg-blue-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors inline-block">
+            Brand Portal
+          </a>
         </div>
       </div>
 
       <div className="space-y-4">
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-          <a href="/catalog" className="bg-accent-yellow text-black px-8 py-4 rounded-xl font-bold hover:bg-accent-yellow/90 transition-colors">
+          <a href="/catalog" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
             Explore Artists
           </a>
           <a href="/welcome" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
-            Get Started
+            General Login
           </a>
         </div>
         
@@ -125,33 +137,74 @@ const router = createBrowserRouter([
     errorElement: <ErrorBoundary />
   },
   {
-    path: '/welcome', // New route for the original auth flow
-    element: <WelcomePage />,
+    path: '/auto-route',
+    element: <AutoRouter />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/welcome',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <WelcomePage />
+      </SmartRouteGuard>
+    ),
     errorElement: <ErrorBoundary />
   },
   {
     path: '/login',
     element: (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
-        <SignInForm 
-          onSuccess={(user) => {
-            const userRole = user?.user_metadata?.role || 'fan'
-            window.location.href = `/dashboard/${userRole}`
-          }}
-          onBack={() => window.location.href = '/welcome'}
-        />
-      </div>
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
+          <SignInForm 
+            onSuccess={(user) => {
+              // Use auto-router to handle smart routing
+              window.location.href = '/auto-route'
+            }}
+            onBack={() => window.location.href = '/welcome'}
+          />
+        </div>
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Separate login flows
+  {
+    path: '/artist/login',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <ArtistLogin />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/brand/login',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <BrandLogin />
+      </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
   },
   {
     path: '/catalog',
-    element: <UserCatalog />,
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <UserCatalog />
+      </SmartRouteGuard>
+    ),
     errorElement: <ErrorBoundary />
   },
   {
     path: '/onboarding',
-    element: <OnboardingFlow />,
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={false}>
+        <OnboardingFlow onComplete={() => {
+          // After onboarding completion, use auto-router
+          window.location.href = '/auto-route'
+        }} />
+      </SmartRouteGuard>
+    ),
     errorElement: <ErrorBoundary />
   },
   // Demo Routes (Public Access)
@@ -181,27 +234,27 @@ const router = createBrowserRouter([
   {
     path: '/dashboard/fan',
     element: (
-      <RouteGuard allowedRoles={['fan', 'admin']} requireAuth={true}>
+      <SmartRouteGuard allowedRoles={['fan', 'admin']} requireAuth={true} requireOnboarding={true}>
         <DashboardWrapper initialRole="fan" />
-      </RouteGuard>
+      </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
   },
   {
     path: '/dashboard/artist',
     element: (
-      <RouteGuard allowedRoles={['artist', 'admin']} requireAuth={true}>
+      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
         <DashboardWrapper initialRole="artist" />
-      </RouteGuard>
+      </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
   },
   {
     path: '/dashboard/brand',
     element: (
-      <RouteGuard allowedRoles={['brand', 'admin']} requireAuth={true}>
+      <SmartRouteGuard allowedRoles={['brand', 'admin']} requireAuth={true} requireOnboarding={true}>
         <DashboardWrapper initialRole="brand" />
-      </RouteGuard>
+      </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
   },

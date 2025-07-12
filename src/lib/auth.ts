@@ -7,11 +7,14 @@ export interface AuthState {
   loading: boolean
 }
 
-export const signUp = async (email: string, password: string) => {
+export const signUp = async (email: string, password: string, userMetadata?: any) => {
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: userMetadata || {}
+      }
     })
     
     if (error) {
@@ -28,6 +31,11 @@ export const signUp = async (email: string, password: string) => {
       }
       
       return { data: null, error: { message: error.message || 'Failed to create account' } }
+    }
+
+    // If user was created successfully, create the database records
+    if (data.user) {
+      await createUserProfile(data.user, userMetadata)
     }
     
     return { data, error }
@@ -48,6 +56,58 @@ export const signUp = async (email: string, password: string) => {
       data: null, 
       error: { message: 'Unable to connect to authentication service. Please check your internet connection and environment configuration.' }
     }
+  }
+}
+
+// Helper function to create initial user profile and MediaID
+const createUserProfile = async (user: any, userMetadata: any) => {
+  try {
+    // Create profile record
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        display_name: userMetadata?.display_name || '',
+        role: userMetadata?.role || 'fan',
+        email_verified: false,
+        onboarding_completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError)
+      // Don't throw - let onboarding handle this
+    }
+
+    // Create initial MediaID record
+    const { error: mediaIdError } = await supabase
+      .from('media_ids')
+      .insert({
+        user_uuid: user.id,
+        interests: [],
+        genre_preferences: [],
+        content_flags: {},
+        privacy_settings: {
+          data_sharing: true,
+          location_access: false,
+          audio_capture: false,
+          anonymous_logging: true,
+          marketing_communications: false
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+
+    if (mediaIdError) {
+      console.error('MediaID creation error:', mediaIdError)
+      // Don't throw - let onboarding handle this
+    }
+
+    console.log('✅ User profile and MediaID created successfully')
+  } catch (error) {
+    console.error('Error creating user profile:', error)
+    // Don't throw - let the signup succeed and onboarding handle missing records
   }
 }
 

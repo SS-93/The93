@@ -98,29 +98,35 @@ const WelcomePage: React.FC = () => {
 
               {/* CTA Buttons */}
               <div className="space-y-6">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveForm('signup')}
-                  className="w-full max-w-md px-12 py-6 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xl font-bold rounded-2xl shadow-2xl hover:shadow-purple-500/25 transition-all"
-                >
-                  Get Started Free
-                </motion.button>
-                
-                <div className="flex items-center space-x-4 max-w-md mx-auto">
-                  <div className="flex-1 h-px bg-gray-600"></div>
-                  <span className="text-gray-400 text-sm">Already have an account?</span>
-                  <div className="flex-1 h-px bg-gray-600"></div>
+                <div className="space-y-4">
+                  <button
+                    onClick={() => setActiveForm('signup')}
+                    className="w-full bg-accent-yellow text-black font-bold py-4 rounded-xl hover:bg-accent-yellow/90 transition-colors"
+                  >
+                    Create Fan Account
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveForm('signin')}
+                    className="w-full bg-gray-800 text-white font-bold py-4 rounded-xl hover:bg-gray-700 transition-colors border border-gray-600"
+                  >
+                    Sign In to Dashboard
+                  </button>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveForm('signin')}
-                  className="w-full max-w-md px-12 py-6 bg-gray-800/50 border-2 border-gray-600 text-white text-xl font-bold rounded-2xl hover:border-gray-500 transition-all"
-                >
-                  Sign In
-                </motion.button>
+                <div className="mt-6 text-center">
+                  <p className="text-gray-500 text-sm mb-3">
+                    Looking for a different experience?
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <a href="/artist/login" className="text-green-400 hover:underline text-sm font-medium">
+                      🎤 Artist Portal
+                    </a>
+                    <a href="/brand/login" className="text-blue-400 hover:underline text-sm font-medium">
+                      🏢 Brand Portal
+                    </a>
+                  </div>
+                </div>
               </div>
             </motion.div>
           ) : (
