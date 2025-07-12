@@ -61,6 +61,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
     }
   }
 
+
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'artist': return 'text-green-400'
