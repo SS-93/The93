@@ -6,7 +6,15 @@ import { AuthProvider } from './hooks/useAuth'
 import BucketDemo from './routes/bucket-demo'
 import LockerDemo from './routes/locker-demo'
 import BucketTemplateUI from './components/BucketTemplateUI'
+import FanDashboard from './components/FanDashboard'
+import UserCatalog from './components/UserCatalog'
+import ArtistDashboardTemplateUI from './components/ArtistDashboardTemplateUI'
+import BrandDashboardTemplateUI from './components/BrandDashboardTemplateUI'
 import ErrorBoundary from './components/ErrorBoundary'
+import { RouteGuard } from './components/RouteGuard'
+import OnboardingFlow from './components/OnboardingFlow'
+import WelcomePage from './components/auth/WelcomePage'
+import SignInForm from './components/auth/SignInForm'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -42,33 +50,111 @@ const mockBTIContent = [
   }
 ]
 
-// Temporary placeholder component
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
+// Landing page component
+const LandingPage: React.FC = () => (
   <div className="min-h-screen bg-black text-white flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold mb-4">{title}</h1>
-      <p className="text-gray-400">Coming soon...</p>
-      <div className="mt-6 space-y-2">
-        <a href="/bucket-demo" className="text-accent-yellow hover:underline block">
-          → Check out the Bucket Demo
-        </a>
-        <a href="/BTI" className="text-accent-yellow hover:underline block">
-          → View BTI Artist Page
-        </a>
-        <a href="/locker-demo" className="text-accent-yellow hover:underline block">
-          → Try Locker A/B/C Demo
-        </a>
+    <div className="text-center max-w-4xl mx-auto p-8">
+      <h1 className="text-6xl font-black bg-gradient-to-r from-accent-yellow via-white to-accent-yellow bg-clip-text text-transparent mb-6">
+        Bucket & MediaID
+      </h1>
+      <p className="text-2xl text-gray-400 mb-12">
+        The underground's home for exclusive content and privacy-first brand collaboration
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="glass p-8 rounded-2xl">
+          <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Fans</h3>
+          <p className="text-gray-400">Discover underground artists and unlock exclusive content</p>
+        </div>
+        <div className="glass p-8 rounded-2xl">
+          <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Artists</h3>
+          <p className="text-gray-400">Monetize your work with daily drops and subscriber tiers</p>
+        </div>
+        <div className="glass p-8 rounded-2xl">
+          <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Brands</h3>
+          <p className="text-gray-400">Connect with engaged communities through MediaID</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <a href="/catalog" className="bg-accent-yellow text-black px-8 py-4 rounded-xl font-bold hover:bg-accent-yellow/90 transition-colors">
+            Explore Artists
+          </a>
+          <a href="/welcome" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
+            Get Started
+          </a>
+        </div>
+        
+        <div className="text-sm text-gray-500">
+          Demo Links: 
+          <a href="/bucket-demo" className="text-accent-yellow hover:underline ml-2">Bucket Demo</a> |
+          <a href="/locker-demo" className="text-accent-yellow hover:underline ml-2">Locker Demo</a> |
+          <a href="/BTI" className="text-accent-yellow hover:underline ml-2">BTI Artist</a>
+        </div>
       </div>
     </div>
   </div>
 )
 
+// Dashboard wrapper component for role switching
+const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' }> = ({ initialRole }) => {
+  const [currentRole, setCurrentRole] = React.useState<'fan' | 'artist' | 'brand'>(initialRole)
+
+  const handleRoleSwitch = (role: 'fan' | 'artist' | 'brand') => {
+    setCurrentRole(role)
+  }
+
+  // Render appropriate dashboard based on current role
+  switch (currentRole) {
+    case 'fan':
+      return <FanDashboard userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+    case 'artist':
+      return <ArtistDashboardTemplateUI userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+    case 'brand':
+      return <BrandDashboardTemplateUI userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+    default:
+      return <FanDashboard userRole="fan" onRoleSwitch={handleRoleSwitch} />
+  }
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PlaceholderPage title="Bucket & MediaID" />,
+    element: <LandingPage />,
     errorElement: <ErrorBoundary />
   },
+  {
+    path: '/welcome', // New route for the original auth flow
+    element: <WelcomePage />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/login',
+    element: (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
+        <SignInForm 
+          onSuccess={(user) => {
+            const userRole = user?.user_metadata?.role || 'fan'
+            window.location.href = `/dashboard/${userRole}`
+          }}
+          onBack={() => window.location.href = '/welcome'}
+        />
+      </div>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/catalog',
+    element: <UserCatalog />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/onboarding',
+    element: <OnboardingFlow />,
+    errorElement: <ErrorBoundary />
+  },
+  // Demo Routes (Public Access)
   {
     path: '/bucket-demo',
     element: <BucketDemo />,
@@ -91,39 +177,48 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />
   },
+  // Protected Dashboard Routes
   {
-    path: '/login',
-    element: <PlaceholderPage title="Login" />,
+    path: '/dashboard/fan',
+    element: (
+      <RouteGuard allowedRoles={['fan', 'admin']} requireAuth={true}>
+        <DashboardWrapper initialRole="fan" />
+      </RouteGuard>
+    ),
     errorElement: <ErrorBoundary />
   },
   {
-    path: '/signup',
-    element: <PlaceholderPage title="Sign Up" />,
+    path: '/dashboard/artist',
+    element: (
+      <RouteGuard allowedRoles={['artist', 'admin']} requireAuth={true}>
+        <DashboardWrapper initialRole="artist" />
+      </RouteGuard>
+    ),
     errorElement: <ErrorBoundary />
   },
   {
-    path: '/onboarding',
-    element: <PlaceholderPage title="Onboarding" />,
+    path: '/dashboard/brand',
+    element: (
+      <RouteGuard allowedRoles={['brand', 'admin']} requireAuth={true}>
+        <DashboardWrapper initialRole="brand" />
+      </RouteGuard>
+    ),
     errorElement: <ErrorBoundary />
   },
+  // Unauthorized access
   {
-    path: '/artists/dashboard',
-    element: <PlaceholderPage title="Artist Dashboard" />,
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/fans/dashboard',
-    element: <PlaceholderPage title="Fan Dashboard" />,
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/brands/dashboard',
-    element: <PlaceholderPage title="Brand Dashboard" />,
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/public',
-    element: <PlaceholderPage title="Public Dashboard" />,
+    path: '/unauthorized',
+    element: (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
+          <p className="text-gray-400 mb-8">You don't have permission to access this page.</p>
+          <a href="/" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold">
+            Go Home
+          </a>
+        </div>
+      </div>
+    ),
     errorElement: <ErrorBoundary />
   }
 ])
