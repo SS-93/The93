@@ -14,6 +14,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
+    "@vercel/analytics": "^1.5.0",
     "framer-motion": "^7.10.3",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
