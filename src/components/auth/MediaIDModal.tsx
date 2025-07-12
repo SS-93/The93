@@ -1,54 +1,48 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '../../lib/supabaseClient'
 
 interface MediaIDModalProps {
   user: any
-  onComplete: (mediaIdData: any) => void
+  onComplete: (data: any) => void
   onClose: () => void
 }
 
 const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }) => {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [mediaIdData, setMediaIdData] = useState({
+  const [step, setStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({
     interests: [] as string[],
-    genrePreferences: [] as string[],
+    genres: [] as string[],
     privacySettings: {
-      dataSharing: true,
-      locationAccess: false,
-      audioCapture: false,
-      anonymousLogging: true,
-      marketingCommunications: false
-    },
-    locationCode: '',
-    contentFlags: {
-      mood: 'curious',
-      likes: [],
-      dislikes: []
+      data_sharing: true,
+      location_access: false,
+      audio_capture: false,
+      anonymous_logging: true,
+      marketing_communications: false
     }
   })
 
   const interestOptions = [
-    'Electronic Music', 'Hip Hop', 'Indie Rock', 'Jazz', 'Classical',
-    'Pop', 'R&B', 'Folk', 'Experimental', 'Ambient', 'Techno', 'House',
-    'Art & Design', 'Fashion', 'Photography', 'Film', 'Literature',
-    'Technology', 'Gaming', 'Sports', 'Travel', 'Food & Cooking'
+    '🎵 Discovering new music',
+    '🎤 Supporting independent artists', 
+    '🎧 High-quality audio',
+    '🔥 Underground scenes',
+    '📱 Exclusive content',
+    '🎬 Behind-the-scenes access',
+    '💬 Artist interactions',
+    '🎯 Early releases',
+    '🌟 Rising talent',
+    '🎹 Production insights'
   ]
 
   const genreOptions = [
-    'Trap', 'Lofi', 'Synthwave', 'Garage', 'Drum & Bass', 'UK Drill',
-    'Afrobeat', 'Reggaeton', 'K-Pop', 'Shoegaze', 'Post Rock', 'Vaporwave'
+    'Electronic', 'Hip-Hop', 'R&B', 'Indie Rock', 'Folk', 'Jazz',
+    'Synthwave', 'Lo-fi', 'Ambient', 'Experimental', 'Pop', 'Alternative'
   ]
 
-  const moodOptions = [
-    { value: 'energetic', emoji: '⚡', label: 'Energetic' },
-    { value: 'chill', emoji: '🌊', label: 'Chill' },
-    { value: 'curious', emoji: '🔍', label: 'Curious' },
-    { value: 'adventurous', emoji: '🚀', label: 'Adventurous' },
-    { value: 'introspective', emoji: '🌙', label: 'Introspective' }
-  ]
-
-  const toggleInterest = (interest: string) => {
-    setMediaIdData(prev => ({
+  const handleInterestToggle = (interest: string) => {
+    setFormData(prev => ({
       ...prev,
       interests: prev.interests.includes(interest)
         ? prev.interests.filter(i => i !== interest)
@@ -56,392 +50,253 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
     }))
   }
 
-  const toggleGenre = (genre: string) => {
-    setMediaIdData(prev => ({
+  const handleGenreToggle = (genre: string) => {
+    setFormData(prev => ({
       ...prev,
-      genrePreferences: prev.genrePreferences.includes(genre)
-        ? prev.genrePreferences.filter(g => g !== genre)
-        : [...prev.genrePreferences, genre]
+      genres: prev.genres.includes(genre)
+        ? prev.genres.filter(g => g !== genre)
+        : [...prev.genres, genre]
     }))
   }
 
-  const updatePrivacySetting = (key: string, value: boolean) => {
-    setMediaIdData(prev => ({
+  const handlePrivacyChange = (setting: string, value: boolean) => {
+    setFormData(prev => ({
       ...prev,
       privacySettings: {
         ...prev.privacySettings,
-        [key]: value
-      }
-    }))
-  }
-
-  const setMood = (mood: string) => {
-    setMediaIdData(prev => ({
-      ...prev,
-      contentFlags: {
-        ...prev.contentFlags,
-        mood
+        [setting]: value
       }
     }))
   }
 
   const handleComplete = async () => {
+    setLoading(true)
     try {
-      // Call the MediaID setup function
-      const response = await fetch('/functions/v1/mediaid-setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          interests: mediaIdData.interests,
-          genre_preferences: mediaIdData.genrePreferences,
-          location_code: mediaIdData.locationCode,
-          privacy_settings: {
-            data_sharing: mediaIdData.privacySettings.dataSharing,
-            location_access: mediaIdData.privacySettings.locationAccess,
-            audio_capture: mediaIdData.privacySettings.audioCapture,
-            anonymous_logging: mediaIdData.privacySettings.anonymousLogging,
-            marketing_communications: mediaIdData.privacySettings.marketingCommunications
-          },
-          content_flags: mediaIdData.contentFlags
-        })
-      })
-
-      const data = await response.json()
-      if (!data.success) throw new Error(data.error)
+      // Get the current session to get the access token
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
-      onComplete(mediaIdData)
+      if (sessionError || !session) {
+        throw new Error('Authentication required. Please sign in again.')
+      }
+
+      // Direct MediaID setup using Supabase client calls (bypassing Edge Function)
+      
+      // Validate interests (3-5 required)
+      if (!formData.interests || formData.interests.length < 3 || formData.interests.length > 5) {
+        throw new Error('Please select 3-5 interests')
+      }
+
+      // Update MediaID with user preferences
+      const { error: mediaIdError } = await supabase
+        .from('media_ids')
+        .upsert({
+          user_uuid: user.id,
+          interests: formData.interests,
+          genre_preferences: formData.genres || [],
+          privacy_settings: formData.privacySettings,
+          content_flags: {},
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_uuid'
+        })
+
+      if (mediaIdError) {
+        console.error('MediaID update error:', mediaIdError)
+        throw new Error('Failed to update MediaID preferences')
+      }
+
+      // Update onboarding status
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        })
+
+      if (profileError) {
+        console.error('Profile update error:', profileError)
+        throw new Error('Failed to complete onboarding')
+      }
+
+      // Log the setup completion (anonymous)
+      await supabase
+        .from('media_engagement_log')
+        .insert({
+          user_id: user.id,
+          event_type: 'mediaid_setup_completed',
+          is_anonymous: formData.privacySettings.anonymous_logging,
+          metadata: {
+            interests_count: formData.interests.length,
+            privacy_level: Object.values(formData.privacySettings).filter(Boolean).length
+          }
+        })
+
+      onComplete({ success: true, message: 'MediaID setup completed successfully' })
     } catch (error) {
       console.error('MediaID setup error:', error)
+      // Show user-friendly error message
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      alert(`Setup failed: ${errorMessage}. Please check your connection and try again.`)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const steps = [
-    {
-      title: 'Welcome to MediaID',
-      subtitle: 'Your privacy-first identity layer'
-    },
-    {
-      title: 'What interests you?',
-      subtitle: 'Select 3-5 topics that resonate with you'
-    },
-    {
-      title: 'Musical taste',
-      subtitle: 'Choose genres that move you'
-    },
-    {
-      title: 'Current mood',
-      subtitle: 'How are you feeling today?'
-    },
-    {
-      title: 'Privacy controls',
-      subtitle: 'You decide what to share'
-    }
-  ]
-
   return (
-    <AnimatePresence>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-        onClick={onClose}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-gray-900 rounded-3xl border border-gray-700/50 w-full max-w-2xl max-h-[90vh] overflow-hidden"
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-2xl bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200 rounded-3xl shadow-2xl overflow-hidden"
-        >
-          {/* MediaID Header - Distinctive Design */}
-          <div className="p-8 bg-gradient-to-r from-blue-50 to-green-50 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl flex items-center justify-center">
-                  <span className="text-white text-2xl font-bold">M</span>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-black text-blue-600">MediaID</h1>
-                  <p className="text-green-600 text-sm font-medium">Privacy-first identity</p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-300 transition-colors"
-              >
-                ×
-              </button>
+        {/* Header */}
+        <div className="p-8 border-b border-gray-700/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-2">Setup Your MediaID</h2>
+              <p className="text-gray-400">Your privacy-first identity layer</p>
             </div>
-            
-            {/* Progress Bar */}
-            <div className="mt-6">
-              <div className="flex justify-between text-xs text-gray-600 mb-2">
-                <span>Step {currentStep + 1} of {steps.length}</span>
-                <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
-              </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                  className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full"
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-            </div>
+            <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">×</button>
           </div>
+          
+          {/* Progress */}
+          <div className="flex items-center mt-6 space-x-4">
+            {[1, 2, 3].map((stepNum) => (
+              <div key={stepNum} className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                  step >= stepNum ? 'bg-accent-yellow text-black' : 'bg-gray-700 text-gray-400'
+                }`}>
+                  {stepNum}
+                </div>
+                {stepNum < 3 && <div className={`w-8 h-1 ${step > stepNum ? 'bg-accent-yellow' : 'bg-gray-700'}`} />}
+              </div>
+            ))}
+          </div>
+        </div>
 
-          {/* Content Area */}
-          <div className="p-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-black text-gray-800 mb-2">
-                {steps[currentStep].title}
-              </h2>
-              <p className="text-gray-600 text-lg">
-                {steps[currentStep].subtitle}
-              </p>
-            </div>
+        {/* Content */}
+        <div className="p-8 overflow-y-auto max-h-[60vh]">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div key="step1" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}>
+                <h3 className="text-2xl font-bold text-white mb-6">What interests you?</h3>
+                <p className="text-gray-400 mb-6">Select all that apply (minimum 3)</p>
+                
+                <div className="grid grid-cols-2 gap-3 mb-8">
+                  {interestOptions.map((interest) => (
+                    <button
+                      key={interest}
+                      onClick={() => handleInterestToggle(interest)}
+                      className={`p-4 rounded-xl text-left transition-all ${
+                        formData.interests.includes(interest)
+                          ? 'bg-accent-yellow text-black border-accent-yellow'
+                          : 'bg-gray-800/50 text-white border-gray-600/50 hover:border-gray-500'
+                      } border`}
+                    >
+                      {interest}
+                    </button>
+                  ))}
+                </div>
 
-            <AnimatePresence mode="wait">
-              {currentStep === 0 && (
-                <motion.div
-                  key="welcome"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="text-center space-y-6"
-                >
-                  <div className="w-24 h-24 mx-auto bg-gradient-to-r from-blue-100 to-green-100 rounded-3xl flex items-center justify-center">
-                    <span className="text-4xl">🔐</span>
-                  </div>
-                  <div className="max-w-md mx-auto space-y-4">
-                    <p className="text-gray-700">
-                      MediaID gives you complete control over your data and preferences. 
-                      You decide what to share, when to share it, and with whom.
-                    </p>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div className="p-3 bg-blue-50 rounded-xl">
-                        <div className="text-blue-600 text-lg mb-1">🛡️</div>
-                        <div className="font-bold text-blue-800">Private</div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setStep(2)}
+                    disabled={formData.interests.length < 3}
+                    className="bg-accent-yellow text-black font-bold px-6 py-3 rounded-xl hover:bg-accent-yellow/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div key="step2" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}>
+                <h3 className="text-2xl font-bold text-white mb-6">Favorite genres?</h3>
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {genreOptions.map((genre) => (
+                    <button
+                      key={genre}
+                      onClick={() => handleGenreToggle(genre)}
+                      className={`px-4 py-2 rounded-full transition-all ${
+                        formData.genres.includes(genre)
+                          ? 'bg-accent-yellow text-black'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      {genre}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex justify-between">
+                  <button onClick={() => setStep(1)} className="px-6 py-3 text-gray-400 hover:text-white">
+                    Back
+                  </button>
+                  <button onClick={() => setStep(3)} className="bg-accent-yellow text-black font-bold px-6 py-3 rounded-xl hover:bg-accent-yellow/90">
+                    Continue
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}>
+                <h3 className="text-2xl font-bold text-white mb-6">Privacy Controls</h3>
+                <p className="text-gray-400 mb-6">You control your data. Change these anytime.</p>
+
+                <div className="space-y-4 mb-8">
+                  {[
+                    { key: 'data_sharing', title: 'Data Sharing', desc: 'Share anonymized data for recommendations' },
+                    { key: 'location_access', title: 'Location Access', desc: 'For local events and discovery' },
+                    { key: 'audio_capture', title: 'Audio Recognition', desc: 'Music identification features' },
+                    { key: 'anonymous_logging', title: 'Usage Analytics', desc: 'Help improve the platform' },
+                    { key: 'marketing_communications', title: 'Updates', desc: 'New features and releases' }
+                  ].map((setting) => (
+                    <div key={setting.key} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <div>
+                        <h4 className="font-medium text-white">{setting.title}</h4>
+                        <p className="text-sm text-gray-400">{setting.desc}</p>
                       </div>
-                      <div className="p-3 bg-green-50 rounded-xl">
-                        <div className="text-green-600 text-lg mb-1">⚡</div>
-                        <div className="font-bold text-green-800">Fast</div>
-                      </div>
-                      <div className="p-3 bg-purple-50 rounded-xl">
-                        <div className="text-purple-600 text-lg mb-1">🎯</div>
-                        <div className="font-bold text-purple-800">Personal</div>
-                      </div>
+                      <button
+                        onClick={() => handlePrivacyChange(setting.key, !formData.privacySettings[setting.key as keyof typeof formData.privacySettings])}
+                        className={`w-12 h-6 rounded-full transition-colors ${
+                          formData.privacySettings[setting.key as keyof typeof formData.privacySettings] 
+                            ? 'bg-accent-yellow' : 'bg-gray-600'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                          formData.privacySettings[setting.key as keyof typeof formData.privacySettings] 
+                            ? 'translate-x-7' : 'translate-x-1'
+                        }`} />
+                      </button>
                     </div>
-                  </div>
-                </motion.div>
-              )}
+                  ))}
+                </div>
 
-              {currentStep === 1 && (
-                <motion.div
-                  key="interests"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="grid grid-cols-3 gap-3 max-h-64 overflow-y-auto">
-                    {interestOptions.map((interest) => (
-                      <motion.button
-                        key={interest}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => toggleInterest(interest)}
-                        className={`p-3 rounded-2xl border-2 text-sm font-medium transition-all ${
-                          mediaIdData.interests.includes(interest)
-                            ? 'bg-blue-100 border-blue-400 text-blue-800'
-                            : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
-                        }`}
-                      >
-                        {interest}
-                      </motion.button>
-                    ))}
-                  </div>
-                  <p className="text-center text-sm text-gray-600">
-                    Selected: {mediaIdData.interests.length} / 5
-                  </p>
-                </motion.div>
-              )}
-
-              {currentStep === 2 && (
-                <motion.div
-                  key="genres"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="grid grid-cols-4 gap-3">
-                    {genreOptions.map((genre) => (
-                      <motion.button
-                        key={genre}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => toggleGenre(genre)}
-                        className={`p-3 rounded-2xl border-2 text-sm font-medium transition-all ${
-                          mediaIdData.genrePreferences.includes(genre)
-                            ? 'bg-green-100 border-green-400 text-green-800'
-                            : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
-                        }`}
-                      >
-                        {genre}
-                      </motion.button>
-                    ))}
-                  </div>
-                  <p className="text-center text-sm text-gray-600">
-                    Selected: {mediaIdData.genrePreferences.length} genres
-                  </p>
-                </motion.div>
-              )}
-
-              {currentStep === 3 && (
-                <motion.div
-                  key="mood"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="grid grid-cols-5 gap-4">
-                    {moodOptions.map((mood) => (
-                      <motion.button
-                        key={mood.value}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => setMood(mood.value)}
-                        className={`p-6 rounded-3xl border-2 text-center transition-all ${
-                          mediaIdData.contentFlags.mood === mood.value
-                            ? 'bg-purple-100 border-purple-400 scale-110'
-                            : 'bg-gray-50 border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <div className="text-3xl mb-2">{mood.emoji}</div>
-                        <div className="text-sm font-bold text-gray-800">{mood.label}</div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {currentStep === 4 && (
-                <motion.div
-                  key="privacy"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="space-y-4">
-                    {[
-                      {
-                        key: 'dataSharing',
-                        title: 'Anonymous Data Sharing',
-                        description: 'Share aggregated preferences to improve recommendations',
-                        recommended: true
-                      },
-                      {
-                        key: 'locationAccess',
-                        title: 'Location Access',
-                        description: 'Allow location-based content and event discovery',
-                        recommended: false
-                      },
-                      {
-                        key: 'audioCapture',
-                        title: 'Audio Fingerprinting',
-                        description: 'Detect music you\'re listening to for better matching',
-                        recommended: false
-                      },
-                      {
-                        key: 'anonymousLogging',
-                        title: 'Anonymous Activity Logging',
-                        description: 'Track interactions to personalize your experience',
-                        recommended: true
-                      },
-                      {
-                        key: 'marketingCommunications',
-                        title: 'Marketing Communications',
-                        description: 'Receive updates about new artists and features',
-                        recommended: false
-                      }
-                    ].map((setting) => (
-                      <div
-                        key={setting.key}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-200"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <h4 className="font-bold text-gray-800">{setting.title}</h4>
-                            {setting.recommended && (
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                Recommended
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">{setting.description}</p>
-                        </div>
-                        <button
-                          onClick={() => updatePrivacySetting(setting.key, !mediaIdData.privacySettings[setting.key as keyof typeof mediaIdData.privacySettings])}
-                          className={`w-12 h-7 rounded-full transition-colors relative ${
-                            mediaIdData.privacySettings[setting.key as keyof typeof mediaIdData.privacySettings]
-                              ? 'bg-green-500'
-                              : 'bg-gray-300'
-                          }`}
-                        >
-                          <div
-                            className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-transform ${
-                              mediaIdData.privacySettings[setting.key as keyof typeof mediaIdData.privacySettings]
-                                ? 'translate-x-6'
-                                : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Navigation */}
-            <div className="flex justify-between mt-8">
-              <button
-                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-                disabled={currentStep === 0}
-                className="px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl disabled:opacity-50 hover:bg-gray-300 transition-colors"
-              >
-                Previous
-              </button>
-
-              {currentStep < steps.length - 1 ? (
-                <button
-                  onClick={() => setCurrentStep(currentStep + 1)}
-                  disabled={
-                    (currentStep === 1 && mediaIdData.interests.length < 3) ||
-                    (currentStep === 2 && mediaIdData.genrePreferences.length === 0)
-                  }
-                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-green-600 transition-all disabled:opacity-50"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  onClick={handleComplete}
-                  className="px-8 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-green-600 transition-all"
-                >
-                  Complete Setup
-                </button>
-              )}
-            </div>
-          </div>
-        </motion.div>
+                <div className="flex justify-between">
+                  <button onClick={() => setStep(2)} className="px-6 py-3 text-gray-400 hover:text-white">
+                    Back
+                  </button>
+                  <button
+                    onClick={handleComplete}
+                    disabled={loading}
+                    className="bg-accent-yellow text-black font-bold px-8 py-3 rounded-xl hover:bg-accent-yellow/90 transition-colors disabled:opacity-50"
+                  >
+                    {loading ? 'Setting up...' : 'Complete Setup'}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
-    </AnimatePresence>
+    </div>
   )
 }
 
-export default MediaIDModal 
+export default MediaIDModal
