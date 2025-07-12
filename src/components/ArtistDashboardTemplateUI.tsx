@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import ArtistUploadManager from './ArtistUploadManager'
 
 // Mock data for artist analytics
 const mockArtistData = {
@@ -50,15 +51,52 @@ const mockArtistData = {
 
 interface ArtistDashboardProps {
   artistData?: any
+  userRole?: 'fan' | 'artist' | 'brand'
+  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand') => void
 }
 
 const ArtistDashboardTemplateUI: React.FC<ArtistDashboardProps> = ({ 
-  artistData = mockArtistData 
+  artistData = mockArtistData,
+  userRole = 'artist',
+  onRoleSwitch
 }) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('30d')
+  const [showUploadManager, setShowUploadManager] = useState(false)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
+      {/* Header with Role Switcher */}
+      {onRoleSwitch && (
+        <header className="glass border-b border-white/10 p-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold text-accent-yellow">Bucket</h1>
+              <div className="h-6 w-px bg-gray-600"></div>
+              <span className="text-gray-300">Artist Dashboard</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Role Switcher */}
+              <div className="flex items-center gap-1 glass rounded-lg p-1">
+                {(['fan', 'artist', 'brand'] as const).map((role) => (
+                  <button
+                    key={role}
+                    onClick={() => onRoleSwitch(role)}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors capitalize ${
+                      userRole === role 
+                        ? 'bg-accent-yellow text-black' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </header>
+      )}
+
       {/* Header with massive spacing */}
       <div className="p-16">
         <div className="flex items-center justify-between mb-20">
@@ -81,21 +119,31 @@ const ArtistDashboardTemplateUI: React.FC<ArtistDashboardProps> = ({
             </div>
           </div>
           
-          {/* Time Filter */}
-          <div className="flex space-x-4">
-            {['7d', '30d', '90d'].map((period) => (
-              <button
-                key={period}
-                onClick={() => setSelectedTimeframe(period)}
-                className={`px-8 py-4 rounded-2xl text-xl font-bold transition-all transform hover:scale-105 ${
-                  selectedTimeframe === period
-                    ? 'bg-green-500 text-black shadow-xl'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                {period}
-              </button>
-            ))}
+          {/* Actions & Time Filter */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowUploadManager(true)}
+              className="bg-accent-yellow text-black font-bold px-6 py-4 rounded-2xl text-lg transition-all transform hover:scale-105 shadow-xl flex items-center space-x-2"
+            >
+              <span>📁</span>
+              <span>Upload Content</span>
+            </button>
+            
+            <div className="flex space-x-4">
+              {['7d', '30d', '90d'].map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setSelectedTimeframe(period)}
+                  className={`px-8 py-4 rounded-2xl text-xl font-bold transition-all transform hover:scale-105 ${
+                    selectedTimeframe === period
+                      ? 'bg-green-500 text-black shadow-xl'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -374,6 +422,18 @@ const ArtistDashboardTemplateUI: React.FC<ArtistDashboardProps> = ({
           </motion.div>
         </div>
       </div>
+
+      {/* Upload Manager Modal */}
+      {showUploadManager && (
+        <ArtistUploadManager
+          onUploadComplete={(files) => {
+            console.log('Upload completed:', files)
+            setShowUploadManager(false)
+            // Refresh dashboard data here
+          }}
+          onClose={() => setShowUploadManager(false)}
+        />
+      )}
     </div>
   )
 }

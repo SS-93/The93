@@ -118,7 +118,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ onSuccess, onBack }) => {
               const email = (e.target as any).email.value
               handleForgotPassword(email)
             }}
-            className="space-y-6"
+            className="space-y-6"                                                                                                                                                                                             
           >
             <div>
               <label className="block text-gray-300 font-medium mb-2">Email Address</label>

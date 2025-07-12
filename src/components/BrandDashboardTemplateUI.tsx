@@ -43,10 +43,14 @@ const mockBrandData = {
 
 interface BrandDashboardProps {
   brandData?: any
+  userRole?: 'fan' | 'artist' | 'brand'
+  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand') => void
 }
 
 const BrandDashboardTemplateUI: React.FC<BrandDashboardProps> = ({ 
-  brandData = mockBrandData 
+  brandData = mockBrandData,
+  userRole = 'brand',
+  onRoleSwitch
 }) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('30d')
 
@@ -316,6 +320,38 @@ const BrandDashboardTemplateUI: React.FC<BrandDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
+      {/* Header with Role Switcher */}
+      {onRoleSwitch && (
+        <header className="glass border-b border-white/10 p-4 mb-8">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold text-accent-yellow">Bucket</h1>
+              <div className="h-6 w-px bg-gray-600"></div>
+              <span className="text-gray-300">Brand Dashboard</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Role Switcher */}
+              <div className="flex items-center gap-1 glass rounded-lg p-1">
+                {(['fan', 'artist', 'brand'] as const).map((role) => (
+                  <button
+                    key={role}
+                    onClick={() => onRoleSwitch(role)}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors capitalize ${
+                      userRole === role 
+                        ? 'bg-accent-yellow text-black' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </header>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-12">
         <div className="flex items-center space-x-6">
