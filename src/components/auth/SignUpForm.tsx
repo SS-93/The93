@@ -1,216 +1,171 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { signUp, signInWithOAuth } from '../../lib/auth'
+import SignUpForm from './SignUpForm'
+import SignInForm from './SignInForm'
+import MediaIDModal from './MediaIDModal'
 
-interface SignUpFormProps {
-  onSuccess: (user: any) => void
-  onBack: () => void
-  defaultRole?: 'fan' | 'artist' | 'brand'
-}
+const WelcomePage: React.FC = () => {
+  const [activeForm, setActiveForm] = useState<'signup' | 'signin' | null>(null)
+  const [showMediaIDModal, setShowMediaIDModal] = useState(false)
+  const [newUser, setNewUser] = useState<any>(null)
 
-const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole = 'fan' }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    displayName: '',
-    role: defaultRole
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-
-    if (!formData.displayName.trim()) {
-      setError('Display name is required')
-      return
-    }
-
-    setLoading(true)
-    try {
-      // Create user with metadata
-      const userMetadata = {
-        display_name: formData.displayName,
-        role: formData.role
-      }
-      
-      const { data, error } = await signUp(formData.email, formData.password, userMetadata)
-      if (error) throw error
-      
-      // User created successfully, trigger MediaID setup
-      onSuccess(data.user)
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account')
-    } finally {
-      setLoading(false)
-    }
+  const handleSignUpSuccess = (user: any) => {
+    setNewUser(user)
+    setActiveForm(null)
+    setShowMediaIDModal(true)
   }
 
-  const handleOAuth = async (provider: 'google' | 'facebook') => {
-    setLoading(true)
-    try {
-      const { data, error } = await signInWithOAuth(provider)
-      if (error) throw error
-      onSuccess(data)
-    } catch (err: any) {
-      setError(err.message || `Failed to sign up with ${provider}`)
-    } finally {
-      setLoading(false)
-    }
+  const handleMediaIDComplete = (mediaIdData: any) => {
+    console.log('MediaID setup complete:', mediaIdData)
+    setShowMediaIDModal(false)
+    // Redirect to appropriate dashboard based on user role
+    const userRole = newUser?.user_metadata?.role || 'fan'
+    window.location.href = `/dashboard/${userRole}`
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative p-8 bg-gray-800/50 backdrop-blur-xl rounded-3xl border border-gray-700/50"
-    >
-      <button
-        onClick={onBack}
-        className="absolute top-6 left-6 w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center text-white hover:bg-gray-600 transition-colors"
-      >
-        ←
-      </button>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-purple-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-48 h-48 bg-blue-500 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-green-500 rounded-full blur-3xl"></div>
+        </div>
 
-      <div className="text-center mb-8 pt-4">
-        <h2 className="text-3xl font-bold text-white mb-2">Create Your Account</h2>
-        <p className="text-gray-400">Join thousands of artists and fans on Bucket</p>
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
+          {!activeForm ? (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center max-w-4xl"
+            >
+              {/* Logo & Title */}
+              <div className="mb-12">
+                <h1 className="text-7xl font-black mb-4">
+                  <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                    Bucket
+                  </span>
+                  <span className="text-white mx-4">&</span>
+                  <span className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+                    MediaID
+                  </span>
+                </h1>
+                <p className="text-2xl text-gray-300 mb-8">
+                  Where artists monetize creativity through authentic fan connections
+                </p>
+                <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+                  Join the platform where daily drops, subscription tiers, and privacy-first brand collaborations 
+                  create sustainable revenue for independent artists.
+                </p>
+              </div>
+
+              {/* Value Props */}
+              <div className="grid grid-cols-3 gap-8 mb-16">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="p-8 bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50"
+                >
+                  <div className="text-4xl mb-4">🎵</div>
+                  <h3 className="text-xl font-bold text-white mb-2">Daily Artist Drops</h3>
+                  <p className="text-gray-400">Exclusive content unlocked each day for subscribers</p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="p-8 bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50"
+                >
+                  <div className="text-4xl mb-4">🔒</div>
+                  <h3 className="text-xl font-bold text-white mb-2">Privacy-First</h3>
+                  <p className="text-gray-400">MediaID gives you full control over your data</p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="p-8 bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-gray-700/50"
+                >
+                  <div className="text-4xl mb-4">🤝</div>
+                  <h3 className="text-xl font-bold text-white mb-2">Cultural Collabs</h3>
+                  <p className="text-gray-400">Authentic brand partnerships, not advertisements</p>
+                </motion.div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <button
+                    onClick={() => setActiveForm('signup')}
+                    className="w-full bg-accent-yellow text-black font-bold py-4 rounded-xl hover:bg-accent-yellow/90 transition-colors"
+                  >
+                    Create Fan Account
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveForm('signin')}
+                    className="w-full bg-gray-800 text-white font-bold py-4 rounded-xl hover:bg-gray-700 transition-colors border border-gray-600"
+                  >
+                    Sign In to Dashboard
+                  </button>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <p className="text-gray-500 text-sm mb-3">
+                    Looking for a different experience?
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <a href="/artist/login" className="text-green-400 hover:underline text-sm font-medium">
+                      🎤 Artist Portal
+                    </a>
+                    <a href="/brand/login" className="text-blue-400 hover:underline text-sm font-medium">
+                      🏢 Brand Portal
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-md"
+            >
+              {activeForm === 'signup' && (
+                <SignUpForm 
+                  onSuccess={handleSignUpSuccess}
+                  onBack={() => setActiveForm(null)}
+                />
+              )}
+              
+              {activeForm === 'signin' && (
+                <SignInForm 
+                  onSuccess={(user) => {
+                    const userRole = user?.user_metadata?.role || 'fan'
+                    window.location.href = `/dashboard/${userRole}`
+                  }}
+                  onBack={() => setActiveForm(null)}
+                />
+              )}
+            </motion.div>
+          )}
+        </div>
       </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400">
-          {error}
-        </div>
+      {/* MediaID Modal */}
+      {showMediaIDModal && (
+        <MediaIDModal
+          user={newUser}
+          onComplete={handleMediaIDComplete}
+          onClose={() => setShowMediaIDModal(false)}
+        />
       )}
-
-      {/* Social Login */}
-      <div className="space-y-4 mb-8">
-        <button
-          onClick={() => handleOAuth('google')}
-          disabled={loading}
-          className="w-full p-4 bg-white text-gray-800 font-bold rounded-xl hover:bg-gray-100 transition-all flex items-center justify-center space-x-3 disabled:opacity-50"
-        >
-          <span className="text-xl">🔍</span>
-          <span>Continue with Google</span>
-        </button>
-        
-        <button
-          onClick={() => handleOAuth('facebook')}
-          disabled={loading}
-          className="w-full p-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center space-x-3 disabled:opacity-50"
-        >
-          <span className="text-xl">📘</span>
-          <span>Continue with Facebook</span>
-        </button>
-      </div>
-
-      <div className="flex items-center space-x-4 mb-8">
-        <div className="flex-1 h-px bg-gray-600"></div>
-        <span className="text-gray-400 text-sm">or create with email</span>
-        <div className="flex-1 h-px bg-gray-600"></div>
-      </div>
-
-      {/* Email Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-gray-300 font-medium mb-2">Display Name</label>
-          <input
-            type="text"
-            required
-            value={formData.displayName}
-            onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-            className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none transition-colors"
-            placeholder="Your name or artist name"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-300 font-medium mb-2">I am a...</label>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { value: 'fan', label: 'Fan', emoji: '🎵' },
-              { value: 'artist', label: 'Artist', emoji: '🎤' },
-              { value: 'brand', label: 'Brand', emoji: '🏢' }
-            ].map((role) => (
-              <button
-                key={role.value}
-                type="button"
-                onClick={() => setFormData({ ...formData, role: role.value as any })}
-                className={`p-3 rounded-xl border-2 transition-all ${
-                  formData.role === role.value
-                    ? 'bg-purple-500/20 border-purple-400 text-white'
-                    : 'bg-gray-700/50 border-gray-600 text-gray-400 hover:border-gray-500'
-                }`}
-              >
-                <div className="text-lg">{role.emoji}</div>
-                <div className="text-sm font-medium">{role.label}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-gray-300 font-medium mb-2">Email Address</label>
-          <input
-            type="email"
-            required
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none transition-colors"
-            placeholder="your@email.com"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-300 font-medium mb-2">Password</label>
-          <input
-            type="password"
-            required
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none transition-colors"
-            placeholder="Create a strong password"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-300 font-medium mb-2">Confirm Password</label>
-          <input
-            type="password"
-            required
-            value={formData.confirmPassword}
-            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none transition-colors"
-            placeholder="Confirm your password"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full p-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Creating Account...' : 'Create Account'}
-        </button>
-      </form>
-
-      <p className="text-center text-gray-400 text-sm mt-6">
-        By signing up, you agree to our Terms of Service and Privacy Policy
-      </p>
-    </motion.div>
+    </>
   )
 }
 
-export default SignUpForm 
+export default WelcomePage 
