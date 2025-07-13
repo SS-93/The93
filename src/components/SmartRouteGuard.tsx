@@ -18,9 +18,19 @@ export const SmartRouteGuard: React.FC<SmartRouteGuardProps> = ({
   requireOnboarding = true
 }) => {
   const { user, loading: authLoading } = useAuth()
+  
+  // Always call useProfileRouting (React hooks must be called unconditionally)
   const { profileState, loading: profileLoading } = useProfileRouting()
 
-  // Show loading while checking auth and profile state
+  // For public routes (requireAuth=false), only show auth loading and ignore profile routing
+  if (!requireAuth) {
+    if (authLoading) {
+      return <LoadingState message="Loading..." />
+    }
+    return <>{children}</>
+  }
+
+  // For protected routes, show loading while checking auth and profile state
   if (authLoading || profileLoading) {
     return <LoadingState message="Loading your profile..." />
   }
