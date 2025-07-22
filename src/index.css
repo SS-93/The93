@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* Enhanced base styles */
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -11,6 +12,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'rlig' 1, 'calt' 1; /* Better character spacing */
 }
 
 code {
@@ -23,4 +25,47 @@ code {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Typography Utilities */
+@layer utilities {
+  /* Text gradients for premium feel */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-accent-yellow via-yellow-400 to-accent-yellow bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent;
+  }
+
+  /* Text balancing for better readability */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Optical alignment for large text */
+  .text-optical {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Premium button typography */
+  .btn-text {
+    @apply text-ui-md font-medium tracking-tight;
+  }
+  
+  /* Card title styling */
+  .card-title {
+    @apply text-heading-sm text-semantic-text-primary font-semibold tracking-tight;
+  }
+  
+  /* Meta text styling */
+  .meta-text {
+    @apply text-caption-md text-semantic-text-tertiary font-medium;
+  }
 }
