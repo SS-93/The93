@@ -16,8 +16,12 @@ import { AutoRouter } from './components/AutoRouter'
 import OnboardingFlow from './components/OnboardingFlow'
 import WelcomePage from './components/auth/WelcomePage'
 import SignInForm from './components/auth/SignInForm'
+import ResetPasswordForm from './components/auth/ResetPasswordForm'
 import ArtistLogin from './components/auth/ArtistLogin'
 import BrandLogin from './components/auth/BrandLogin'
+import DeveloperLogin from './components/auth/DeveloperLogin'
+import DeveloperDashboard from './components/DeveloperDashboard'
+import TestDashboard from './components/TestDashboard'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -64,7 +68,7 @@ const LandingPage: React.FC = () => (
         The underground's home for exclusive content and privacy-first brand collaboration
       </p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
         <div className="glass p-8 rounded-2xl">
           <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Fans</h3>
           <p className="text-gray-400 mb-6">Discover underground artists and unlock exclusive content</p>
@@ -86,6 +90,13 @@ const LandingPage: React.FC = () => (
             Brand Portal
           </a>
         </div>
+        <div className="glass p-8 rounded-2xl border border-purple-200/20">
+          <h3 className="text-2xl font-bold text-purple-400 mb-4">For Developers</h3>
+          <p className="text-gray-400 mb-6">Build privacy-first experiences with MediaID APIs</p>
+          <a href="/developer/login" className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:from-purple-600 hover:to-purple-700 transition-colors inline-block">
+            Developer Portal
+          </a>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -102,7 +113,8 @@ const LandingPage: React.FC = () => (
           Demo Links: 
           <a href="/bucket-demo" className="text-accent-yellow hover:underline ml-2">Bucket Demo</a> |
           <a href="/locker-demo" className="text-accent-yellow hover:underline ml-2">Locker Demo</a> |
-          <a href="/BTI" className="text-accent-yellow hover:underline ml-2">BTI Artist</a>
+          <a href="/BTI" className="text-accent-yellow hover:underline ml-2">BTI Artist</a> |
+          <a href="/test" className="text-accent-yellow hover:underline ml-2">🧪 Test Dashboard</a>
         </div>
       </div>
     </div>
@@ -110,10 +122,10 @@ const LandingPage: React.FC = () => (
 )
 
 // Dashboard wrapper component for role switching
-const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' }> = ({ initialRole }) => {
-  const [currentRole, setCurrentRole] = React.useState<'fan' | 'artist' | 'brand'>(initialRole)
+const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' | 'developer' }> = ({ initialRole }) => {
+  const [currentRole, setCurrentRole] = React.useState<'fan' | 'artist' | 'brand' | 'developer'>(initialRole)
 
-  const handleRoleSwitch = (role: 'fan' | 'artist' | 'brand') => {
+  const handleRoleSwitch = (role: 'fan' | 'artist' | 'brand' | 'developer') => {
     setCurrentRole(role)
   }
 
@@ -125,6 +137,8 @@ const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' }> = 
       return <ArtistDashboardTemplateUI userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
     case 'brand':
       return <BrandDashboardTemplateUI userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+    case 'developer':
+      return <DeveloperDashboard userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
     default:
       return <FanDashboard userRole="fan" onRoleSwitch={handleRoleSwitch} />
   }
@@ -134,6 +148,12 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+    errorElement: <ErrorBoundary />
+  },
+  // Test route for development - bypasses all auth guards
+  {
+    path: '/test',
+    element: <TestDashboard />,
     errorElement: <ErrorBoundary />
   },
   {
@@ -167,6 +187,15 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />
   },
+  {
+    path: '/reset-password',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <ResetPasswordForm />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
   // Separate login flows
   {
     path: '/artist/login',
@@ -182,6 +211,15 @@ const router = createBrowserRouter([
     element: (
       <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
         <BrandLogin />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/developer/login',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <DeveloperLogin />
       </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
@@ -254,6 +292,15 @@ const router = createBrowserRouter([
     element: (
       <SmartRouteGuard allowedRoles={['brand', 'admin']} requireAuth={true} requireOnboarding={true}>
         <DashboardWrapper initialRole="brand" />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/dashboard/developer',
+    element: (
+      <SmartRouteGuard allowedRoles={['developer', 'admin']} requireAuth={true} requireOnboarding={true}>
+        <DashboardWrapper initialRole="developer" />
       </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />

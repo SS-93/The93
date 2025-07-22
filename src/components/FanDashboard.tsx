@@ -30,9 +30,9 @@ interface Activity {
 }
 
 interface FanDashboardProps {
-  userRole?: 'fan' | 'artist' | 'brand'
+  userRole?: 'fan' | 'artist' | 'brand' | 'developer'
   userName?: string
-  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand') => void
+  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand' | 'developer') => void
 }
 
 // Mock data
@@ -278,7 +278,7 @@ const FanDashboard: React.FC<FanDashboardProps> = ({
 
             {/* Role Switcher */}
             <div className="flex items-center gap-1 glass rounded-lg p-1">
-              {(['fan', 'artist', 'brand'] as const).map((role) => (
+              {(['fan', 'artist', 'brand', 'developer'] as const).map((role) => (
                 <button
                   key={role}
                   onClick={() => onRoleSwitch?.(role)}

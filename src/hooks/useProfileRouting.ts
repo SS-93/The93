@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 
 interface ProfileState {
   hasCompletedOnboarding: boolean
-  selectedRole: 'fan' | 'artist' | 'brand' | null
+  selectedRole: 'fan' | 'artist' | 'brand' | 'developer' | null
   hasMediaID: boolean
   loading: boolean
   databaseAvailable: boolean
