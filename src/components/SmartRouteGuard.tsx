@@ -6,7 +6,7 @@ import LoadingState from './LoadingState'
 
 interface SmartRouteGuardProps {
   children: React.ReactNode
-  allowedRoles?: ('fan' | 'artist' | 'brand' | 'admin')[]
+  allowedRoles?: ('fan' | 'artist' | 'brand' | 'developer' | 'admin')[]
   requireAuth?: boolean
   requireOnboarding?: boolean
 }

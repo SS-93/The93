@@ -29,8 +29,8 @@ interface Artist {
 }
 
 interface UserCatalogProps {
-  userRole?: 'fan' | 'artist' | 'brand'
-  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand') => void
+  userRole?: 'fan' | 'artist' | 'brand' | 'developer'
+  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand' | 'developer') => void
 }
 
 // Mock underground artists data
@@ -216,7 +216,7 @@ const UserCatalog: React.FC<UserCatalogProps> = ({ userRole = 'fan', onRoleSwitc
             <div className="flex items-center gap-4">
               {/* Role Switcher */}
               <div className="flex items-center gap-1 glass rounded-lg p-1">
-                {(['fan', 'artist', 'brand'] as const).map((role) => (
+                {(['fan', 'artist', 'brand', 'developer'] as const).map((role) => (
                   <button
                     key={role}
                     onClick={() => onRoleSwitch(role)}
