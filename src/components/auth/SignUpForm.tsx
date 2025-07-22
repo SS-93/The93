@@ -5,7 +5,7 @@ import { signUp, signInWithOAuth } from '../../lib/auth'
 interface SignUpFormProps {
   onSuccess: (user: any) => void
   onBack: () => void
-  defaultRole?: 'fan' | 'artist' | 'brand'
+  defaultRole?: 'fan' | 'artist' | 'brand' | 'developer'
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole = 'fan' }) => {
@@ -66,6 +66,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
     switch (role) {
       case 'artist': return 'text-green-400'
       case 'brand': return 'text-blue-400'
+      case 'developer': return 'text-purple-400'
       default: return 'text-accent-yellow'
     }
   }
@@ -74,6 +75,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
     switch (role) {
       case 'artist': return '🎤'
       case 'brand': return '🏢'
+      case 'developer': return '⚡'
       default: return '🎧'
     }
   }
@@ -109,11 +111,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
       {/* Role Selection */}
       <div className="mb-6">
         <label className="block text-gray-300 font-medium mb-3">Account Type</label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {[
             { value: 'fan', label: 'Fan', icon: '🎧' },
             { value: 'artist', label: 'Artist', icon: '🎤' },
-            { value: 'brand', label: 'Brand', icon: '🏢' }
+            { value: 'brand', label: 'Brand', icon: '🏢' },
+            { value: 'developer', label: 'Developer', icon: '⚡' }
           ].map((role) => (
             <button
               key={role.value}

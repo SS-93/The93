@@ -14,7 +14,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const [formData, setFormData] = useState({
     interests: [] as string[],
     genres: [] as string[],
-    selectedRole: 'fan' as 'fan' | 'artist' | 'brand', // Add role selection
+    selectedRole: 'fan' as 'fan' | 'artist' | 'brand' | 'developer', // Add role selection including developer
     privacySettings: {
       data_sharing: true,
       location_access: false,
@@ -73,7 +73,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     }))
   }
 
-  const handleRoleSelect = (role: 'fan' | 'artist' | 'brand') => {
+  const handleRoleSelect = (role: 'fan' | 'artist' | 'brand' | 'developer') => {
     setFormData(prev => ({ ...prev, selectedRole: role }))
   }
 
@@ -395,7 +395,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
                       title: '🏢 Brand Dashboard',
                       description: 'Connect with audiences through privacy-first brand collaborations',
                       features: ['Campaign management', 'Audience insights', 'MediaID targeting']
-                    }
+                    },
+                    {
+                      role: 'developer' as const,
+                      title: '⚡ Developer Portal',
+                      description: 'Build privacy-first experiences with MediaID APIs',
+                      features: ['OAuth2 API access', 'User preference data', 'Privacy-first integrations']
+                    }  
+                    
                   ].map((option) => (
                     <button
                       key={option.role}
