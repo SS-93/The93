@@ -21,7 +21,7 @@ export interface MediaIDData {
 export interface MediaIDProfile {
   id: string
   user_uuid: string
-  role: 'fan' | 'artist' | 'brand' | 'developer'
+  role: 'fan' | 'artist' | 'brand' | 'developer'| 'admin'
   interests: string[]
   genre_preferences: string[]
   content_flags: any
@@ -34,7 +34,7 @@ export interface MediaIDProfile {
   updated_at: string
 }
 
-export const setupMediaID = async (data: MediaIDData, role: 'fan' | 'artist' | 'brand' | 'developer' = 'fan') => {
+export const setupMediaID = async (data: MediaIDData, role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin' = 'fan') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
@@ -89,7 +89,7 @@ export const setupMediaID = async (data: MediaIDData, role: 'fan' | 'artist' | '
   }
 }
 
-export const getMediaIDProfile = async (role?: 'fan' | 'artist' | 'brand' | 'developer'): Promise<MediaIDProfile | null> => {
+export const getMediaIDProfile = async (role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'): Promise<MediaIDProfile | null> => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
@@ -152,7 +152,7 @@ export const getAllMediaIDProfiles = async (): Promise<MediaIDProfile[]> => {
   }
 }
 
-export const updateMediaIDPreferences = async (preferences: Partial<MediaIDData>, role: 'fan' | 'artist' | 'brand' | 'developer') => {
+export const updateMediaIDPreferences = async (preferences: Partial<MediaIDData>, role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
@@ -201,7 +201,7 @@ export const updateMediaIDPreferences = async (preferences: Partial<MediaIDData>
   }
 }
 
-export const switchMediaIDRole = async (newRole: 'fan' | 'artist' | 'brand' | 'developer') => {
+export const switchMediaIDRole = async (newRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
@@ -246,7 +246,7 @@ export const switchMediaIDRole = async (newRole: 'fan' | 'artist' | 'brand' | 'd
   }
 }
 
-export const deactivateMediaIDRole = async (role: 'fan' | 'artist' | 'brand' | 'developer') => {
+export const deactivateMediaIDRole = async (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
@@ -273,7 +273,7 @@ export const deactivateMediaIDRole = async (role: 'fan' | 'artist' | 'brand' | '
   }
 }
 
-export const logMediaEngagement = async (contentId: string, eventType: string, metadata?: any, role?: 'fan' | 'artist' | 'brand' | 'developer') => {
+export const logMediaEngagement = async (contentId: string, eventType: string, metadata?: any, role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -318,7 +318,7 @@ export const clearEngagementHistory = async () => {
   }
 }
 
-export const getEngagementHistory = async (limit = 100, role?: 'fan' | 'artist' | 'brand' | 'developer') => {
+export const getEngagementHistory = async (limit = 100, role?: 'fan' | 'artist' | 'brand' | 'developer'| 'admin') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
@@ -346,7 +346,7 @@ export const getEngagementHistory = async (limit = 100, role?: 'fan' | 'artist' 
   }
 }
 
-export const generateRecommendations = async (type: 'artists' | 'content' | 'brands', role: 'fan' | 'artist' | 'brand' | 'developer' = 'fan') => {
+export const generateRecommendations = async (type: 'artists' | 'content' | 'brands', role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin' = 'fan') => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
@@ -372,7 +372,7 @@ export const generateRecommendations = async (type: 'artists' | 'content' | 'bra
 }
 
 // New helper functions for multi-role management
-export const getUserAvailableRoles = async (): Promise<('fan' | 'artist' | 'brand' | 'developer')[]> => {
+export const getUserAvailableRoles = async (): Promise<('fan' | 'artist' | 'brand' | 'developer' | 'admin')[]> => {
   try {
     const profiles = await getAllMediaIDProfiles()
     return profiles.map(profile => profile.role)
@@ -382,7 +382,7 @@ export const getUserAvailableRoles = async (): Promise<('fan' | 'artist' | 'bran
   }
 }
 
-export const checkRoleSetupRequired = async (role: 'fan' | 'artist' | 'brand' | 'developer'): Promise<boolean> => {
+export const checkRoleSetupRequired = async (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'): Promise<boolean> => {
   try {
     const profile = await getMediaIDProfile(role)
     return !profile
