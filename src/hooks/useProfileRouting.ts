@@ -14,14 +14,14 @@ interface ProfileState {
   selectedRole: 'fan' | 'artist' | 'brand' | 'developer' | null
   hasMediaID: boolean
   hasRoleSpecificMediaID: boolean
-  availableRoles: ('fan' | 'artist' | 'brand' | 'developer')[]
+  availableRoles: ('fan' | 'artist' | 'brand' | 'developer' | 'admin')[]
   loading: boolean
   databaseAvailable: boolean
   needsProfileCreation: boolean
   roleSetupStatuses: Record<string, boolean> // Track which roles need setup
 }
 
-export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'developer') => {
+export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [profileState, setProfileState] = useState<ProfileState>({
@@ -114,7 +114,7 @@ export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'de
       const hasAnyMediaID = availableRoles.length > 0
 
       // Check setup status for all roles
-      const allRoles: ('fan' | 'artist' | 'brand' | 'developer')[] = ['fan', 'artist', 'brand', 'developer']
+      const allRoles: ('fan' | 'artist' | 'brand' | 'developer' | 'admin')[] = ['fan', 'artist', 'brand', 'developer', 'admin']
       const roleSetupStatuses: Record<string, boolean> = {}
       
       for (const role of allRoles) {
@@ -198,17 +198,17 @@ export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'de
   }
 
   // Enhanced helper function to check if user can switch to a specific role
-  const canSwitchToRole = (role: 'fan' | 'artist' | 'brand' | 'developer') => {
+  const canSwitchToRole = (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
     return profileState.availableRoles.includes(role)
   }
 
   // Helper function to check if user needs MediaID setup for a specific role
-  const needsMediaIDForRole = (role: 'fan' | 'artist' | 'brand' | 'developer') => {
+  const needsMediaIDForRole = (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
     return profileState.roleSetupStatuses[role] || false
   }
 
   // New function to switch user's active role
-  const switchToRole = async (newRole: 'fan' | 'artist' | 'brand' | 'developer') => {
+  const switchToRole = async (newRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
     try {
       if (!canSwitchToRole(newRole)) {
         throw new Error(`MediaID not set up for ${newRole} role. Please complete setup first.`)
@@ -235,12 +235,13 @@ export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'de
   }, [checkProfileState])
 
   // Function to get role display information
-  const getRoleInfo = (role: 'fan' | 'artist' | 'brand' | 'developer') => {
+  const getRoleInfo = (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
     const roleInfo = {
       fan: { name: 'Fan', icon: '🎧', color: 'yellow' },
       artist: { name: 'Artist', icon: '🎤', color: 'green' },
       brand: { name: 'Brand', icon: '🏢', color: 'blue' },
-      developer: { name: 'Developer', icon: '⚡', color: 'purple' }
+      developer: { name: 'Developer', icon: '⚡', color: 'purple' },
+      admin: { name: 'Admin', icon: '⚙️', color: 'red' }
     }
     
     return {
