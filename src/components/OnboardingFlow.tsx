@@ -94,20 +94,23 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         throw new Error('Please select 3-5 interests')
       }
 
-      // Create or update MediaID with user preferences
+      // Create or update MediaID with user preferences for the selected role
       const { error: mediaIdError } = await supabase
         .from('media_ids')
         .upsert({
           user_uuid: user.id,
+          role: formData.selectedRole,
           interests: formData.interests,
           genre_preferences: formData.genres || [],
           privacy_settings: formData.privacySettings,
           content_flags: {},
           location_code: '',
+          is_active: true,
+          version: 1,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'user_uuid'
+          onConflict: 'user_uuid,role'
         })
 
       if (mediaIdError) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, useNavigate } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from './lib/stripeClient'
 import { AuthProvider } from './hooks/useAuth'
@@ -123,22 +123,23 @@ const LandingPage: React.FC = () => (
 
 // Dashboard wrapper component for role switching
 const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' | 'developer' }> = ({ initialRole }) => {
-  const [currentRole, setCurrentRole] = React.useState<'fan' | 'artist' | 'brand' | 'developer'>(initialRole)
+  const navigate = useNavigate()
 
   const handleRoleSwitch = (role: 'fan' | 'artist' | 'brand' | 'developer') => {
-    setCurrentRole(role)
+    // Navigate to the appropriate dashboard URL instead of changing local state
+    navigate(`/dashboard/${role}`)
   }
 
-  // Render appropriate dashboard based on current role
-  switch (currentRole) {
+  // Render appropriate dashboard based on initial role
+  switch (initialRole) {
     case 'fan':
-      return <FanDashboard userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+      return <FanDashboard userRole={initialRole} onRoleSwitch={handleRoleSwitch} />
     case 'artist':
-      return <ArtistDashboardTemplateUI userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+      return <ArtistDashboardTemplateUI userRole={initialRole} onRoleSwitch={handleRoleSwitch} />
     case 'brand':
-      return <BrandDashboardTemplateUI userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+      return <BrandDashboardTemplateUI userRole={initialRole} onRoleSwitch={handleRoleSwitch} />
     case 'developer':
-      return <DeveloperDashboard userRole={currentRole} onRoleSwitch={handleRoleSwitch} />
+      return <DeveloperDashboard userRole={initialRole} onRoleSwitch={handleRoleSwitch} />
     default:
       return <FanDashboard userRole="fan" onRoleSwitch={handleRoleSwitch} />
   }
