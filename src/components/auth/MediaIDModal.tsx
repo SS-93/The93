@@ -4,7 +4,7 @@ import { setupMediaID, MediaIDData } from '../../lib/mediaId'
 
 interface MediaIDModalProps {
   user: any
-  role: 'fan' | 'artist' | 'brand' | 'developer'
+  role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'
   onComplete: (data: any) => void
   onClose: () => void
 }
