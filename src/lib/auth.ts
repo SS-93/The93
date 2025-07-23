@@ -62,13 +62,15 @@ export const signUp = async (email: string, password: string, userMetadata?: any
 // Helper function to create initial user profile and MediaID
 const createUserProfile = async (user: any, userMetadata: any) => {
   try {
+    const userRole = userMetadata?.role || 'fan'
+    
     // Create profile record
     const { error: profileError } = await supabase
       .from('profiles')
       .insert({
         id: user.id,
         display_name: userMetadata?.display_name || '',
-        role: userMetadata?.role || 'fan',
+        role: userRole,
         email_verified: false,
         onboarding_completed: false,
         created_at: new Date().toISOString(),
@@ -80,11 +82,12 @@ const createUserProfile = async (user: any, userMetadata: any) => {
       // Don't throw - let onboarding handle this
     }
 
-    // Create initial MediaID record
+    // Create initial MediaID record for the selected role (new multi-role schema)
     const { error: mediaIdError } = await supabase
       .from('media_ids')
       .insert({
         user_uuid: user.id,
+        role: userRole,
         interests: [],
         genre_preferences: [],
         content_flags: {},
@@ -95,6 +98,8 @@ const createUserProfile = async (user: any, userMetadata: any) => {
           anonymous_logging: true,
           marketing_communications: false
         },
+        is_active: true,
+        version: 1,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
@@ -104,7 +109,7 @@ const createUserProfile = async (user: any, userMetadata: any) => {
       // Don't throw - let onboarding handle this
     }
 
-    console.log('✅ User profile and MediaID created successfully')
+    console.log(`✅ User profile and MediaID created successfully for role: ${userRole}`)
   } catch (error) {
     console.error('Error creating user profile:', error)
     // Don't throw - let the signup succeed and onboarding handle missing records
