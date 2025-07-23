@@ -39,22 +39,22 @@ export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'de
   const checkProfileState = useCallback(async () => {
     if (!user) return
 
-    try {
-      // First, test if database tables exist by checking profiles table
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, onboarding_completed')
-        .eq('id', user.id)
-        .single()
+      try {
+        // First, test if database tables exist by checking profiles table
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role, onboarding_completed')
+          .eq('id', user.id)
+          .single()
 
       // Handle table not existing (database setup issue)
-      if (profileError && (
-        profileError.code === 'PGRST106' || // table not found
-        profileError.message?.includes('relation "public.profiles" does not exist') ||
-        profileError.message?.includes('does not exist')
-      )) {
-        console.warn('Database tables not set up yet. Using fallback routing.')
-        
+        if (profileError && (
+          profileError.code === 'PGRST106' || // table not found
+          profileError.message?.includes('relation "public.profiles" does not exist') ||
+          profileError.message?.includes('does not exist')
+        )) {
+          console.warn('Database tables not set up yet. Using fallback routing.')
+          
         const fallbackRole = currentRole || user.user_metadata?.role || 'fan'
         setProfileState({
           hasCompletedOnboarding: false,
@@ -75,37 +75,37 @@ export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'de
         console.log('User profile not found. Will create during onboarding.')
         
         const fallbackRole = currentRole || user.user_metadata?.role || 'fan'
-        setProfileState({
+          setProfileState({
           hasCompletedOnboarding: false,
-          selectedRole: fallbackRole,
-          hasMediaID: false,
+            selectedRole: fallbackRole,
+            hasMediaID: false,
           hasRoleSpecificMediaID: false,
           availableRoles: [fallbackRole],
-          loading: false,
+            loading: false,
           databaseAvailable: true, // Database exists, user just needs profile
           needsProfileCreation: true,
           roleSetupStatuses: { [fallbackRole]: true }
-        })
-        return
-      }
+          })
+          return
+        }
 
       // Handle other profile errors
-      if (profileError) {
-        console.error('Profile check error:', profileError)
+        if (profileError) {
+          console.error('Profile check error:', profileError)
         const fallbackRole = currentRole || user.user_metadata?.role || 'fan'
-        setProfileState({
-          hasCompletedOnboarding: false,
-          selectedRole: fallbackRole,
-          hasMediaID: false,
+          setProfileState({
+            hasCompletedOnboarding: false,
+            selectedRole: fallbackRole,
+            hasMediaID: false,
           hasRoleSpecificMediaID: false,
           availableRoles: [fallbackRole],
-          loading: false,
+            loading: false,
           databaseAvailable: false,
           needsProfileCreation: false,
           roleSetupStatuses: { [fallbackRole]: true }
-        })
-        return
-      }
+          })
+          return
+        }
 
       // Profile found! Now get all available roles and their setup status
       const availableRoles = await getUserAvailableRoles()
@@ -119,34 +119,34 @@ export const useProfileRouting = (currentRole?: 'fan' | 'artist' | 'brand' | 'de
       
       for (const role of allRoles) {
         roleSetupStatuses[role] = await checkRoleSetupRequired(role)
-      }
+        }
 
-      setProfileState({
-        hasCompletedOnboarding: profile?.onboarding_completed || false,
-        selectedRole: profile?.role || null,
+        setProfileState({
+          hasCompletedOnboarding: profile?.onboarding_completed || false,
+          selectedRole: profile?.role || null,
         hasMediaID: hasAnyMediaID,
         hasRoleSpecificMediaID: hasRoleSpecificMediaID,
         availableRoles: availableRoles,
-        loading: false,
+          loading: false,
         databaseAvailable: true,
         needsProfileCreation: false,
         roleSetupStatuses
-      })
-    } catch (error) {
-      console.error('Profile routing error:', error)
-      
+        })
+      } catch (error) {
+        console.error('Profile routing error:', error)
+        
       const fallbackRole = currentRole || user?.user_metadata?.role || 'fan'
-      setProfileState({
-        hasCompletedOnboarding: false,
-        selectedRole: fallbackRole,
-        hasMediaID: false,
+        setProfileState({
+          hasCompletedOnboarding: false,
+          selectedRole: fallbackRole,
+          hasMediaID: false,
         hasRoleSpecificMediaID: false,
         availableRoles: [fallbackRole],
-        loading: false,
+          loading: false,
         databaseAvailable: false,
         needsProfileCreation: false,
         roleSetupStatuses: { [fallbackRole]: true }
-      })
+        })
     }
   }, [user, currentRole])
 
