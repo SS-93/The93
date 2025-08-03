@@ -6,8 +6,10 @@ import { AuthProvider } from './hooks/useAuth'
 import { router } from './routes/router'
 
 function App() {
-  console.log('URL:', process.env.REACT_APP_SUPABASE_URL)
-  console.log('KEY:', process.env.REACT_APP_SUPABASE_ANON_KEY)
+  // ✅ Debug logging for Vercel
+  console.log('Environment:', process.env.NODE_ENV)
+  console.log('Supabase URL exists:', !!process.env.REACT_APP_SUPABASE_URL)
+  console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY)
   
   return (
     <Elements stripe={stripePromise}>

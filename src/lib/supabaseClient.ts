@@ -1,31 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
-import { env } from './env-validation'
 
-export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
+// ✅ FIXED: Better error handling for Vercel
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase environment variables. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY in your Vercel environment variables.'
+  )
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 2
-    }
   }
-})
-
-// Export types for better TypeScript support
-export type { User, Session } from '@supabase/supabase-js'
-
-// Helper function to check if user is authenticated
-export const isAuthenticated = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  return !!user
-}
-
-// Helper function to get current user
-export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error) throw error
-  return user
-} 
+}) 
