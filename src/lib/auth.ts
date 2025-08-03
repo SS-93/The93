@@ -12,9 +12,9 @@ export const signUp = async (email: string, password: string, userMetadata?: any
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: userMetadata || {}
-      }
+      // options: {
+      //   data: userMetadata || {}
+      // }
     })
     
     if (error) {
