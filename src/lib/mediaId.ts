@@ -21,279 +21,125 @@ export interface MediaIDData {
 export interface MediaIDProfile {
   id: string
   user_uuid: string
-  role: 'fan' | 'artist' | 'brand' | 'developer'| 'admin'
   interests: string[]
   genre_preferences: string[]
   content_flags: any
   location_code: string
-  privacy_settings: any
   profile_embedding?: number[]
-  is_active: boolean
-  version: number
   created_at: string
   updated_at: string
 }
 
-export const setupMediaID = async (data: MediaIDData, role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin' = 'fan') => {
+export const setupMediaID = async (data: MediaIDData) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not authenticated')
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) throw new Error('User not authenticated')
 
-    // Validate interests (3-5 required)
-    if (!data.interests || data.interests.length < 3 || data.interests.length > 5) {
-      throw new Error('Please select 3-5 interests')
+    const mediaIdPayload = {
+      user_uuid: user.user.id,
+      interests: data.interests,
+      genre_preferences: data.genrePreferences,
+      location_code: data.locationCode || 'US',
+      content_flags: {
+        mood: data.contentFlags.mood,
+        likes: data.contentFlags.likes,
+        dislikes: data.contentFlags.dislikes,
+        privacy_settings: data.privacySettings
+      }
     }
 
-    // Create or update MediaID record for this specific role using upsert
-    const { error } = await supabase
+    const { data: mediaId, error } = await supabase
       .from('media_ids')
-      .upsert({
-        user_uuid: user.id,
-        role: role,
-        interests: data.interests,
-        genre_preferences: data.genrePreferences,
-        privacy_settings: data.privacySettings,
-        content_flags: data.contentFlags,
-        location_code: data.locationCode,
-        is_active: true,
-        version: 1,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_uuid,role',
-        ignoreDuplicates: false
-      })
+      .insert([mediaIdPayload])
+      .select()
+      .single()
 
-    if (error) {
-      console.error('MediaID setup error:', error)
-      throw new Error(`Failed to setup MediaID for ${role} role`)
-    }
+    if (error) throw error
 
-    // Log the setup completion
-    await supabase
-      .from('media_engagement_log')
-      .insert({
-        user_id: user.id,
-        event_type: 'mediaid_setup_completed',
-        is_anonymous: data.privacySettings.anonymousLogging,
-        metadata: {
-          role: role,
-          interests_count: data.interests.length,
-          privacy_level: Object.values(data.privacySettings).filter(Boolean).length
-        }
-      })
-
-    return { success: true, role }
-  } catch (error) {
-    console.error('MediaID setup error:', error)
-    throw error
+    return { data: mediaId, error: null }
+  } catch (error: any) {
+    return { data: null, error: error.message }
   }
 }
 
-export const getMediaIDProfile = async (role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'): Promise<MediaIDProfile | null> => {
+export const getMediaIDProfile = async (): Promise<MediaIDProfile | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) return null
 
-    // If no role specified, get the user's current role from profiles
-    let targetRole = role
-    if (!targetRole) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-      
-      targetRole = profile?.role || 'fan'
-    }
-
-    // Get MediaID for specific role
     const { data, error } = await supabase
       .from('media_ids')
       .select('*')
-      .eq('user_uuid', user.id)
-      .eq('role', targetRole)
-      .eq('is_active', true)
+      .eq('user_uuid', user.user.id)
       .single()
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('MediaID fetch error:', error)
-      throw error
-    }
-
-    return data || null
+    if (error) throw error
+    return data
   } catch (error) {
     console.error('Error fetching MediaID profile:', error)
     return null
   }
 }
 
-export const getAllMediaIDProfiles = async (): Promise<MediaIDProfile[]> => {
+export const updateMediaIDPreferences = async (preferences: Partial<MediaIDData>) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return []
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) throw new Error('User not authenticated')
 
-    // Get all MediaID records for this user across all roles
+    const updatePayload: any = {}
+    
+    if (preferences.interests) updatePayload.interests = preferences.interests
+    if (preferences.genrePreferences) updatePayload.genre_preferences = preferences.genrePreferences
+    if (preferences.locationCode) updatePayload.location_code = preferences.locationCode
+    if (preferences.contentFlags || preferences.privacySettings) {
+      const currentProfile = await getMediaIDProfile()
+      updatePayload.content_flags = {
+        ...currentProfile?.content_flags,
+        ...(preferences.contentFlags && {
+          mood: preferences.contentFlags.mood,
+          likes: preferences.contentFlags.likes,
+          dislikes: preferences.contentFlags.dislikes
+        }),
+        ...(preferences.privacySettings && {
+          privacy_settings: preferences.privacySettings
+        })
+      }
+    }
+
     const { data, error } = await supabase
       .from('media_ids')
-      .select('*')
-      .eq('user_uuid', user.id)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
+      .update(updatePayload)
+      .eq('user_uuid', user.user.id)
+      .select()
+      .single()
 
-    if (error) {
-      console.error('MediaID profiles fetch error:', error)
-      throw error
-    }
-
-    return data || []
-  } catch (error) {
-    console.error('Error fetching all MediaID profiles:', error)
-    return []
+    if (error) throw error
+    return { data, error: null }
+  } catch (error: any) {
+    return { data: null, error: error.message }
   }
 }
 
-export const updateMediaIDPreferences = async (preferences: Partial<MediaIDData>, role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
+export const logMediaEngagement = async (contentId: string, eventType: string, metadata?: any) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not authenticated')
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) return
 
-    // Build update object only with provided fields
-    const updateData: any = {
-      updated_at: new Date().toISOString()
-    }
+    // Check if anonymous logging is enabled
+    const profile = await getMediaIDProfile()
+    if (!profile?.content_flags?.privacy_settings?.anonymousLogging) return
 
-    if (preferences.interests) updateData.interests = preferences.interests
-    if (preferences.genrePreferences) updateData.genre_preferences = preferences.genrePreferences
-    if (preferences.privacySettings) updateData.privacy_settings = preferences.privacySettings
-    if (preferences.contentFlags) updateData.content_flags = preferences.contentFlags
-    if (preferences.locationCode !== undefined) updateData.location_code = preferences.locationCode
-
-    // Update MediaID for specific role
     const { error } = await supabase
-      .from('media_ids')
-      .update(updateData)
-      .eq('user_uuid', user.id)
-      .eq('role', role)
-      .eq('is_active', true)
-
-    if (error) {
-      console.error('MediaID update error:', error)
-      throw new Error(`Failed to update MediaID preferences for ${role} role`)
-    }
-
-    // Log the preference update
-    await supabase
       .from('media_engagement_log')
-      .insert({
-        user_id: user.id,
-        event_type: 'mediaid_preferences_updated',
-        is_anonymous: preferences.privacySettings?.anonymousLogging ?? true,
-        metadata: {
-          role: role,
-          updated_fields: Object.keys(updateData).filter(key => key !== 'updated_at')
-        }
-      })
-
-    return { success: true, role }
-  } catch (error) {
-    console.error('Error updating MediaID preferences:', error)
-    throw error
-  }
-}
-
-export const switchMediaIDRole = async (newRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not authenticated')
-
-    // Check if MediaID exists for the target role
-    const targetProfile = await getMediaIDProfile(newRole)
-    if (!targetProfile) {
-      throw new Error(`No MediaID setup found for ${newRole} role. Please complete setup first.`)
-    }
-
-    // Update user's active role in profiles table
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ 
-        role: newRole,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', user.id)
-
-    if (profileError) {
-      console.error('Profile role update error:', profileError)
-      throw new Error(`Failed to switch to ${newRole} role`)
-    }
-
-    // Log the role switch
-    await supabase
-      .from('media_engagement_log')
-      .insert({
-        user_id: user.id,
-        event_type: 'role_switched',
-        is_anonymous: targetProfile.privacy_settings?.anonymous_logging ?? true,
-        metadata: {
-          new_role: newRole,
-          timestamp: new Date().toISOString()
-        }
-      })
-
-    return { success: true, newRole, profile: targetProfile }
-  } catch (error) {
-    console.error('Error switching MediaID role:', error)
-    throw error
-  }
-}
-
-export const deactivateMediaIDRole = async (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not authenticated')
-
-    // Deactivate MediaID for specific role
-    const { error } = await supabase
-      .from('media_ids')
-      .update({ 
-        is_active: false,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_uuid', user.id)
-      .eq('role', role)
-
-    if (error) {
-      console.error('MediaID deactivation error:', error)
-      throw new Error(`Failed to deactivate MediaID for ${role} role`)
-    }
-
-    return { success: true, role }
-  } catch (error) {
-    console.error('Error deactivating MediaID role:', error)
-    throw error
-  }
-}
-
-export const logMediaEngagement = async (contentId: string, eventType: string, metadata?: any, role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    // Get privacy settings for the specified role or current role
-    const mediaIdProfile = await getMediaIDProfile(role)
-    const isAnonymous = mediaIdProfile?.privacy_settings?.anonymous_logging ?? true
-
-    await supabase
-      .from('media_engagement_log')
-      .insert({
-        user_id: user.id,
+      .insert([{
+        user_id: user.user.id,
         content_id: contentId,
         event_type: eventType,
-        is_anonymous: isAnonymous,
-        metadata: {
-          ...metadata,
-          role: role || mediaIdProfile?.role || 'fan'
-        }
-      })
+        metadata: metadata || {},
+        timestamp: new Date().toISOString()
+      }])
+
+    if (error) throw error
   } catch (error) {
     console.error('Error logging media engagement:', error)
   }
@@ -301,44 +147,34 @@ export const logMediaEngagement = async (contentId: string, eventType: string, m
 
 export const clearEngagementHistory = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('User not authenticated')
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) throw new Error('User not authenticated')
 
     const { error } = await supabase
       .from('media_engagement_log')
       .delete()
-      .eq('user_id', user.id)
+      .eq('user_id', user.user.id)
 
     if (error) throw error
-
-    return { success: true }
-  } catch (error) {
-    console.error('Error clearing engagement history:', error)
-    throw error
+    return { success: true, error: null }
+  } catch (error: any) {
+    return { success: false, error: error.message }
   }
 }
 
-export const getEngagementHistory = async (limit = 100, role?: 'fan' | 'artist' | 'brand' | 'developer'| 'admin') => {
+export const getEngagementHistory = async (limit = 100) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return []
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) return []
 
-    let query = supabase
+    const { data, error } = await supabase
       .from('media_engagement_log')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', user.user.id)
       .order('timestamp', { ascending: false })
       .limit(limit)
 
-    // Filter by role if specified
-    if (role) {
-      query = query.eq('metadata->>role', role)
-    }
-
-    const { data, error } = await query
-
     if (error) throw error
-
     return data || []
   } catch (error) {
     console.error('Error fetching engagement history:', error)
@@ -346,48 +182,31 @@ export const getEngagementHistory = async (limit = 100, role?: 'fan' | 'artist' 
   }
 }
 
-export const generateRecommendations = async (type: 'artists' | 'content' | 'brands', role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin' = 'fan') => {
+export const generateRecommendations = async (type: 'artists' | 'content' | 'brands') => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return []
+    const profile = await getMediaIDProfile()
+    if (!profile) return []
 
-    // Get MediaID profile for the specified role
-    const profile = await getMediaIDProfile(role)
-    if (!profile) {
-      throw new Error(`No MediaID profile found for ${role} role`)
+    // This would typically call an AI/ML service
+    // For now, we'll return mock recommendations based on interests
+    const mockRecommendations = {
+      artists: [
+        { id: '1', name: 'Luna Starlight', match: 0.95, reason: 'Electronic & Ambient interests' },
+        { id: '2', name: 'Neon Waves', match: 0.87, reason: 'Synthwave & Experimental genres' }
+      ],
+      content: [
+        { id: '1', title: 'Midnight Dreams EP', match: 0.92, artist: 'Luna Starlight' },
+        { id: '2', title: 'Digital Sunrise', match: 0.88, artist: 'Cyber Collective' }
+      ],
+      brands: [
+        { id: '1', name: 'Future Sounds', match: 0.85, reason: 'Audio technology focus' },
+        { id: '2', name: 'Neon Apparel', match: 0.78, reason: 'Aesthetic alignment' }
+      ]
     }
 
-    // This would typically call an AI service or recommendation engine
-    // For now, return mock data based on interests
-    const mockRecommendations = [
-      { id: '1', name: 'Sample Artist', relevance: 0.95, reason: 'Based on your electronic music interest' },
-      { id: '2', name: 'Underground Scene', relevance: 0.87, reason: 'Matches your underground preferences' },
-    ]
-
-    return mockRecommendations
+    return mockRecommendations[type] || []
   } catch (error) {
     console.error('Error generating recommendations:', error)
     return []
-  }
-}
-
-// New helper functions for multi-role management
-export const getUserAvailableRoles = async (): Promise<('fan' | 'artist' | 'brand' | 'developer' | 'admin')[]> => {
-  try {
-    const profiles = await getAllMediaIDProfiles()
-    return profiles.map(profile => profile.role)
-  } catch (error) {
-    console.error('Error getting available roles:', error)
-    return []
-  }
-}
-
-export const checkRoleSetupRequired = async (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'): Promise<boolean> => {
-  try {
-    const profile = await getMediaIDProfile(role)
-    return !profile
-  } catch (error) {
-    console.error('Error checking role setup:', error)
-    return true
   }
 } 
