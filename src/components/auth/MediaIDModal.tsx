@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { supabase } from '../../lib/supabaseClient'
+import { setupMediaID, MediaIDData } from '../../lib/mediaId'
 
 interface MediaIDModalProps {
   user: any
+  role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'
   onComplete: (data: any) => void
   onClose: () => void
 }
 
-const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }) => {
+const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, role, onComplete, onClose }) => {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     interests: [] as string[],
     genres: [] as string[],
@@ -42,6 +44,7 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
   ]
 
   const handleInterestToggle = (interest: string) => {
+    setError(null) // Clear any existing errors
     setFormData(prev => ({
       ...prev,
       interests: prev.interests.includes(interest)
@@ -71,79 +74,83 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
 
   const handleComplete = async () => {
     setLoading(true)
+    setError(null)
+    
     try {
-      // Get the current session to get the access token
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
-      if (sessionError || !session) {
-        throw new Error('Authentication required. Please sign in again.')
-      }
-
-      // Direct MediaID setup using Supabase client calls (bypassing Edge Function)
-      
       // Validate interests (3-5 required)
-      if (!formData.interests || formData.interests.length < 3 || formData.interests.length > 5) {
-        throw new Error('Please select 3-5 interests')
+      if (!formData.interests || formData.interests.length < 3) {
+        throw new Error('Please select at least 3 interests to personalize your experience.')
+      }
+      
+      if (formData.interests.length > 5) {
+        throw new Error('Please select no more than 5 interests to keep your profile focused.')
       }
 
-      // Update MediaID with user preferences
-      const { error: mediaIdError } = await supabase
-        .from('media_ids')
-        .upsert({
-          user_uuid: user.id,
+      // Prepare MediaID data
+      const mediaIdData: MediaIDData = {
           interests: formData.interests,
-          genre_preferences: formData.genres || [],
-          privacy_settings: formData.privacySettings,
-          content_flags: {},
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_uuid'
-        })
-
-      if (mediaIdError) {
-        console.error('MediaID update error:', mediaIdError)
-        throw new Error('Failed to update MediaID preferences')
+        genrePreferences: formData.genres,
+        privacySettings: {
+          dataSharing: formData.privacySettings.data_sharing,
+          locationAccess: formData.privacySettings.location_access,
+          audioCapture: formData.privacySettings.audio_capture,
+          anonymousLogging: formData.privacySettings.anonymous_logging,
+          marketingCommunications: formData.privacySettings.marketing_communications
+        },
+        locationCode: '',
+        contentFlags: {
+          mood: '',
+          likes: [],
+          dislikes: []
+        }
       }
 
-      // Update onboarding status
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({ 
-          id: user.id,
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'id'
-        })
+      // Set up MediaID for the specific role
+      const result = await setupMediaID(mediaIdData, role)
 
-      if (profileError) {
-        console.error('Profile update error:', profileError)
-        throw new Error('Failed to complete onboarding')
-      }
-
-      // Log the setup completion (anonymous)
-      await supabase
-        .from('media_engagement_log')
-        .insert({
-          user_id: user.id,
-          event_type: 'mediaid_setup_completed',
-          is_anonymous: formData.privacySettings.anonymous_logging,
-          metadata: {
-            interests_count: formData.interests.length,
-            privacy_level: Object.values(formData.privacySettings).filter(Boolean).length
-          }
-        })
-
-      onComplete({ success: true, message: 'MediaID setup completed successfully' })
+      onComplete({ 
+        success: true, 
+        message: `MediaID setup completed for ${role} role! 🎉`,
+        role: role,
+        data: result
+      })
     } catch (error) {
       console.error('MediaID setup error:', error)
-      // Show user-friendly error message
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      alert(`Setup failed: ${errorMessage}. Please check your connection and try again.`)
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'An unexpected error occurred. Please try again.'
+      
+      if (error instanceof Error) {
+        if (error.message.includes('interests')) {
+          errorMessage = error.message
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network connection issue. Please check your internet and try again.'
+        } else if (error.message.includes('authentication') || error.message.includes('unauthorized')) {
+          errorMessage = 'Authentication expired. Please sign in again.'
+        } else if (error.message.includes('database') || error.message.includes('unique')) {
+          errorMessage = `You already have a MediaID set up for the ${role} role. Updating your preferences...`
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
   }
+
+  const getRoleDisplayName = (role: string) => {
+    const roleInfo = {
+      fan: { name: 'Fan', icon: '🎧', description: 'Discover and enjoy exclusive content' },
+      artist: { name: 'Artist', icon: '🎤', description: 'Create and share your music' },
+      brand: { name: 'Brand', icon: '🏢', description: 'Connect with engaged audiences' },
+      developer: { name: 'Developer', icon: '⚡', description: 'Build privacy-first integrations' }
+    }
+    return roleInfo[role as keyof typeof roleInfo] || { name: role, icon: '👤', description: '' }
+  }
+
+  const roleInfo = getRoleDisplayName(role)
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -156,9 +163,16 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
         {/* Header */}
         <div className="p-8 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                <span className="text-2xl">{roleInfo.icon}</span>
+              </div>
             <div>
-              <h2 className="text-3xl font-bold text-white mb-2">Setup Your MediaID</h2>
-              <p className="text-gray-400">Your privacy-first identity layer</p>
+                <h2 className="text-3xl font-bold text-white mb-1">Setup Your MediaID</h2>
+                <p className="text-gray-400">
+                  {roleInfo.description} • {roleInfo.name} Role
+                </p>
+              </div>
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">×</button>
           </div>
@@ -176,6 +190,20 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
               </div>
             ))}
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-red-400 text-xl">⚠️</span>
+                <p className="text-red-400 font-medium">{error}</p>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Content */}
@@ -183,8 +211,10 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}>
-                <h3 className="text-2xl font-bold text-white mb-6">What interests you?</h3>
-                <p className="text-gray-400 mb-6">Select all that apply (minimum 3)</p>
+                <h3 className="text-2xl font-bold text-white mb-6">What interests you most?</h3>
+                <p className="text-gray-400 mb-6">
+                  Select 3-5 interests to personalize your {roleInfo.name.toLowerCase()} experience
+                </p>
                 
                 <div className="grid grid-cols-2 gap-3 mb-8">
                   {interestOptions.map((interest) => (
@@ -202,6 +232,18 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
                   ))}
                 </div>
 
+                {/* Interest count indicator */}
+                <div className="mb-6 p-3 bg-gray-800/30 rounded-lg">
+                  <p className="text-sm text-gray-400">
+                    Selected: {formData.interests.length}/5 interests
+                    {formData.interests.length < 3 && (
+                      <span className="text-orange-400 ml-2">
+                        (Need at least 3)
+                      </span>
+                    )}
+                  </p>
+                </div>
+
                 <div className="flex justify-end">
                   <button
                     onClick={() => setStep(2)}
@@ -217,6 +259,10 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}>
                 <h3 className="text-2xl font-bold text-white mb-6">Favorite genres?</h3>
+                <p className="text-gray-400 mb-6">
+                  Optional: Help us understand your musical taste (select any that appeal to you)
+                </p>
+                
                 <div className="flex flex-wrap gap-3 mb-8">
                   {genreOptions.map((genre) => (
                     <button
@@ -247,7 +293,9 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }}>
                 <h3 className="text-2xl font-bold text-white mb-6">Privacy Controls</h3>
-                <p className="text-gray-400 mb-6">You control your data. Change these anytime.</p>
+                <p className="text-gray-400 mb-6">
+                  You're in control. Adjust these settings anytime from your profile.
+                </p>
 
                 <div className="space-y-4 mb-8">
                   {[
@@ -285,9 +333,16 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
                   <button
                     onClick={handleComplete}
                     disabled={loading}
-                    className="bg-accent-yellow text-black font-bold px-8 py-3 rounded-xl hover:bg-accent-yellow/90 transition-colors disabled:opacity-50"
+                    className="bg-accent-yellow text-black font-bold px-8 py-3 rounded-xl hover:bg-accent-yellow/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Setting up...' : 'Complete Setup'}
+                    {loading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                        Setting up...
+                      </div>
+                    ) : (
+                      `Complete ${roleInfo.name} Setup`
+                    )}
                   </button>
                 </div>
               </motion.div>
