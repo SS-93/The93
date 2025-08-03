@@ -21,31 +21,44 @@ export interface MediaIDData {
 export interface MediaIDProfile {
   id: string
   user_uuid: string
+  role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'
   interests: string[]
   genre_preferences: string[]
   content_flags: any
   location_code: string
   profile_embedding?: number[]
+  privacy_settings?: {
+    data_sharing: boolean
+    location_access: boolean
+    audio_capture: boolean
+    anonymous_logging: boolean
+    marketing_communications: boolean
+  }
+  version?: number
+  is_active?: boolean
   created_at: string
   updated_at: string
 }
 
-export const setupMediaID = async (data: MediaIDData) => {
+export const setupMediaID = async (data: MediaIDData, userRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin' = 'fan') => {
   try {
     const { data: user } = await supabase.auth.getUser()
     if (!user.user) throw new Error('User not authenticated')
 
     const mediaIdPayload = {
       user_uuid: user.user.id,
+      role: userRole,
       interests: data.interests,
       genre_preferences: data.genrePreferences,
       location_code: data.locationCode || 'US',
+      privacy_settings: data.privacySettings,
       content_flags: {
         mood: data.contentFlags.mood,
         likes: data.contentFlags.likes,
-        dislikes: data.contentFlags.dislikes,
-        privacy_settings: data.privacySettings
-      }
+        dislikes: data.contentFlags.dislikes
+      },
+      version: 1,
+      is_active: true
     }
 
     const { data: mediaId, error } = await supabase
@@ -91,18 +104,20 @@ export const updateMediaIDPreferences = async (preferences: Partial<MediaIDData>
     if (preferences.interests) updatePayload.interests = preferences.interests
     if (preferences.genrePreferences) updatePayload.genre_preferences = preferences.genrePreferences
     if (preferences.locationCode) updatePayload.location_code = preferences.locationCode
-    if (preferences.contentFlags || preferences.privacySettings) {
+    
+    // Handle privacy settings as a separate field
+    if (preferences.privacySettings) {
+      updatePayload.privacy_settings = preferences.privacySettings
+    }
+    
+    // Handle content flags
+    if (preferences.contentFlags) {
       const currentProfile = await getMediaIDProfile()
       updatePayload.content_flags = {
         ...currentProfile?.content_flags,
-        ...(preferences.contentFlags && {
-          mood: preferences.contentFlags.mood,
-          likes: preferences.contentFlags.likes,
-          dislikes: preferences.contentFlags.dislikes
-        }),
-        ...(preferences.privacySettings && {
-          privacy_settings: preferences.privacySettings
-        })
+        mood: preferences.contentFlags.mood,
+        likes: preferences.contentFlags.likes,
+        dislikes: preferences.contentFlags.dislikes
       }
     }
 
@@ -208,5 +223,109 @@ export const generateRecommendations = async (type: 'artists' | 'content' | 'bra
   } catch (error) {
     console.error('Error generating recommendations:', error)
     return []
+  }
+}
+
+// Get all MediaID profiles for the current user (for multi-role support)
+export const getAllMediaIDProfiles = async (): Promise<MediaIDProfile[]> => {
+  try {
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) return []
+
+    const { data, error } = await supabase
+      .from('media_ids')
+      .select('*')
+      .eq('user_uuid', user.user.id)
+
+    if (error) throw error
+    return data || []
+  } catch (error) {
+    console.error('Error fetching all MediaID profiles:', error)
+    return []
+  }
+}
+
+// Get available roles for the current user
+export const getUserAvailableRoles = async (): Promise<('fan' | 'artist' | 'brand' | 'developer' | 'admin')[]> => {
+  try {
+    const profiles = await getAllMediaIDProfiles()
+    const roles = profiles.map(profile => profile.role).filter(Boolean) as ('fan' | 'artist' | 'brand' | 'developer' | 'admin')[]
+    return roles.length > 0 ? roles : ['fan'] // Default to fan if no roles found
+  } catch (error) {
+    console.error('Error getting available roles:', error)
+    return ['fan'] // Default fallback
+  }
+}
+
+// Switch to a different MediaID role
+export const switchMediaIDRole = async (targetRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
+  try {
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) throw new Error('User not authenticated')
+
+    // Check if user already has a MediaID profile for this role
+    const { data: existingProfile } = await supabase
+      .from('media_ids')
+      .select('*')
+      .eq('user_uuid', user.user.id)
+      .eq('role', targetRole)
+      .single()
+
+    if (existingProfile) {
+      return { data: existingProfile, error: null }
+    }
+
+    // Create new MediaID profile for this role
+    const { data, error } = await supabase
+      .from('media_ids')
+      .insert({
+        user_uuid: user.user.id,
+        role: targetRole,
+        interests: [],
+        genre_preferences: [],
+        privacy_settings: {
+          data_sharing: true,
+          location_access: false,
+          audio_capture: false,
+          anonymous_logging: true,
+          marketing_communications: false
+        },
+        version: 1,
+        is_active: true
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return { data, error: null }
+  } catch (error: any) {
+    return { data: null, error: error.message }
+  }
+}
+
+// Check if role-specific setup is required
+export const checkRoleSetupRequired = async (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'): Promise<boolean> => {
+  try {
+    const { data: user } = await supabase.auth.getUser()
+    if (!user.user) return true
+
+    const { data: profile } = await supabase
+      .from('media_ids')
+      .select('*')
+      .eq('user_uuid', user.user.id)
+      .eq('role', role)
+      .single()
+
+    // If no profile exists for this role, setup is required
+    if (!profile) return true
+
+    // Check if profile has basic required fields
+    const hasInterests = profile.interests && profile.interests.length > 0
+    const hasPrivacySettings = profile.privacy_settings && typeof profile.privacy_settings === 'object'
+
+    return !hasInterests || !hasPrivacySettings
+  } catch (error) {
+    console.error('Error checking role setup requirement:', error)
+    return true // Default to requiring setup if there's an error
   }
 } 
