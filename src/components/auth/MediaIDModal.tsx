@@ -88,7 +88,7 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, role, onComplete, onC
 
       // Prepare MediaID data
       const mediaIdData: MediaIDData = {
-        interests: formData.interests,
+          interests: formData.interests,
         genrePreferences: formData.genres,
         privacySettings: {
           dataSharing: formData.privacySettings.data_sharing,
@@ -167,7 +167,7 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, role, onComplete, onC
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                 <span className="text-2xl">{roleInfo.icon}</span>
               </div>
-              <div>
+            <div>
                 <h2 className="text-3xl font-bold text-white mb-1">Setup Your MediaID</h2>
                 <p className="text-gray-400">
                   {roleInfo.description} • {roleInfo.name} Role
