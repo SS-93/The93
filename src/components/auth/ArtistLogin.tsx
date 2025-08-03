@@ -160,6 +160,7 @@ const ArtistLogin: React.FC = () => {
         {showMediaIDModal && (
           <MediaIDModal
             user={newUser}
+            role="artist"
             onComplete={handleMediaIDComplete}
             onClose={() => setShowMediaIDModal(false)}
           />
