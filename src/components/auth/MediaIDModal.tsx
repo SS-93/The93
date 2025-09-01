@@ -87,17 +87,26 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
       }
 
       // Update MediaID with user preferences
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const effectiveRole = profile?.role || 'fan'
+
       const { error: mediaIdError } = await supabase
         .from('media_ids')
         .upsert({
           user_uuid: user.id,
+          role: effectiveRole,
           interests: formData.interests,
           genre_preferences: formData.genres || [],
           privacy_settings: formData.privacySettings,
           content_flags: {},
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'user_uuid'
+          onConflict: 'user_uuid,role'
         })
 
       if (mediaIdError) {

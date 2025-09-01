@@ -22,6 +22,7 @@ import BrandLogin from './components/auth/BrandLogin'
 import DeveloperLogin from './components/auth/DeveloperLogin'
 import DeveloperDashboard from './components/DeveloperDashboard'
 import TestDashboard from './components/TestDashboard'
+import UniversalSettingsPanel from './components/settings/UniversalSettingsPanel'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -301,6 +302,16 @@ const router = createBrowserRouter([
     element: (
       <SmartRouteGuard allowedRoles={['developer', 'admin']} requireAuth={true} requireOnboarding={true}>
         <DashboardWrapper initialRole="developer" />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Settings Route
+  {
+    path: '/settings',
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <UniversalSettingsPanel />
       </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
