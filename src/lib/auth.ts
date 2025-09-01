@@ -59,6 +59,29 @@ export const signUp = async (email: string, password: string, userMetadata?: any
   }
 }
 
+// Consolidated signup via Supabase Edge Function to centralize server-side logic
+export const signupViaEdgeFunction = async (email: string, password: string, userMetadata?: any) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('auth-signup', {
+      body: { email, password, userData: userMetadata || {} }
+    })
+
+    if (error || !data?.success) {
+      const message = (data as any)?.error || (error as any)?.message || 'Failed to create account'
+      return { data: null, error: { message } }
+    }
+
+    const signInResult = await supabase.auth.signInWithPassword({ email, password })
+    if (signInResult.error) {
+      return { data: null, error: { message: signInResult.error.message } }
+    }
+
+    return { data: signInResult.data, error: null }
+  } catch (err: any) {
+    return { data: null, error: { message: err.message || 'Signup failed' } }
+  }
+}
+
 // Helper function to create initial user profile and MediaID
 const createUserProfile = async (user: any, userMetadata: any) => {
   try {
