@@ -160,6 +160,7 @@ const BrandLogin: React.FC = () => {
         {showMediaIDModal && (
           <MediaIDModal
             user={newUser}
+            role="brand"
             onComplete={handleMediaIDComplete}
             onClose={() => setShowMediaIDModal(false)}
           />
