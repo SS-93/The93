@@ -99,6 +99,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         .from('media_ids')
         .upsert({
           user_uuid: user.id,
+          role: formData.selectedRole,
           interests: formData.interests,
           genre_preferences: formData.genres || [],
           privacy_settings: formData.privacySettings,
@@ -107,7 +108,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'user_uuid'
+          onConflict: 'user_uuid,role'
         })
 
       if (mediaIdError) {

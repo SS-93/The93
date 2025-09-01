@@ -87,22 +87,27 @@ export const useProfileRouting = () => {
           return
         }
 
-        // Profile found! Now check MediaID
-        const { data: mediaId, error: mediaIdError } = await supabase
-          .from('media_ids')
-          .select('id, interests')
-          .eq('user_uuid', user.id)
-          .single()
+        // Profile found! Now check MediaID for the user's role
+        const selectedRole = profile?.role || null
+        let hasMediaID = false
+        if (selectedRole) {
+          const { data: mediaRows, error: mediaIdError } = await supabase
+            .from('media_ids')
+            .select('id')
+            .eq('user_uuid', user.id)
+            .eq('role', selectedRole)
+            .limit(1)
 
-        // MediaID not found is okay (user hasn't set it up yet)
-        if (mediaIdError && mediaIdError.code !== 'PGRST116') {
-          console.warn('MediaID check error:', mediaIdError)
+          if (mediaIdError && mediaIdError.code !== 'PGRST116') {
+            console.warn('MediaID check error:', mediaIdError)
+          }
+          hasMediaID = Array.isArray(mediaRows) && mediaRows.length > 0
         }
 
         setProfileState({
           hasCompletedOnboarding: profile?.onboarding_completed || false,
-          selectedRole: profile?.role || null,
-          hasMediaID: !!mediaId,
+          selectedRole,
+          hasMediaID,
           loading: false,
           databaseAvailable: true,
           needsProfileCreation: false
