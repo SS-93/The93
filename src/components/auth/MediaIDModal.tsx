@@ -4,11 +4,12 @@ import { supabase } from '../../lib/supabaseClient'
 
 interface MediaIDModalProps {
   user: any
+  role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'
   onComplete: (data: any) => void
   onClose: () => void
 }
 
-const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }) => {
+const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, role, onComplete, onClose }) => {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -93,7 +94,7 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
         .eq('id', user.id)
         .single()
 
-      const effectiveRole = profile?.role || 'fan'
+      const effectiveRole = role || profile?.role || 'fan'
 
       const { error: mediaIdError } = await supabase
         .from('media_ids')
