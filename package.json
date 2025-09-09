@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.109",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@stripe/react-stripe-js": "^2.9.0",
     "@stripe/stripe-js": "^1.54.2",
     "@supabase/supabase-js": "^2.50.0",
@@ -27,19 +30,20 @@
   "devDependencies": {
     "@types/react-router-dom": "^5.3.3",
     "autoprefixer": "^10.4.21",
+    "express": "^5.1.0",
     "postcss": "^8.5.4",
     "tailwindcss": "^3.4.17"
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:ffmpeg": "npm run build && node serve-with-headers.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {

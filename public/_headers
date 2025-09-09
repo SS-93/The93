@@ -1,0 +1,4 @@
+# Headers for FFmpeg support (Cross-Origin Isolation)
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
