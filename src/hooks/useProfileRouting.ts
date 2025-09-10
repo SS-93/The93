@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 
 interface ProfileState {
   hasCompletedOnboarding: boolean
-  selectedRole: 'fan' | 'artist' | 'brand' | 'developer' | null
+  selectedRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin' | null
   hasMediaID: boolean
   loading: boolean
   databaseAvailable: boolean
@@ -130,6 +130,62 @@ export const useProfileRouting = () => {
     checkProfileState()
   }, [user, authLoading])
 
+  const switchToRole = async (targetRole: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
+    if (!user) throw new Error('User not authenticated')
+    
+    try {
+      // Update user's role in profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ role: targetRole })
+        .eq('id', user.id)
+
+      if (profileError) throw profileError
+
+      // Update local state
+      setProfileState(prev => ({
+        ...prev,
+        selectedRole: targetRole
+      }))
+
+      // Navigate to the new role's dashboard
+      navigate(`/dashboard/${targetRole}`)
+      
+    } catch (error) {
+      console.error('Error switching role:', error)
+      throw error
+    }
+  }
+
+  const getRoleInfo = (role: 'fan' | 'artist' | 'brand' | 'developer' | 'admin') => {
+    const roleIcons: Record<string, string> = {
+      fan: '🎵',
+      artist: '🎤',
+      brand: '🏢',
+      developer: '👨‍💻',
+      admin: '⚙️'
+    }
+
+    const roleNames: Record<string, string> = {
+      fan: 'Fan',
+      artist: 'Artist',
+      brand: 'Brand',
+      developer: 'Developer',
+      admin: 'Admin'
+    }
+
+    // Mock role availability logic - in real app this would check user's MediaID profiles
+    const isAvailable = true // For now, assume all roles are available
+    const needsSetup = false // For now, assume no setup needed
+
+    return {
+      icon: roleIcons[role] || '👤',
+      name: roleNames[role] || role,
+      isAvailable,
+      needsSetup
+    }
+  }
+
   const routeUser = () => {
     if (profileState.loading || authLoading) return
 
@@ -165,6 +221,8 @@ export const useProfileRouting = () => {
   return {
     profileState,
     routeUser,
+    switchToRole,
+    getRoleInfo,
     loading: profileState.loading || authLoading
   }
 } 

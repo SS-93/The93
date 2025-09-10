@@ -66,13 +66,13 @@ class VideoEditingService {
     try {
       // Check if FFmpeg is already loaded from audio service
       const { hybridAudioService } = await import('./hybridAudioService')
-      this.ffmpegLoaded = await hybridAudioService.isFFmpegAvailable()
+      this.ffmpegLoaded = await hybridAudioService.canProcessClientSide()
       
       if (!this.ffmpegLoaded) {
         console.log('🎬 Loading FFmpeg for video editing...')
         // Load FFmpeg.wasm for video processing
-        const { createFFmpeg, fetchFile } = await import('@ffmpeg/ffmpeg')
-        const ffmpeg = createFFmpeg({ log: true })
+        const { FFmpeg } = await import('@ffmpeg/ffmpeg')
+        const ffmpeg = new FFmpeg()
         await ffmpeg.load()
         this.ffmpegLoaded = true
       }
@@ -141,17 +141,20 @@ class VideoEditingService {
     
     try {
       // Apply filter using FFmpeg
-      const { createFFmpeg, fetchFile } = await import('@ffmpeg/ffmpeg')
-      const ffmpeg = createFFmpeg({ log: true })
+      const { FFmpeg } = await import('@ffmpeg/ffmpeg')
+      const { fetchFile } = await import('@ffmpeg/util')
+      const ffmpeg = new FFmpeg()
       
       const inputName = 'input.mp4'
       const outputName = 'output.mp4'
       
-      ffmpeg.FS('writeFile', inputName, await fetchFile(clip.file))
-      await ffmpeg.run('-i', inputName, '-vf', filterString, outputName)
+      await ffmpeg.load()
+      await ffmpeg.writeFile(inputName, await fetchFile(clip.file))
+      await ffmpeg.exec(['-i', inputName, '-vf', filterString, outputName])
       
-      const data = ffmpeg.FS('readFile', outputName)
-      return new Blob([data.buffer], { type: 'video/mp4' })
+      const data = await ffmpeg.readFile(outputName)
+      const buffer = data instanceof Uint8Array ? data.buffer : data
+      return new Blob([buffer], { type: 'video/mp4' })
     } catch (error) {
       console.error('Filter application failed:', error)
       throw error
@@ -186,8 +189,11 @@ class VideoEditingService {
     }
 
     try {
-      const { createFFmpeg, fetchFile } = await import('@ffmpeg/ffmpeg')
-      const ffmpeg = createFFmpeg({ log: true })
+      const { FFmpeg } = await import('@ffmpeg/ffmpeg')
+      const { fetchFile } = await import('@ffmpeg/util')
+      const ffmpeg = new FFmpeg()
+      
+      await ffmpeg.load()
 
       // Build FFmpeg command for multi-clip rendering
       const commands: string[] = ['-y'] // Overwrite output
@@ -195,14 +201,14 @@ class VideoEditingService {
       // Input files
       for (let i = 0; i < project.clips.length; i++) {
         const inputName = `input${i}.mp4`
-        ffmpeg.FS('writeFile', inputName, await fetchFile(project.clips[i].file))
+        await ffmpeg.writeFile(inputName, await fetchFile(project.clips[i].file))
         commands.push('-i', inputName)
       }
 
       // Audio input if present
       if (project.audio) {
         const audioName = 'audio.mp3'
-        ffmpeg.FS('writeFile', audioName, await fetchFile(project.audio.file))
+        await ffmpeg.writeFile(audioName, await fetchFile(project.audio.file))
         commands.push('-i', audioName)
       }
 
@@ -237,10 +243,11 @@ class VideoEditingService {
         'output.mp4'
       )
 
-      await ffmpeg.run(...commands)
+      await ffmpeg.exec(commands)
       
-      const data = ffmpeg.FS('readFile', 'output.mp4')
-      return new Blob([data.buffer], { type: 'video/mp4' })
+      const data = await ffmpeg.readFile('output.mp4')
+      const buffer = data instanceof Uint8Array ? data.buffer : data
+      return new Blob([buffer], { type: 'video/mp4' })
     } catch (error) {
       console.error('Video rendering failed:', error)
       throw error
