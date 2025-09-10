@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import RoleManager from './RoleManager'
 
 // Mock data interfaces
 interface Artist {
@@ -277,21 +278,10 @@ const FanDashboard: React.FC<FanDashboardProps> = ({
             </div>
 
             {/* Role Switcher */}
-            <div className="flex items-center gap-1 glass rounded-lg p-1">
-              {(['fan', 'artist', 'brand', 'developer'] as const).map((role) => (
-                <button
-                  key={role}
-                  onClick={() => onRoleSwitch?.(role)}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-colors capitalize ${
-                    userRole === role 
-                      ? 'bg-accent-yellow text-black' 
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
+            <RoleManager 
+              currentRole={userRole} 
+              compact={true}
+            />
           </div>
         </div>
       </header>

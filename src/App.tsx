@@ -3,6 +3,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from './lib/stripeClient'
 import { AuthProvider } from './hooks/useAuth'
+import { AudioPlayerProvider } from './context/AudioPlayerContext'
+import BucketsSystemTray from './components/player/enhanced/BucketsSystemTray'
+import PlayerPage from './components/player/PlayerPage'
 import BucketDemo from './routes/bucket-demo'
 import LockerDemo from './routes/locker-demo'
 import BucketTemplateUI from './components/BucketTemplateUI'
@@ -22,6 +25,10 @@ import BrandLogin from './components/auth/BrandLogin'
 import DeveloperLogin from './components/auth/DeveloperLogin'
 import DeveloperDashboard from './components/DeveloperDashboard'
 import TestDashboard from './components/TestDashboard'
+import UniversalSettingsPanel from './components/settings/UniversalSettingsPanel'
+import DedicatedUploadPage from './components/DedicatedUploadPage'
+import ContentLibraryManager from './components/ContentLibraryManager'
+import DiscoveryPage from './components/DiscoveryPage'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -101,6 +108,9 @@ const LandingPage: React.FC = () => (
 
       <div className="space-y-4">
         <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <a href="/discover" className="glass border border-accent-yellow/30 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/70 transition-colors bg-accent-yellow/10">
+            🎵 Discover Music
+          </a>
           <a href="/catalog" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
             Explore Artists
           </a>
@@ -305,6 +315,55 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />
   },
+  // Settings Route
+  {
+    path: '/settings',
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <UniversalSettingsPanel />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Player Route
+  {
+    path: '/player',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <PlayerPage />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Discovery Route
+  {
+    path: '/discover',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <DiscoveryPage />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Upload System Routes
+  {
+    path: '/upload',
+    element: (
+      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+        <DedicatedUploadPage />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/upload/library',
+    element: (
+      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+        <ContentLibraryManager />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
   // Unauthorized access
   {
     path: '/unauthorized',
@@ -324,15 +383,20 @@ const router = createBrowserRouter([
 ])
 
 function App() {
-  console.log('URL:', process.env.REACT_APP_SUPABASE_URL)
-  console.log('KEY:', process.env.REACT_APP_SUPABASE_ANON_KEY)
+  // ✅ Debug logging for Vercel
+  console.log('Environment:', process.env.NODE_ENV)
+  console.log('Supabase URL exists:', !!process.env.REACT_APP_SUPABASE_URL)
+  console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY)
   
   return (
     <Elements stripe={stripePromise}>
       <AuthProvider>
-        <div className="min-h-screen bg-black text-white">
-          <RouterProvider router={router} />
-        </div>
+        <AudioPlayerProvider>
+          <div className="min-h-screen bg-black text-white">
+            <RouterProvider router={router} />
+            <BucketsSystemTray />
+          </div>
+        </AudioPlayerProvider>
       </AuthProvider>
     </Elements>
   )

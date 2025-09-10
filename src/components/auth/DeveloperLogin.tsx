@@ -130,6 +130,7 @@ const DeveloperLogin: React.FC = () => {
       {showMediaIDSetup && user && (
         <MediaIDModal
           user={user}
+          role="developer"
           onComplete={handleMediaIDComplete}
           onClose={() => setShowMediaIDSetup(false)}
         />

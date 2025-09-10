@@ -4,11 +4,12 @@ import { supabase } from '../../lib/supabaseClient'
 
 interface MediaIDModalProps {
   user: any
+  role?: 'fan' | 'artist' | 'brand' | 'developer' | 'admin'
   onComplete: (data: any) => void
   onClose: () => void
 }
 
-const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }) => {
+const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, role, onComplete, onClose }) => {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -87,17 +88,26 @@ const MediaIDModal: React.FC<MediaIDModalProps> = ({ user, onComplete, onClose }
       }
 
       // Update MediaID with user preferences
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const effectiveRole = role || profile?.role || 'fan'
+
       const { error: mediaIdError } = await supabase
         .from('media_ids')
         .upsert({
           user_uuid: user.id,
+          role: effectiveRole,
           interests: formData.interests,
           genre_preferences: formData.genres || [],
           privacy_settings: formData.privacySettings,
           content_flags: {},
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'user_uuid'
+          onConflict: 'user_uuid,role'
         })
 
       if (mediaIdError) {

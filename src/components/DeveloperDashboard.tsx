@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import RoleManager from './RoleManager'
 
 interface DeveloperApp {
   id: string
@@ -226,6 +227,7 @@ const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
             </div>
             
             <div className="flex items-center space-x-4">
+              <RoleManager currentRole={userRole} compact={true} />
               <button 
                 onClick={() => setShowCreateApp(true)}
                 className="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-colors"

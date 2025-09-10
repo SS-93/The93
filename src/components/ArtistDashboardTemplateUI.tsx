@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import ArtistUploadManager from './ArtistUploadManager'
+import RoleManager from './RoleManager'
 
 // Mock data for artist analytics
 const mockArtistData = {
@@ -76,22 +77,8 @@ const ArtistDashboardTemplateUI: React.FC<ArtistDashboardProps> = ({
             </div>
 
             <div className="flex items-center gap-4">
-              {/* Role Switcher */}
-              <div className="flex items-center gap-1 glass rounded-lg p-1">
-                {(['fan', 'artist', 'brand', 'developer'] as const).map((role) => (
-                  <button
-                    key={role}
-                    onClick={() => onRoleSwitch(role)}
-                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors capitalize ${
-                      userRole === role 
-                        ? 'bg-accent-yellow text-black' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    {role}
-                  </button>
-                ))}
-              </div>
+              {/* Role Manager */}
+              <RoleManager currentRole={userRole} compact={true} />
             </div>
           </div>
         </header>
@@ -121,12 +108,28 @@ const ArtistDashboardTemplateUI: React.FC<ArtistDashboardProps> = ({
           
           {/* Actions & Time Filter */}
           <div className="flex items-center space-x-4">
+            <a
+              href="/upload"
+              className="bg-accent-yellow text-black font-bold px-6 py-4 rounded-2xl text-lg transition-all transform hover:scale-105 shadow-xl flex items-center space-x-2 no-underline"
+            >
+              <span>🎵</span>
+              <span>Upload Studio</span>
+            </a>
+            
+            <a
+              href="/upload/library"
+              className="bg-gray-800 hover:bg-gray-700 text-white font-bold px-6 py-4 rounded-2xl text-lg transition-all transform hover:scale-105 shadow-xl flex items-center space-x-2 no-underline"
+            >
+              <span>📚</span>
+              <span>Library</span>
+            </a>
+            
             <button
               onClick={() => setShowUploadManager(true)}
-              className="bg-accent-yellow text-black font-bold px-6 py-4 rounded-2xl text-lg transition-all transform hover:scale-105 shadow-xl flex items-center space-x-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-4 rounded-2xl text-lg transition-all transform hover:scale-105 shadow-xl flex items-center space-x-2"
             >
               <span>📁</span>
-              <span>Upload Content</span>
+              <span>Quick Upload</span>
             </button>
             
             <div className="flex space-x-4">
