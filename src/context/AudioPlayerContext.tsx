@@ -448,19 +448,26 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       audioRef.current.addEventListener('loadstart', () => console.log(`🎵 Load started for ${state.currentTrack?.title}`))
       audioRef.current.addEventListener('canplay', () => console.log(`✅ Can play ${state.currentTrack?.title}`))
       
-      if (state.isPlaying) {
-        audioRef.current.play().catch(error => {
-          console.error(`❌ Play failed for ${state.currentTrack?.title}:`, error)
-        })
-      }
-      
       return () => {
         if (audioRef.current) {
           audioRef.current.removeEventListener('error', handleError)
         }
       }
     }
-  }, [state.currentTrack, state.isPlaying])
+  }, [state.currentTrack])
+
+  // Separate useEffect for handling play/pause state changes
+  useEffect(() => {
+    if (audioRef.current && state.currentTrack) {
+      if (state.isPlaying) {
+        audioRef.current.play().catch(error => {
+          console.error(`❌ Play failed for ${state.currentTrack?.title}:`, error)
+        })
+      } else {
+        audioRef.current.pause()
+      }
+    }
+  }, [state.isPlaying, state.currentTrack])
 
   // Sync volume and mute state
   useEffect(() => {

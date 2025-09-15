@@ -4,6 +4,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAudioPlayer } from '../../../context/AudioPlayerContext'
+import VerticalMusicPlayer from '../VerticalMusicPlayer'
+import { supabase } from '../../../lib/supabaseClient'
 
 // Device interface for handoff functionality
 interface Device {
@@ -13,6 +15,40 @@ interface Device {
   isActive: boolean
   isAvailable: boolean
 }
+
+// Extended track for vertical player
+interface VideoTrack {
+  id: string
+  title: string
+  artist: string
+  artistId: string
+  audioUrl: string
+  duration?: number
+  albumArt?: string
+  videoUrl?: string
+  videoLoopDuration?: number
+  topicHashtag?: string
+  tags?: string[]
+  isExplicit?: boolean
+  followerCount?: string
+  isFollowing?: boolean
+  creatorId?: string
+  waveformData?: number[]
+  audioFeatures?: {
+    bpm?: number
+    key?: string
+    mode?: string
+    energy?: number
+    valence?: number
+    danceability?: number
+  }
+  moodTags?: {
+    tags: string[]
+    confidence: number
+  }
+}
+
+// No mock data - only use real uploaded content from artist profiles
 
 const BucketsSystemTray: React.FC = () => {
   const { 
@@ -48,6 +84,8 @@ const BucketsSystemTray: React.FC = () => {
   const [showLyrics, setShowLyrics] = useState(false)
   const [showQueue, setShowQueue] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showVerticalPlayer, setShowVerticalPlayer] = useState(false)
+  const [verticalTracks, setVerticalTracks] = useState<VideoTrack[]>([])
   
   // Refs for interaction handling
   const scrubberRef = useRef<HTMLDivElement>(null)
@@ -203,6 +241,150 @@ const BucketsSystemTray: React.FC = () => {
     // TODO: Implement actual device transfer logic
     console.log(`Transferring playback to ${device.name}`)
   }
+
+  // Function to fetch video tracks from database
+  const fetchVideoTracks = useCallback(async (): Promise<VideoTrack[]> => {
+    try {
+      // Simplified approach - get content items and artist info separately
+      const { data: contentItems, error: contentError } = await supabase
+        .from('content_items')
+        .select(`
+          id,
+          title,
+          description,
+          file_path,
+          duration_seconds,
+          metadata,
+          created_at,
+          artist_id
+        `)
+        .in('content_type', ['video', 'audio']) // Include both for fallback
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      if (contentError) {
+        console.error('Error fetching content items:', contentError)
+        return [] // Return empty array instead of mock data
+      }
+
+      if (!contentItems || contentItems.length === 0) {
+        console.log('No published content found')
+        return []
+      }
+
+      // Convert to VideoTrack format
+      const videoTracks: VideoTrack[] = await Promise.all(
+        contentItems.map(async (item: any) => {
+          // Get artist info separately if artist_id exists
+          let artistInfo = { artist_name: 'Unknown Artist', user_id: 'unknown' }
+          if (item.artist_id) {
+            try {
+              // Try artist_profiles first
+              const { data: artist, error: artistError } = await supabase
+                .from('artist_profiles')
+                .select('artist_name, user_id')
+                .eq('id', item.artist_id)
+                .single()
+              
+              if (artist && !artistError) {
+                artistInfo = {
+                  artist_name: artist.artist_name,
+                  user_id: artist.user_id
+                }
+              }
+            } catch (error) {
+              // If artist_profiles fails, try artists table
+              try {
+                const { data: artist, error: artistError } = await supabase
+                  .from('artists')
+                  .select('name, user_id')
+                  .eq('id', item.artist_id)
+                  .single()
+                
+                if (artist && !artistError && artist.name) {
+                  artistInfo = {
+                    artist_name: artist.name,
+                    user_id: artist.user_id
+                  }
+                }
+              } catch (err) {
+                console.warn('Could not fetch artist info for', item.artist_id)
+              }
+            }
+          }
+
+          // Get signed URL for the file
+          const { data: signedUrlData } = await supabase.storage
+            .from('artist-content')
+            .createSignedUrl(item.file_path, 3600)
+
+          // For video files, use the same URL for both video and audio
+          // For audio files, use as audio URL only
+          const isVideo = item.file_path.toLowerCase().includes('.mp4') || 
+                         item.file_path.toLowerCase().includes('.mov') || 
+                         item.file_path.toLowerCase().includes('.webm')
+          
+          return {
+            id: item.id,
+            title: item.title,
+            artist: artistInfo.artist_name,
+            artistId: item.artist_id || 'unknown',
+            audioUrl: signedUrlData?.signedUrl || '',
+            videoUrl: isVideo ? signedUrlData?.signedUrl : undefined,
+            albumArt: `https://picsum.photos/600/600?random=${item.id}`, // Blue-ish random image
+            duration: item.duration_seconds,
+            topicHashtag: item.metadata?.genre || 'original',
+            tags: item.metadata?.tags || ['original'],
+            isExplicit: item.metadata?.explicit || false,
+            followerCount: '1.2K',
+            isFollowing: false,
+            creatorId: artistInfo.user_id,
+            audioFeatures: item.metadata?.audio_features,
+            moodTags: item.metadata?.mood_tags ? {
+              tags: item.metadata.mood_tags,
+              confidence: 0.8
+            } : undefined
+          }
+        })
+      )
+
+      // Include current track if it's not already in the list
+      if (state.currentTrack && !videoTracks.find(t => t.id === state.currentTrack?.id)) {
+        const currentAsVideoTrack: VideoTrack = {
+          ...state.currentTrack,
+          videoUrl: undefined, // Will use artwork fallback
+          topicHashtag: 'now playing',
+          tags: ['current', 'playing'],
+          isExplicit: false,
+          followerCount: '0',
+          isFollowing: false,
+          creatorId: state.currentTrack.artistId
+        }
+        videoTracks.unshift(currentAsVideoTrack)
+      }
+
+      return videoTracks
+    } catch (error) {
+      console.error('Error fetching video tracks:', error)
+      console.log('No uploaded content available for vertical player')
+      
+      // Return empty array - no mock data allowed
+      return []
+    }
+  }, [state.currentTrack])
+
+  // Vertical player handlers
+  const openVerticalPlayer = useCallback(async () => {
+    setShowVerticalPlayer(true)
+    // Fetch latest video tracks when opening
+    const tracks = await fetchVideoTracks()
+    setVerticalTracks(tracks)
+  }, [fetchVideoTracks])
+
+  const closeVerticalPlayer = useCallback(() => {
+    setShowVerticalPlayer(false)
+  }, [])
 
   // Progress calculation
   const progress = state.duration > 0 ? (state.currentTime / state.duration) * 100 : 0
@@ -425,6 +607,16 @@ const BucketsSystemTray: React.FC = () => {
 
               {/* RIGHT CLUSTER: Secondary Controls */}
               <div className="flex items-center justify-end space-x-2">
+                {/* Vertical Player Button */}
+                <button
+                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded"
+                  aria-label="Open vertical player"
+                  onClick={openVerticalPlayer}
+                  title="Vertical Player"
+                >
+                  📱
+                </button>
+
                 {/* Lyrics */}
                 <button
                   className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${
@@ -542,6 +734,32 @@ const BucketsSystemTray: React.FC = () => {
                   {isFullscreen ? '🗗' : '⛶'}
                 </button>
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Vertical Player Modal with Frosted Background */}
+      <AnimatePresence>
+        {showVerticalPlayer && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+          >
+            {/* Frosted Background Overlay */}
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" />
+            
+            {/* Vertical Player Container */}
+            <div className="relative w-full h-full max-w-md mx-auto">
+              <VerticalMusicPlayer
+                tracks={verticalTracks}
+                initialIndex={0}
+                onClose={closeVerticalPlayer}
+                className="rounded-none"
+              />
             </div>
           </motion.div>
         )}
