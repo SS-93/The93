@@ -160,6 +160,7 @@ const WelcomePage: React.FC = () => {
       {showMediaIDModal && (
         <MediaIDModal
           user={newUser}
+          role={newUser?.user_metadata?.role || 'fan'}
           onComplete={handleMediaIDComplete}
           onClose={() => setShowMediaIDModal(false)}
         />

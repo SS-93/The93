@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { signUp, signInWithOAuth } from '../../lib/auth'
+import { signupViaEdgeFunction, signInWithOAuth } from '../../lib/auth'
 
 interface SignUpFormProps {
   onSuccess: (user: any) => void
@@ -34,12 +34,14 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
 
     setLoading(true)
     try {
-      const { data, error } = await signUp(formData.email, formData.password, {
-        role: formData.role
-      })
-      
+      const { data, error } = await signupViaEdgeFunction(
+        formData.email,
+        formData.password,
+        { role: formData.role }
+      )
+
       if (error) throw error
-      
+
       onSuccess(data.user)
     } catch (err: any) {
       setError(err.message || 'Failed to create account')
