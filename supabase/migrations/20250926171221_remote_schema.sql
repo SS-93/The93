@@ -1,5 +1,5 @@
 -- ===============================================
--- COMBINED FINAL SCHEMA — SUPABASE READY (v2, Enhanced by Gemini)
+-- COMBINED FINAL SCHEMA  SUPABASE READY (v2, Enhanced by Gemini)
 -- Key Enhancements:
 -- 1. Data Integrity: `media_engagement_log.content_id` is now UUID with a proper Foreign Key.
 -- 2. Normalization: Removed redundant `role` from `media_ids` table.

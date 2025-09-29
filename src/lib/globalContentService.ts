@@ -17,7 +17,7 @@ export interface GlobalTrack {
   
   // Artist relationship
   artist_id: string
-  artists?: {
+  artist_profiles?: {
     id: string
     artist_name: string
     user_id: string
@@ -76,7 +76,7 @@ export class GlobalContentService {
           created_at,
           updated_at,
           artist_id,
-          artists (
+          artist_profiles (
             id,
             artist_name,
             user_id
@@ -142,7 +142,7 @@ export class GlobalContentService {
           created_at,
           updated_at,
           artist_id,
-          artists (
+          artist_profiles (
             id,
             artist_name,
             user_id
@@ -161,7 +161,7 @@ export class GlobalContentService {
           )
         `)
         .eq('content_type', 'audio')
-        .eq('artists.user_id', userData.id)
+        .eq('artist_profiles.user_id', userData.id)
         .order('created_at', { ascending: false })
       
       console.log(`Found ${data?.length || 0} tracks for user ${email}`)
@@ -195,7 +195,7 @@ export class GlobalContentService {
   
   // Convert database track to player format
   static trackToPlayerFormat(track: GlobalTrack): any {
-    const artistField = (track as any).artists
+    const artistField = (track as any).artist_profiles
     const artistObj = Array.isArray(artistField) ? artistField[0] : artistField
     return {
       id: track.id,
@@ -311,6 +311,28 @@ export class GlobalContentService {
       
     } catch (error) {
       return { success: false, error }
+    }
+  }
+
+  // Get total count of published tracks for discovery counter
+  static async getPublishedTracksCount(): Promise<{ count: number | null, error: any }> {
+    try {
+      const { count, error } = await supabase
+        .from('content_items')
+        .select('*', { count: 'exact', head: true })
+        .eq('content_type', 'audio')
+        .eq('is_published', true)
+
+      if (error) {
+        console.error('Error fetching published tracks count:', error)
+        return { count: null, error }
+      }
+
+      return { count: count || 0, error: null }
+
+    } catch (error) {
+      console.error('Error in getPublishedTracksCount:', error)
+      return { count: null, error }
     }
   }
 }

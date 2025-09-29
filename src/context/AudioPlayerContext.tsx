@@ -2,6 +2,8 @@
 // Provides centralized state management for audio playback across the entire app
 
 import React, { createContext, useContext, useReducer, useRef, useEffect } from 'react'
+import { listeningHistoryService, trackPlay } from '../lib/listeningHistory'
+import { useAuth } from '../hooks/useAuth'
 
 // Types for the audio player
 export interface Track {
@@ -289,28 +291,57 @@ const AudioPlayerContext = createContext<AudioPlayerContextType | null>(null)
 export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(playerReducer, initialState)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const { user } = useAuth()
+  const playStartTimeRef = useRef<number | null>(null)
+  const currentSessionRef = useRef<string | null>(null)
 
   // Helper functions
-  const playTrack = (track: Track) => {
+  const playTrack = async (track: Track) => {
     dispatch({ type: 'PLAY_TRACK', payload: track })
+    
+    // Start listening session if user is authenticated
+    if (user && !currentSessionRef.current) {
+      try {
+        const sessionId = await listeningHistoryService.startSession(
+          user.id,
+          'web',
+          navigator.userAgent,
+          'global_player'
+        )
+        currentSessionRef.current = sessionId
+      } catch (error) {
+        console.warn('Failed to start listening session:', error)
+      }
+    }
+    
+    // Track play start time
+    playStartTimeRef.current = Date.now()
   }
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (audioRef.current) {
       if (state.isPlaying) {
+        // Track listening event before pausing
+        await trackListeningEvent('paused')
         audioRef.current.pause()
       } else {
         audioRef.current.play()
+        // Reset play start time when resuming
+        playStartTimeRef.current = Date.now()
       }
     }
     dispatch({ type: 'TOGGLE_PLAY' })
   }
 
-  const nextTrack = () => {
+  const nextTrack = async () => {
+    // Track current song before changing
+    await trackListeningEvent('played')
     dispatch({ type: 'NEXT_TRACK' })
   }
 
-  const previousTrack = () => {
+  const previousTrack = async () => {
+    // Track current song before changing
+    await trackListeningEvent('played')
     dispatch({ type: 'PREVIOUS_TRACK' })
   }
 
@@ -336,6 +367,63 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     dispatch({ type: 'ADD_TO_QUEUE', payload: [] })
   }
 
+  // Load recent tracks from listening history
+  const refreshRecentTracks = async () => {
+    if (!user) return
+    
+    try {
+      const history = await listeningHistoryService.getListeningHistory(user.id, undefined, 10)
+      const recentTracks = history.map(entry => ({
+        id: entry.content_id,
+        title: entry.content_title,
+        artist: entry.content_artist || 'Unknown Artist',
+        artistId: 'unknown',
+        audioUrl: '', // Would need to resolve from content_id
+        albumArt: entry.artwork_url,
+        duration: entry.total_duration_seconds
+      }))
+      
+      dispatch({ type: 'UPDATE_RECENT_TRACKS', payload: recentTracks })
+    } catch (error) {
+      console.warn('Failed to refresh recent tracks:', error)
+    }
+  }
+
+  // Track listening events
+  const trackListeningEvent = async (eventType: 'played' | 'paused' | 'completed' = 'played') => {
+    if (!user || !state.currentTrack || !playStartTimeRef.current) return
+    
+    const currentTime = Date.now()
+    const playDuration = Math.floor((currentTime - playStartTimeRef.current) / 1000)
+    
+    try {
+      await trackPlay({
+        userId: user.id,
+        contentId: state.currentTrack.id,
+        contentTitle: state.currentTrack.title,
+        contentArtist: state.currentTrack.artist,
+        contentType: 'music',
+        durationSeconds: playDuration,
+        totalDuration: state.currentTrack.duration,
+        context: 'global_player'
+      })
+      
+      console.log(`🎵 Tracked ${eventType} event for: ${state.currentTrack.title} (${playDuration}s)`)
+      
+      // Refresh recent tracks after tracking
+      if (eventType === 'completed' || eventType === 'played') {
+        await refreshRecentTracks()
+      }
+    } catch (error) {
+      console.warn('Failed to track listening event:', error)
+    }
+    
+    // Reset play start time for next tracking
+    if (eventType === 'completed' || eventType === 'paused') {
+      playStartTimeRef.current = null
+    }
+  }
+
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current
@@ -349,7 +437,10 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const handleTimeUpdate = () => {
       dispatch({ type: 'UPDATE_TIME', payload: audio.currentTime })
     }
-    const handleEnded = () => {
+    const handleEnded = async () => {
+      // Track listening event when track ends
+      await trackListeningEvent('completed')
+      
       if (state.repeatMode === 'track') {
         audio.currentTime = 0
         audio.play()
@@ -475,6 +566,42 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       audioRef.current.volume = state.isMuted ? 0 : state.volume
     }
   }, [state.volume, state.isMuted])
+
+  // Load recent tracks from listening history
+  useEffect(() => {
+    const loadRecentTracks = async () => {
+      if (!user) return
+      
+      try {
+        const history = await listeningHistoryService.getListeningHistory(user.id, undefined, 10)
+        const recentTracks = history.map(entry => ({
+          id: entry.content_id,
+          title: entry.content_title,
+          artist: entry.content_artist || 'Unknown Artist',
+          artistId: 'unknown',
+          audioUrl: '', // Would need to resolve from content_id
+          albumArt: entry.artwork_url,
+          duration: entry.total_duration_seconds
+        }))
+        
+        dispatch({ type: 'UPDATE_RECENT_TRACKS', payload: recentTracks })
+      } catch (error) {
+        console.warn('Failed to load recent tracks from listening history:', error)
+      }
+    }
+    
+    loadRecentTracks()
+  }, [user])
+
+  // Cleanup session on unmount
+  useEffect(() => {
+    return () => {
+      if (currentSessionRef.current) {
+        listeningHistoryService.endSession()
+        currentSessionRef.current = null
+      }
+    }
+  }, [])
 
   const contextValue: AudioPlayerContextType = {
     state,

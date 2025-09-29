@@ -11,6 +11,7 @@ import LockerDemo from '../routes/locker-demo'
 import BucketDemo from '../routes/bucket-demo'
 import AudioProcessingDashboard from './AudioProcessingDashboard'
 import GlobalContentTest from './GlobalContentTest'
+import ListeningHistoryDebug from './ListeningHistoryDebug'
 
 type ComponentType = 
   | 'landing'
@@ -26,6 +27,7 @@ type ComponentType =
   | 'auth-flows'
   | 'audio-processing'
   | 'global-content-test'
+  | 'listening-history-debug'
 
 const TestDashboard: React.FC = () => {
   const [activeComponent, setActiveComponent] = useState<ComponentType>('landing')
@@ -76,7 +78,8 @@ const TestDashboard: React.FC = () => {
           { id: 'bucket-demo', label: '🎵 Bucket Demo', color: 'bg-teal-600' },
           { id: 'auth-flows', label: '🔑 Auth Flows', color: 'bg-cyan-600' },
           { id: 'audio-processing', label: '🎼 Audio Processing', color: 'bg-amber-600' },
-          { id: 'global-content-test', label: '🌐 Global Content Test', color: 'bg-emerald-600' }
+          { id: 'global-content-test', label: '🌐 Global Content Test', color: 'bg-emerald-600' },
+          { id: 'listening-history-debug', label: '🕐 Listening History Debug', color: 'bg-green-600' }
         ].map((component) => (
           <button
             key={component.id}
@@ -254,6 +257,9 @@ const TestDashboard: React.FC = () => {
 
       case 'global-content-test':
         return <GlobalContentTest />
+
+      case 'listening-history-debug':
+        return <ListeningHistoryDebug />
 
       default:
         return <div className="text-white">Component not found</div>

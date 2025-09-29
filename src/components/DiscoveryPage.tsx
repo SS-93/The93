@@ -2,12 +2,12 @@
 // Three-panel layout: Library | Discovery | Feed
 
 import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useAudioPlayer } from '../context/AudioPlayerContext'
-import { supabase } from '../lib/supabaseClient'
 import GlobalContentService from '../lib/globalContentService'
+import { trackPlay } from '../lib/listeningHistory'
 
 // Types for discovery system
 interface PublishedTrack {
@@ -55,6 +55,7 @@ const DiscoveryPage: React.FC = () => {
   })
   const [selectedTrack, setSelectedTrack] = useState<PublishedTrack | null>(null)
   const [loading, setLoading] = useState(true)
+  const [savedTracksExpanded, setSavedTracksExpanded] = useState(true)
 
   useEffect(() => {
     loadDiscoveryData()
@@ -91,41 +92,56 @@ const DiscoveryPage: React.FC = () => {
         is_published: true
       }))
 
-      // Create discovery shelves
+      // Create discovery shelves with unique tracks
+      const usedTrackIds = new Set<string>()
+      const getUniqueTrackSlice = (tracks: PublishedTrack[], count: number) => {
+        const uniqueTracks = tracks.filter(track => !usedTrackIds.has(track.id))
+        const selected = uniqueTracks.slice(0, count)
+        selected.forEach(track => usedTrackIds.add(track.id))
+        return selected
+      }
+
+      // Pre-sort tracks for different shelf types
+      const shuffledTracks = shuffleArray([...publishedTracks])
+      const newestTracks = [...publishedTracks].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      const trendingTracks = [...publishedTracks].sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0))
+      const electronicTracks = publishedTracks.filter(t => t.genre?.toLowerCase().includes('electronic'))
+      const hiphopTracks = publishedTracks.filter(t => t.genre?.toLowerCase().includes('hip'))
+
       const shelves: DiscoveryShelf[] = [
         {
           id: 'weekly-discovery',
           title: 'Weekly Discovery',
           description: 'Fresh tracks picked just for you',
-          tracks: shuffleArray(publishedTracks).slice(0, 10),
+          tracks: getUniqueTrackSlice(shuffledTracks, 10),
           type: 'personalized'
         },
         {
           id: 'new-releases',
           title: 'New Releases',
           description: 'Latest drops from artists',
-          tracks: publishedTracks.slice(0, 8),
+          tracks: getUniqueTrackSlice(newestTracks, 8),
           type: 'new_releases'
         },
         {
           id: 'trending-now',
           title: 'Trending Now',
           description: 'What everyone\'s listening to',
-          tracks: publishedTracks.sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0)).slice(0, 12),
+          tracks: getUniqueTrackSlice(trendingTracks, 8),
           type: 'trending'
         },
         {
           id: 'electronic-vibes',
-          title: 'Electronic Vibes', 
+          title: 'Electronic Vibes',
           description: 'Electronic and experimental sounds',
-          tracks: publishedTracks.filter(t => t.genre?.toLowerCase().includes('electronic')).slice(0, 8),
+          tracks: getUniqueTrackSlice(electronicTracks, 6),
           type: 'genre'
         },
         {
           id: 'hip-hop-heat',
           title: 'Hip-Hop Heat',
-          description: 'Fresh beats and flows', 
-          tracks: publishedTracks.filter(t => t.genre?.toLowerCase().includes('hip')).slice(0, 8),
+          description: 'Fresh beats and flows',
+          tracks: getUniqueTrackSlice(hiphopTracks, 6),
           type: 'genre'
         }
       ]
@@ -162,7 +178,7 @@ const DiscoveryPage: React.FC = () => {
     return shuffled
   }
 
-  const handleTrackPlay = (track: PublishedTrack, shelf: DiscoveryShelf) => {
+  const handleTrackPlay = async (track: PublishedTrack, shelf: DiscoveryShelf) => {
     // Convert to player format
     const playerTrack = {
       id: track.id,
@@ -175,6 +191,25 @@ const DiscoveryPage: React.FC = () => {
     }
 
     playTrack(playerTrack)
+
+    // Explicitly track the listening event
+    if (user) {
+      try {
+        await trackPlay({
+          userId: user.id,
+          contentId: track.id,
+          contentTitle: track.title,
+          contentArtist: track.artist_name,
+          contentType: 'music',
+          durationSeconds: 0, // Just started playing
+          totalDuration: track.duration,
+          context: 'discovery_page'
+        })
+        console.log('🎵 Tracked play event for:', track.title)
+      } catch (error) {
+        console.warn('Failed to track play event:', error)
+      }
+    }
     
     // Add remaining shelf tracks to queue
     const remainingTracks = shelf.tracks.filter(t => t.id !== track.id).map(t => ({
@@ -189,6 +224,37 @@ const DiscoveryPage: React.FC = () => {
     addToQueue(remainingTracks)
 
     setSelectedTrack(track)
+  }
+
+  // Test function to add sample listening data
+  const addTestListeningData = async () => {
+    if (!user) return
+    
+    try {
+      const testTracks = [
+        { id: '550e8400-e29b-41d4-a716-446655440001', title: 'Test Song 1', artist: 'Test Artist 1' },
+        { id: '550e8400-e29b-41d4-a716-446655440002', title: 'Test Song 2', artist: 'Test Artist 2' },
+        { id: '550e8400-e29b-41d4-a716-446655440003', title: 'Test Song 3', artist: 'Test Artist 3' }
+      ]
+
+      for (const track of testTracks) {
+        await trackPlay({
+          userId: user.id,
+          contentId: track.id,
+          contentTitle: track.title,
+          contentArtist: track.artist,
+          contentType: 'music',
+          durationSeconds: 180,
+          totalDuration: 240,
+          context: 'test_data'
+        })
+      }
+      
+      console.log('✅ Added test listening data')
+      alert('Test data added! Check /recents page')
+    } catch (error) {
+      console.error('Failed to add test data:', error)
+    }
   }
 
   const handleTrackSave = (trackId: string) => {
@@ -244,7 +310,7 @@ const DiscoveryPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate(-1)}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 ← Back
@@ -266,8 +332,26 @@ const DiscoveryPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="text-gray-400 text-sm">
-              {discoveryShells.reduce((total, shelf) => total + shelf.tracks.length, 0)} tracks available
+            {/* Right side actions */}
+            <div className="flex items-center space-x-4">
+              {/* Listening History Clock */}
+              <button
+                onClick={() => navigate('/recents')}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 hover:border-green-500/50 transition-all group"
+                aria-label="View Listening History"
+                title="View Listening History"
+              >
+                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </svg>
+              </button>
+              
+              {/* Track count */}
+              <div className="text-gray-400 text-sm">
+                {discoveryShells.reduce((total, shelf) => total + shelf.tracks.length, 0)} tracks available
+              </div>
+
             </div>
           </div>
         </div>
@@ -282,14 +366,33 @@ const DiscoveryPage: React.FC = () => {
             
             {user ? (
               <div className="space-y-3">
-                <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-700/30 transition-colors cursor-pointer">
+                <div
+                  className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-700/30 transition-colors cursor-pointer"
+                  onClick={() => setSavedTracksExpanded(!savedTracksExpanded)}
+                >
                   <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded flex items-center justify-center text-sm">
                     ♥
                   </div>
-                  <div>
-                    <div className="text-white font-medium">Liked Songs</div>
-                    <div className="text-gray-400 text-sm">{fanLibrary.saved_tracks.length} songs</div>
+                  <div className="flex-1">
+                    <div className="text-white font-medium">Saved Tracks</div>
+                    <motion.div
+                      className="overflow-hidden"
+                      animate={{
+                        width: savedTracksExpanded ? 'auto' : '0px',
+                        opacity: savedTracksExpanded ? 1 : 0
+                      }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                      <div className="text-gray-400 text-sm whitespace-nowrap">{fanLibrary.saved_tracks.length} saved</div>
+                    </motion.div>
                   </div>
+                  <motion.div
+                    className="text-gray-400 text-sm"
+                    animate={{ rotate: savedTracksExpanded ? 0 : 180 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    −
+                  </motion.div>
                 </div>
 
                 <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700/30 transition-colors cursor-pointer">
