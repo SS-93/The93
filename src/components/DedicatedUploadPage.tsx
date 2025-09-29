@@ -42,7 +42,7 @@ const DedicatedUploadPage: React.FC = () => {
     try {
       // First, check if artist profile exists
       let { data: existingProfile, error } = await supabase
-        .from('artists')
+        .from('artist_profiles')
         .select('*')
         .eq('user_id', user.id)
         .single()
@@ -61,7 +61,7 @@ const DedicatedUploadPage: React.FC = () => {
         const artistName = userProfile?.display_name || user.email?.split('@')[0] || 'New Artist'
 
         const { data: newProfile, error: createError } = await supabase
-          .from('artists')
+          .from('artist_profiles')
           .insert({
             user_id: user.id,
             artist_name: artistName,

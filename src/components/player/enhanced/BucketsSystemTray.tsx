@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAudioPlayer } from '../../../context/AudioPlayerContext'
 import VerticalMusicPlayer from '../VerticalMusicPlayer'
 import { supabase } from '../../../lib/supabaseClient'
+import HostStatusIndicator from '../../concierto/HostStatusIndicator'
 
 // Device interface for handoff functionality
 interface Device {
@@ -419,6 +420,9 @@ const BucketsSystemTray: React.FC = () => {
             role="region"
             aria-label="Media player controls"
           >
+            {/* Host Status Indicator */}
+            <HostStatusIndicator className="absolute top-2 right-4 z-10" />
+
             <div className="max-w-screen-2xl mx-auto grid grid-cols-3 items-center gap-4">
               
               {/* LEFT CLUSTER: Now Playing */}

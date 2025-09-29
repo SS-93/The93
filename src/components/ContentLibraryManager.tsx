@@ -57,7 +57,7 @@ const ContentLibraryManager: React.FC = () => {
     if (!user) return
 
     const { data, error } = await supabase
-      .from('artists')
+      .from('artist_profiles')
       .select('id, artist_name, verification_status')
       .eq('user_id', user.id)
       .single()

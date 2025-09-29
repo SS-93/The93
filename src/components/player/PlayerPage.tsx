@@ -144,7 +144,7 @@ const PlayerPage: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate(-1)}
               className="bg-gray-700 text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-600 transition-colors"
             >
               Go Home

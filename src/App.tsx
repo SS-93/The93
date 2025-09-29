@@ -29,11 +29,14 @@ import UniversalSettingsPanel from './components/settings/UniversalSettingsPanel
 import DedicatedUploadPage from './components/DedicatedUploadPage'
 import ContentLibraryManager from './components/ContentLibraryManager'
 import DiscoveryPage from './components/DiscoveryPage'
+import ListeningHistoryPortal from './components/ListeningHistoryPortal'
+import ConciertoRoutes from './components/concierto/ConciertoRoutes'
+import HostAdminDashboard from './components/concierto/HostAdminDashboard'
 
 // Mock data for the BTI route
 const mockBTIContent = [
   {
-    id: '1',
+    id: '550e8400-e29b-41d4-a716-446655440011',
     name: "LOYALTY - KENDRICK.MP3",
     type: 'audio' as const,
     size: '12MB',
@@ -43,7 +46,7 @@ const mockBTIContent = [
     metadata: { duration: '4:15', artist: 'Kendrick Lamar', album: 'DAMN.' }
   },
   {
-    id: '2',
+    id: '550e8400-e29b-41d4-a716-446655440012',
     name: "DNA - KENDRICK.MP3",
     type: 'audio' as const,
     size: '10MB',
@@ -53,7 +56,7 @@ const mockBTIContent = [
     metadata: { duration: '3:05', artist: 'Kendrick Lamar', album: 'DAMN.' }
   },
   {
-    id: '3',
+    id: '550e8400-e29b-41d4-a716-446655440013',
     name: "HUMBLE - KENDRICK.MP3",
     type: 'audio' as const,
     size: '9MB',
@@ -110,6 +113,9 @@ const LandingPage: React.FC = () => (
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           <a href="/discover" className="glass border border-accent-yellow/30 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/70 transition-colors bg-accent-yellow/10">
             🎵 Discover Music
+          </a>
+          <a href="/recents" className="glass border border-green-500/30 px-8 py-4 rounded-xl font-bold hover:border-green-500/70 transition-colors bg-green-500/10">
+            🕐 Listening History
           </a>
           <a href="/catalog" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
             Explore Artists
@@ -345,6 +351,16 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />
   },
+  // Recents/Listening History Route
+  {
+    path: '/recents',
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <ListeningHistoryPortal />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
   // Upload System Routes
   {
     path: '/upload',
@@ -362,6 +378,22 @@ const router = createBrowserRouter([
         <ContentLibraryManager />
       </SmartRouteGuard>
     ),
+    errorElement: <ErrorBoundary />
+  },
+  // Host Admin Dashboard - /host/dashboard
+  {
+    path: '/host/dashboard',
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <HostAdminDashboard />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Concierto Event Management & Voting System - buckets.media/events/*
+  {
+    path: '/events/*',
+    element: <ConciertoRoutes />,
     errorElement: <ErrorBoundary />
   },
   // Unauthorized access

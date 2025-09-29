@@ -154,7 +154,7 @@ const ArtistUploadManager: React.FC<ArtistUploadManagerProps> = ({
               description: undefined,
               genre: undefined,
               tags: [],
-              isPublic: false,
+              isPublic: true,
               unlockDate: undefined,
               subscriptionTier: 'free',
               collaborators: [],
@@ -746,6 +746,91 @@ const ArtistUploadManager: React.FC<ArtistUploadManagerProps> = ({
                     }`} />
                   </button>
                 </div>
+
+                {/* Video Link Section for video content */}
+                {currentFile.contentType === 'video' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Video Link (Optional)
+                      </label>
+                      <div className="space-y-3">
+                        <input
+                          type="url"
+                          value={currentFile.metadata.visual_clip?.file_path || ''}
+                          onChange={(e) => updateFileMetadata(currentFile.id, { 
+                            visual_clip: { 
+                              file_path: e.target.value,
+                              duration_sec: currentFile.metadata.visual_clip?.duration_sec || 30,
+                              loop_enabled: currentFile.metadata.visual_clip?.loop_enabled !== false
+                            }
+                          })}
+                          className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:border-accent-yellow/50 focus:outline-none"
+                          placeholder="https://media.giphy.com/media/your-gif-id/giphy.mp4"
+                        />
+                        
+                        {/* Giphy Suggestion */}
+                        <div className="flex items-center space-x-2 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                          <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12zm4.64-1.96l3.54 3.54c.78.78 2.05.78 2.83 0l3.54-3.54c.78-.78.78-2.05 0-2.83L12.83 3.5c-.78-.78-2.05-.78-2.83 0L6.46 7.04c-.78.78-.78 2.05 0 2.83l3.54 3.54z"/>
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm text-purple-300 font-medium">💡 UX Suggestion</p>
+                            <p className="text-xs text-purple-400">
+                              Find visual loops at{' '}
+                              <a 
+                                href="https://giphy.com" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-purple-300 hover:text-purple-200 underline"
+                              >
+                                giphy.com
+                              </a>{' '}
+                              and paste the MP4 link here for seamless looping visuals
+                            </p>
+                          </div>
+                          <a
+                            href="https://giphy.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 bg-purple-500 text-white rounded-lg flex items-center justify-center hover:bg-purple-400 transition-colors"
+                            aria-label="Open Giphy"
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
+                      <div>
+                        <h4 className="font-medium text-white">Enable Looping</h4>
+                        <p className="text-sm text-gray-400">Loop video continuously during playback</p>
+                      </div>
+                      <button
+                        onClick={() => updateFileMetadata(currentFile.id, { 
+                          visual_clip: {
+                            ...currentFile.metadata.visual_clip,
+                            file_path: currentFile.metadata.visual_clip?.file_path || '',
+                            duration_sec: currentFile.metadata.visual_clip?.duration_sec || 30,
+                            loop_enabled: !(currentFile.metadata.visual_clip?.loop_enabled !== false)
+                          }
+                        })}
+                        className={`w-12 h-6 rounded-full transition-colors ${
+                          currentFile.metadata.visual_clip?.loop_enabled !== false ? 'bg-accent-yellow' : 'bg-gray-600'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                          currentFile.metadata.visual_clip?.loop_enabled !== false ? 'translate-x-7' : 'translate-x-1'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Advanced Metadata Accordion */}
                 <div className="mt-8">
