@@ -49,11 +49,15 @@ const MediaIDSettings: React.FC<MediaIDSettingsProps> = ({ user, profile, onProf
         .select('*')
         .eq('user_uuid', user.id)
         .eq('role', profile?.role || 'fan')
-        .single()
+        .order('updated_at', { ascending: false })
+        .limit(1)
 
       if (error) throw error
+      
+      // Handle multiple rows by taking the first (most recent) one
+      const mediaData = Array.isArray(data) ? data[0] : data
 
-      setMediaIDData(data)
+      setMediaIDData(mediaData)
     } catch (error) {
       console.error('Error fetching MediaID data:', error)
       // Set default values if no MediaID exists

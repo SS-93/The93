@@ -1,12 +1,10 @@
 -- ===============================================
--- COMBINED FINAL SCHEMA — SUPABASE READY (v2, Enhanced by Gemini)
+-- COMBINED FINAL SCHEMA — SUPABASE READY (v3, Hardened by Gemini)
 -- Key Enhancements:
--- 1. Data Integrity: `media_engagement_log.content_id` is now UUID with a proper Foreign Key.
--- 2. Normalization: Removed redundant `role` from `media_ids` table.
--- 3. Synchronization: Added a trigger to keep `content_search_index` in sync with `content_items`.
--- 4. Search: Expanded the `search_vector` to include more fields for better search results.
--- 5. RLS Hardening: Refined and commented Row Level Security policies for clarity and security.
--- 6. Consistency: Standardized index creation and added more comments.
+-- 1. Runtime Safety: Added safe casting for metadata to prevent trigger errors.
+-- 2. Security Hardening: Secured all SECURITY DEFINER functions by setting a blank search_path and revoking public execute permissions.
+-- 3. Best Practices: Removed redundant extensions and applied explicit casting for all JSONB defaults.
+-- 4. Bug Fix: Made content_search_index.artist_id nullable to prevent sync trigger failures.
 -- ===============================================
 
 SET search_path = public, extensions, auth, pg_catalog;
@@ -15,7 +13,7 @@ SET search_path = public, extensions, auth, pg_catalog;
 -- EXTENSIONS & SCHEMAS
 -- ===============================================
 CREATE SCHEMA IF NOT EXISTS extensions;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
+-- pgcrypto is sufficient, uuid-ossp is not needed as we use gen_random_uuid()
 CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS "vector" WITH SCHEMA extensions;
 
@@ -47,11 +45,11 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 -- MediaID: Normalized to remove role, simplified unique constraint.
 CREATE TABLE IF NOT EXISTS media_ids (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   user_uuid UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   interests TEXT[] DEFAULT '{}',
   genre_preferences TEXT[] DEFAULT '{}',
-  content_flags JSONB DEFAULT '{}',
+  content_flags JSONB DEFAULT '{}'::jsonb,
   location_code TEXT,
   profile_embedding extensions.vector(1536),
   privacy_settings JSONB DEFAULT '{
@@ -60,7 +58,7 @@ CREATE TABLE IF NOT EXISTS media_ids (
     "audio_capture": false,
     "anonymous_logging": true,
     "marketing_communications": false
-  }',
+  }'::jsonb,
   version INTEGER NOT NULL DEFAULT 1,
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -69,25 +67,25 @@ CREATE TABLE IF NOT EXISTS media_ids (
 
 -- Artist profiles
 CREATE TABLE IF NOT EXISTS artist_profiles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   artist_name TEXT NOT NULL,
   bio TEXT,
   banner_url TEXT,
-  social_links JSONB DEFAULT '{}',
+  social_links JSONB DEFAULT '{}'::jsonb,
   verification_status TEXT DEFAULT 'pending',
   record_label TEXT,
   publisher TEXT,
   bsl_enabled BOOLEAN DEFAULT false,
   bsl_tier TEXT,
-  upload_preferences JSONB DEFAULT '{}',
+  upload_preferences JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- Subscriptions
 CREATE TABLE IF NOT EXISTS subscriptions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   fan_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   artist_id UUID REFERENCES artist_profiles(id) ON DELETE CASCADE,
   status subscription_status NOT NULL DEFAULT 'active',
@@ -96,7 +94,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 
 -- Albums
 CREATE TABLE IF NOT EXISTS albums (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   name TEXT NOT NULL,
   artist_id UUID NOT NULL REFERENCES artist_profiles(id) ON DELETE CASCADE,
   description TEXT,
@@ -109,7 +107,7 @@ CREATE TABLE IF NOT EXISTS albums (
 
 -- Content items
 CREATE TABLE IF NOT EXISTS content_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   artist_id UUID REFERENCES artist_profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
@@ -121,7 +119,7 @@ CREATE TABLE IF NOT EXISTS content_items (
   milestone_condition JSONB,
   is_premium BOOLEAN DEFAULT FALSE,
   is_published BOOLEAN DEFAULT FALSE,
-  metadata JSONB DEFAULT '{}',
+  metadata JSONB DEFAULT '{}'::jsonb,
   audio_checksum TEXT,
   processing_status TEXT DEFAULT 'pending',
   file_type TEXT,
@@ -157,7 +155,7 @@ CREATE TABLE IF NOT EXISTS content_items (
 
 -- Audio processing jobs
 CREATE TABLE IF NOT EXISTS audio_processing_jobs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   content_id UUID REFERENCES content_items(id) ON DELETE CASCADE,
   job_type job_type NOT NULL,
   status job_status DEFAULT 'queued',
@@ -177,7 +175,7 @@ CREATE TABLE IF NOT EXISTS audio_processing_jobs (
 CREATE TABLE IF NOT EXISTS content_search_index (
   content_id UUID PRIMARY KEY REFERENCES content_items(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
-  artist_id UUID NOT NULL,
+  artist_id UUID, -- Made nullable to prevent trigger errors
   artist_name TEXT NOT NULL,
   genre TEXT,
   tags TEXT[] DEFAULT '{}',
@@ -194,7 +192,7 @@ CREATE TABLE IF NOT EXISTS content_search_index (
 
 -- Listening sessions
 CREATE TABLE IF NOT EXISTS listening_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   session_start TIMESTAMPTZ NOT NULL DEFAULT now(),
   session_end TIMESTAMPTZ,
@@ -210,7 +208,7 @@ CREATE TABLE IF NOT EXISTS listening_sessions (
 
 -- Listening history
 CREATE TABLE IF NOT EXISTS listening_history (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   media_id_profile_id TEXT,
   content_id UUID NOT NULL REFERENCES content_items(id) ON DELETE CASCADE,
@@ -233,18 +231,18 @@ CREATE TABLE IF NOT EXISTS listening_history (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Media engagement log: content_id is now UUID and nullable to support external content without sacrificing integrity for internal content.
+-- Media engagement log
 CREATE TABLE IF NOT EXISTS media_engagement_log (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  content_id UUID REFERENCES content_items(id) ON DELETE SET NULL, -- Changed to UUID and FK
-  external_content_id TEXT, -- For items not in content_items
+  content_id UUID REFERENCES content_items(id) ON DELETE SET NULL,
+  external_content_id TEXT,
   event_type TEXT NOT NULL CHECK (event_type IN (
     'track_play','track_complete','track_pause','track_skip',
     'content_add','content_remove','content_like','content_unlike',
     'playlist_add','playlist_remove','download','share'
   )),
-  metadata JSONB DEFAULT '{}',
+  metadata JSONB DEFAULT '{}'::jsonb,
   "timestamp" TIMESTAMPTZ DEFAULT now(),
   is_anonymous BOOLEAN DEFAULT FALSE,
   session_id UUID,
@@ -254,43 +252,45 @@ CREATE TABLE IF NOT EXISTS media_engagement_log (
 -- ===============================================
 -- STORAGE BUCKETS (Idempotent)
 -- ===============================================
-INSERT INTO storage.buckets (id,name)
+INSERT INTO storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
 VALUES
-  ('artist-content','artist-content'),
-  ('visual-clips','visual-clips'),
-  ('lyrics-documents','lyrics-documents'),
-  ('brand-assets','brand-assets'),
-  ('public-assets','public-assets'),
-  ('profile-avatars','profile-avatars')
+  ('artist-content','artist-content',false,104857600,ARRAY['audio/*','video/*','image/*']),
+  ('visual-clips','visual-clips',true,52428800,ARRAY['video/mp4','video/quicktime','video/webm','video/avi']),
+  ('lyrics-documents','lyrics-documents',false,10485760,ARRAY['text/plain','application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document']),
+  ('brand-assets','brand-assets',false,10485760,ARRAY['image/*','video/*']),
+  ('public-assets','public-assets',true,5242880,ARRAY['image/*']),
+  ('profile-avatars','profile-avatars',true,2097152,ARRAY['image/*'])
 ON CONFLICT (id) DO NOTHING;
 
 -- ===============================================
--- HELPER FUNCTIONS (SECURITY DEFINER + safe search_path)
+-- HELPER FUNCTIONS (Hardened for Security)
 -- ===============================================
 
 -- updated_at trigger helper
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 AS $$ BEGIN NEW.updated_at := now(); RETURN NEW; END; $$;
+REVOKE EXECUTE ON FUNCTION update_updated_at_column() FROM PUBLIC;
 
 -- Album track count maintenance
 CREATE OR REPLACE FUNCTION update_album_track_count()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 AS $$
 BEGIN
   IF TG_OP IN ('INSERT','UPDATE') AND NEW.album_id IS NOT NULL THEN
-    UPDATE albums SET total_tracks = (SELECT COUNT(*) FROM content_items WHERE album_id = NEW.album_id) WHERE id = NEW.album_id;
+    UPDATE public.albums SET total_tracks = (SELECT COUNT(*) FROM public.content_items WHERE album_id = NEW.album_id) WHERE id = NEW.album_id;
   END IF;
   IF TG_OP IN ('UPDATE','DELETE') AND OLD.album_id IS NOT NULL AND (TG_OP = 'DELETE' OR NEW.album_id IS DISTINCT FROM OLD.album_id) THEN
-    UPDATE albums SET total_tracks = (SELECT COUNT(*) FROM content_items WHERE album_id = OLD.album_id) WHERE id = OLD.album_id;
+    UPDATE public.albums SET total_tracks = (SELECT COUNT(*) FROM public.content_items WHERE album_id = OLD.album_id) WHERE id = OLD.album_id;
   END IF;
   RETURN COALESCE(NEW, OLD);
 END;
 $$;
+REVOKE EXECUTE ON FUNCTION update_album_track_count() FROM PUBLIC;
 
 -- Search vector maintenance for content_search_index
 CREATE OR REPLACE FUNCTION trg_csi_search_vector_maintain()
-RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 AS $$
 BEGIN
   NEW.search_vector :=
@@ -303,61 +303,67 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+REVOKE EXECUTE ON FUNCTION trg_csi_search_vector_maintain() FROM PUBLIC;
 
--- NEW: Trigger to sync content_items -> content_search_index
+-- Helper to convert jsonb array to text array
+CREATE OR REPLACE FUNCTION public.jsonb_array_to_text_array(jsonb)
+RETURNS text[] LANGUAGE sql IMMUTABLE AS $$
+  SELECT ARRAY(SELECT jsonb_array_elements_text($1));
+$$;
+
+-- Trigger to sync content_items -> content_search_index (with safe casting)
 CREATE OR REPLACE FUNCTION sync_content_item_to_search_index()
-RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 AS $$
 DECLARE
   v_artist_name TEXT;
 BEGIN
-  SELECT ap.artist_name INTO v_artist_name FROM artist_profiles ap WHERE ap.id = NEW.artist_id;
+  IF NEW.artist_id IS NOT NULL THEN
+    SELECT ap.artist_name INTO v_artist_name FROM public.artist_profiles ap WHERE ap.id = NEW.artist_id;
+  ELSE
+    v_artist_name := 'Unknown Artist';
+  END IF;
 
   IF TG_OP = 'INSERT' THEN
-    INSERT INTO content_search_index (content_id, title, artist_id, artist_name, genre, tags, mood_tags, bpm, musical_key, mode, energy, valence, danceability, created_at)
+    INSERT INTO public.content_search_index (content_id, title, artist_id, artist_name, genre, tags, mood_tags, bpm, musical_key, mode, energy, valence, danceability, created_at)
     SELECT
       NEW.id,
       NEW.title,
       NEW.artist_id,
       v_artist_name,
       NEW.metadata->>'genre',
-      jsonb_array_to_text_array(NEW.metadata->'tags'),
-      jsonb_array_to_text_array(NEW.metadata->'mood_tags'),
-      (NEW.metadata->>'bpm')::decimal,
+      public.jsonb_array_to_text_array(NEW.metadata->'tags'),
+      public.jsonb_array_to_text_array(NEW.metadata->'mood_tags'),
+      (NULLIF(trim(NEW.metadata->>'bpm'),''))::decimal,
       NEW.metadata->>'key',
       NEW.metadata->>'mode',
-      (NEW.metadata->>'energy')::decimal,
-      (NEW.metadata->>'valence')::decimal,
-      (NEW.metadata->>'danceability')::decimal,
+      (NULLIF(trim(NEW.metadata->>'energy'),''))::decimal,
+      (NULLIF(trim(NEW.metadata->>'valence'),''))::decimal,
+      (NULLIF(trim(NEW.metadata->>'danceability'),''))::decimal,
       NEW.created_at
     ON CONFLICT (content_id) DO NOTHING;
   ELSIF TG_OP = 'UPDATE' THEN
-    UPDATE content_search_index csi
+    UPDATE public.content_search_index csi
     SET
       title = NEW.title,
       artist_name = v_artist_name,
       genre = NEW.metadata->>'genre',
-      tags = jsonb_array_to_text_array(NEW.metadata->'tags'),
-      mood_tags = jsonb_array_to_text_array(NEW.metadata->'mood_tags'),
-      bpm = (NEW.metadata->>'bpm')::decimal,
+      tags = public.jsonb_array_to_text_array(NEW.metadata->'tags'),
+      mood_tags = public.jsonb_array_to_text_array(NEW.metadata->'mood_tags'),
+      bpm = (NULLIF(trim(NEW.metadata->>'bpm'),''))::decimal,
       musical_key = NEW.metadata->>'key',
       mode = NEW.metadata->>'mode',
-      energy = (NEW.metadata->>'energy')::decimal,
-      valence = (NEW.metadata->>'valence')::decimal,
-      danceability = (NEW.metadata->>'danceability')::decimal
+      energy = (NULLIF(trim(NEW.metadata->>'energy'),''))::decimal,
+      valence = (NULLIF(trim(NEW.metadata->>'valence'),''))::decimal,
+      danceability = (NULLIF(trim(NEW.metadata->>'danceability'),''))::decimal
     WHERE csi.content_id = NEW.id;
   ELSIF TG_OP = 'DELETE' THEN
-    DELETE FROM content_search_index csi WHERE csi.content_id = OLD.id;
+    DELETE FROM public.content_search_index csi WHERE csi.content_id = OLD.id;
   END IF;
   RETURN COALESCE(NEW, OLD);
 END;
 $$;
-
--- Helper to convert jsonb array to text array
-CREATE OR REPLACE FUNCTION jsonb_array_to_text_array(jsonb)
-RETURNS text[] LANGUAGE sql IMMUTABLE AS $$
-  SELECT ARRAY(SELECT jsonb_array_elements_text($1));
-$$;
+REVOKE EXECUTE ON FUNCTION sync_content_item_to_search_index() FROM PUBLIC;
 
 -- ===============================================
 -- CONSTRAINTS (Idempotent)
@@ -386,24 +392,27 @@ CREATE INDEX IF NOT EXISTS idx_media_engagement_log_event_type ON media_engageme
 CREATE INDEX IF NOT EXISTS idx_media_engagement_log_timestamp ON media_engagement_log("timestamp");
 CREATE INDEX IF NOT EXISTS idx_media_engagement_log_user_timestamp ON media_engagement_log(user_id, "timestamp");
 CREATE INDEX IF NOT EXISTS idx_media_engagement_log_session_id ON media_engagement_log(session_id) WHERE session_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_media_ids_profile_embedding ON media_ids USING ivfflat (profile_embedding extensions.vector_cosine_ops) WITH (lists = 100);
+CREATE INDEX IF NOT EXISTS idx_media_ids_profile_embedding
+  ON media_ids USING hnsw (profile_embedding vector_cosine_ops);
 
 -- ===============================================
 -- TRIGGERS
 -- ===============================================
-CREATE OR REPLACE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE OR REPLACE TRIGGER update_artist_profiles_updated_at BEFORE UPDATE ON artist_profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE OR REPLACE TRIGGER update_content_items_updated_at BEFORE UPDATE ON content_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE OR REPLACE TRIGGER update_albums_updated_at BEFORE UPDATE ON albums FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE OR REPLACE TRIGGER update_listening_sessions_updated_at BEFORE UPDATE ON listening_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE OR REPLACE TRIGGER update_listening_history_updated_at BEFORE UPDATE ON listening_history FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE OR REPLACE TRIGGER update_album_track_count_trigger AFTER INSERT OR UPDATE OR DELETE ON content_items FOR EACH ROW EXECUTE FUNCTION update_album_track_count();
-CREATE OR REPLACE TRIGGER csi_search_vector_maintain BEFORE INSERT OR UPDATE OF title, artist_name, tags, mood_tags ON content_search_index FOR EACH ROW EXECUTE FUNCTION trg_csi_search_vector_maintain();
+CREATE OR REPLACE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_artist_profiles_updated_at BEFORE UPDATE ON artist_profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_content_items_updated_at BEFORE UPDATE ON content_items FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_albums_updated_at BEFORE UPDATE ON albums FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_listening_sessions_updated_at BEFORE UPDATE ON listening_sessions FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_listening_history_updated_at BEFORE UPDATE ON listening_history FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_album_track_count_trigger AFTER INSERT OR UPDATE OR DELETE ON content_items FOR EACH ROW EXECUTE FUNCTION public.update_album_track_count();
+CREATE OR REPLACE TRIGGER csi_search_vector_maintain BEFORE INSERT OR UPDATE OF title, artist_name, tags, mood_tags ON content_search_index FOR EACH ROW EXECUTE FUNCTION public.trg_csi_search_vector_maintain();
 
--- NEW: Trigger to keep search index synchronized
+-- Trigger to keep search index synchronized
 CREATE OR REPLACE TRIGGER sync_content_items_to_search
 AFTER INSERT OR UPDATE OR DELETE ON content_items
-FOR EACH ROW EXECUTE FUNCTION sync_content_item_to_search_index();
+FOR EACH ROW EXECUTE FUNCTION public.sync_content_item_to_search_index();
+
+-- Remaining SQL is unchanged and follows
 
 -- ===============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -419,6 +428,8 @@ ALTER TABLE listening_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE listening_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media_engagement_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+
+-- Policies remain largely the same, but are more secure due to hardened functions
 
 -- Profiles Policies
 DROP POLICY IF EXISTS "Users can manage their own profile" ON profiles;
@@ -539,14 +550,14 @@ SELECT
   ci.artist_id,
   ap.artist_name,
   ci.metadata->>'genre',
-  jsonb_array_to_text_array(ci.metadata->'tags'),
-  jsonb_array_to_text_array(ci.metadata->'mood_tags'),
-  (ci.metadata->>'bpm')::decimal,
+  public.jsonb_array_to_text_array(ci.metadata->'tags'),
+  public.jsonb_array_to_text_array(ci.metadata->'mood_tags'),
+  (NULLIF(trim(ci.metadata->>'bpm'),''))::decimal,
   ci.metadata->>'key',
   ci.metadata->>'mode',
-  (ci.metadata->>'energy')::decimal,
-  (ci.metadata->>'valence')::decimal,
-  (ci.metadata->>'danceability')::decimal,
+  (NULLIF(trim(ci.metadata->>'energy'),''))::decimal,
+  (NULLIF(trim(ci.metadata->>'valence'),''))::decimal,
+  (NULLIF(trim(ci.metadata->>'danceability'),''))::decimal,
   ci.created_at
 FROM content_items ci
 JOIN artist_profiles ap ON ci.artist_id = ap.id
@@ -559,7 +570,7 @@ GRANT SELECT ON content_search_index TO anon, authenticated;
 GRANT INSERT, UPDATE, DELETE ON content_search_index TO authenticated;
 GRANT SELECT, INSERT ON media_engagement_log TO anon, authenticated;
 GRANT UPDATE, DELETE ON media_engagement_log TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION jsonb_array_to_text_array(jsonb) TO public;
+GRANT EXECUTE ON FUNCTION public.jsonb_array_to_text_array(jsonb) TO public;
 
 -- ===============================================
 -- DONE

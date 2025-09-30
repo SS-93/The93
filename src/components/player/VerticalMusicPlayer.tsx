@@ -28,7 +28,7 @@ const VerticalMusicPlayer: React.FC<VerticalMusicPlayerProps> = ({
   onClose,
   className = ''
 }) => {
-  const { state: playerState, playTrack, togglePlay, seekTo } = useAudioPlayer()
+  const { state: playerState, playTrack, togglePlay, seekTo, nextTrack, previousTrack } = useAudioPlayer()
   
   // Player state
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
@@ -48,8 +48,9 @@ const VerticalMusicPlayer: React.FC<VerticalMusicPlayerProps> = ({
   const opacity = useTransform(y, [-100, 0, 100], [0.8, 1, 0.8])
   
   const currentTrack = tracks[currentIndex]
-  const hasNext = currentIndex < tracks.length - 1
-  const hasPrevious = currentIndex > 0
+  // Check if there are next/previous tracks in the global audio player's queue
+  const hasNext = playerState.queue && playerState.queueIndex < (playerState.queue.length - 1)
+  const hasPrevious = playerState.queue && playerState.queueIndex > 0
 
   // Video event handlers
   const handleVideoLoad = useCallback(() => {
@@ -66,34 +67,22 @@ const VerticalMusicPlayer: React.FC<VerticalMusicPlayerProps> = ({
   }, [currentTrack])
 
   const goToNext = useCallback(() => {
-    if (hasNext) {
-      const nextIndex = currentIndex + 1
-      setCurrentIndex(nextIndex)
-      const nextTrack = tracks[nextIndex]
-      if (nextTrack) {
-        playTrack(nextTrack)
-        logMediaEngagement(nextTrack.id, 'vertical_swipe_next', { 
-          from_index: currentIndex,
-          to_index: nextIndex 
-        })
-      }
-    }
-  }, [currentIndex, hasNext, tracks, playTrack])
+    // Use global audio player's next function for library navigation
+    nextTrack()
+    logMediaEngagement(currentTrack?.id || '', 'vertical_arrow_next', { 
+      library_navigation: true,
+      source: 'arrow_button'
+    })
+  }, [nextTrack, currentTrack])
 
   const goToPrevious = useCallback(() => {
-    if (hasPrevious) {
-      const prevIndex = currentIndex - 1
-      setCurrentIndex(prevIndex)
-      const prevTrack = tracks[prevIndex]
-      if (prevTrack) {
-        playTrack(prevTrack)
-        logMediaEngagement(prevTrack.id, 'vertical_swipe_previous', {
-          from_index: currentIndex,
-          to_index: prevIndex
-        })
-      }
-    }
-  }, [currentIndex, hasPrevious, tracks, playTrack])
+    // Use global audio player's previous function for library navigation
+    previousTrack()
+    logMediaEngagement(currentTrack?.id || '', 'vertical_arrow_previous', {
+      library_navigation: true,
+      source: 'arrow_button'
+    })
+  }, [previousTrack, currentTrack])
 
   // Gesture handlers
   const handleDragEnd = useCallback((event: any, info: PanInfo) => {
@@ -288,7 +277,8 @@ const VerticalMusicPlayer: React.FC<VerticalMusicPlayerProps> = ({
             {/* Animated looping visual overlay */}
             <div className="absolute inset-0 opacity-20">
               <img 
-                src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeHE3MW1jbDZuMHgya3JkMTBhNzk4Zmw4b3NnZ3BnMDB6eDV3bWVidyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26tn33aiTi1jkl6H6/giphy.gif"
+                src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExc2ttNTY4Yjl3a3c0Y3Z3NWg5Ym8xYjR5cDR4dmdjN2oyandtdWRjNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xUNd9SokVPSprgyI24/giphy.gif"
+      
                 alt="looping visual"
                 className="w-full h-full object-cover mix-blend-overlay"
                 style={{ filter: 'hue-rotate(240deg) brightness(0.6)' }}
@@ -402,6 +392,47 @@ const VerticalMusicPlayer: React.FC<VerticalMusicPlayerProps> = ({
             onClick={handleTapRight}
             aria-label="Next track"
           />
+        </div>
+
+        {/* Visible Left/Right Arrow Navigation */}
+        <div className="absolute inset-0 flex items-center justify-between px-6 pointer-events-none z-20">
+          {/* Left Arrow - Previous Track */}
+          {hasPrevious && (
+            <motion.button
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white pointer-events-auto"
+              whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={goToPrevious}
+              aria-label="Previous track"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </motion.button>
+          )}
+
+          {/* Right Arrow - Next Track */}
+          {hasNext && (
+            <motion.button
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white pointer-events-auto"
+              whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+              whileTap={{ scale: 0.9 }}
+              onClick={goToNext}
+              aria-label="Next track"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </motion.button>
+          )}
         </div>
 
         {/* Mid Overlay - Artist Info */}
