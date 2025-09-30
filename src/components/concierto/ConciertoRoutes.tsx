@@ -7,6 +7,8 @@ import ArtistRegistration from './ArtistRegistration'
 import AudienceRegistration from './AudienceRegistration'
 import PublicEventView from './PublicEventView'
 import VotingInterface from './VotingInterface'
+import SMSVotingInterface from '../voting/SMSVotingInterface'
+import StreamlinedVotingInterface from '../voting/StreamlinedVotingInterface'
 import EventResults from './EventResults'
 import GlobalEventsListing from './GlobalEventsListing'
 
@@ -32,8 +34,14 @@ const ConciertoRoutes: React.FC = () => {
       {/* Public event view (The Christening) - buckets.media/events/view/:eventCode */}
       <Route path="/view/:eventCode" element={<PublicEventView />} />
 
-      {/* Voting interface - buckets.media/events/vote/:shareableCode */}
-      <Route path="/vote/:shareableCode" element={<VotingInterface />} />
+      {/* Streamlined voting interface - buckets.media/events/vote/:shareableCode */}
+      <Route path="/vote/:shareableCode" element={<StreamlinedVotingInterface />} />
+
+      {/* SMS-style voting interface - buckets.media/events/sms/:shareableCode */}
+      <Route path="/sms/:shareableCode" element={<SMSVotingInterface />} />
+
+      {/* Legacy card-style voting - buckets.media/events/vote-cards/:shareableCode */}
+      <Route path="/vote-cards/:shareableCode" element={<VotingInterface />} />
 
       {/* Event results - buckets.media/events/results/:shareableCode */}
       <Route path="/results/:shareableCode" element={<EventResults />} />

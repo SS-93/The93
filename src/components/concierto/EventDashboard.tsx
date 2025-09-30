@@ -83,6 +83,8 @@ const EventDashboard: React.FC = () => {
     contactStatus: '',
     notes: ''
   })
+  const [showPublishModal, setShowPublishModal] = useState(false)
+  const [pendingStatusChange, setPendingStatusChange] = useState<string | null>(null)
 
   useEffect(() => {
     if (eventId) {
@@ -143,9 +145,11 @@ const EventDashboard: React.FC = () => {
       if (artistsData) {
         const formattedArtists = artistsData.map((prospect: any) => ({
           id: prospect.id,
-          name: prospect.artist_name,
+          artist_name: prospect.artist_name, // MVP: Keep consistent with database field
+          name: prospect.artist_name, // For backward compatibility
           vote_count: prospect.vote_count || 0,
-          registration_status: prospect.contact_status,
+          contact_status: prospect.contact_status, // MVP: Keep consistent with database field
+          registration_status: prospect.contact_status, // For backward compatibility
           email: prospect.email,
           instagram: prospect.instagram_handle,
           bio: prospect.bio || undefined,
@@ -204,10 +208,29 @@ const EventDashboard: React.FC = () => {
 
       if (!error) {
         setEvent(prev => prev ? { ...prev, status: newStatus } : null)
+        console.log(`✅ Event status updated to: ${newStatus}`)
       }
     } catch (error) {
       console.error('Failed to update event status:', error)
     }
+  }
+
+  const handleStatusChange = (newStatus: string) => {
+    setPendingStatusChange(newStatus)
+    setShowPublishModal(true)
+  }
+
+  const confirmStatusChange = async () => {
+    if (pendingStatusChange) {
+      await updateEventStatus(pendingStatusChange)
+      setShowPublishModal(false)
+      setPendingStatusChange(null)
+    }
+  }
+
+  const cancelStatusChange = () => {
+    setShowPublishModal(false)
+    setPendingStatusChange(null)
   }
 
   const copyShareableLink = () => {
@@ -504,28 +527,56 @@ The Event Team
 
           {/* Status Controls */}
           <div className="flex space-x-3">
-            {event.status === 'published' && (
+            {/* Publish/Unpublish Toggle */}
+            {event.status === 'draft' && (
               <button
-                onClick={() => updateEventStatus('live')}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors"
+                onClick={() => handleStatusChange('published')}
+                className="px-4 py-2 bg-accent-yellow text-black hover:bg-accent-yellow/90 rounded-lg font-medium transition-colors flex items-center space-x-2"
               >
-                Start Event
+                <span>📢</span>
+                <span>Publish Event</span>
               </button>
             )}
+
+            {event.status === 'published' && (
+              <>
+                <button
+                  onClick={() => handleStatusChange('draft')}
+                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>📝</span>
+                  <span>Unpublish</span>
+                </button>
+                <button
+                  onClick={() => handleStatusChange('live')}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                >
+                  <span>🎬</span>
+                  <span>Start Event</span>
+                </button>
+              </>
+            )}
+
             {event.status === 'live' && (
               <button
-                onClick={() => updateEventStatus('completed')}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
+                onClick={() => handleStatusChange('completed')}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors flex items-center space-x-2"
               >
-                End Event
+                <span>🏁</span>
+                <span>End Event</span>
               </button>
             )}
-            <button
-              onClick={copyShareableLink}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
-            >
-              Copy Link
-            </button>
+
+            {/* Copy Link - available for published and live events */}
+            {(event.status === 'published' || event.status === 'live') && (
+              <button
+                onClick={copyShareableLink}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors flex items-center space-x-2"
+              >
+                <span>🔗</span>
+                <span>Copy Voting Link</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -1204,6 +1255,99 @@ The Event Team
                     Generate QR Code
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Publish/Status Change Confirmation Modal */}
+        {showPublishModal && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-md mx-4">
+              <h3 className="text-xl font-bold mb-4">Confirm Status Change</h3>
+
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4">
+                  Are you sure you want to change the event status?
+                </p>
+
+                <div className="bg-gray-800 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400">From:</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      event?.status === 'draft' ? 'bg-yellow-900/30 text-yellow-300' :
+                      event?.status === 'published' ? 'bg-blue-900/30 text-blue-300' :
+                      event?.status === 'live' ? 'bg-green-900/30 text-green-300' :
+                      'bg-gray-900/30 text-gray-300'
+                    }`}>
+                      {event?.status?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-gray-400">To:</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      pendingStatusChange === 'draft' ? 'bg-yellow-900/30 text-yellow-300' :
+                      pendingStatusChange === 'published' ? 'bg-blue-900/30 text-blue-300' :
+                      pendingStatusChange === 'live' ? 'bg-green-900/30 text-green-300' :
+                      pendingStatusChange === 'completed' ? 'bg-red-900/30 text-red-300' :
+                      'bg-gray-900/30 text-gray-300'
+                    }`}>
+                      {pendingStatusChange?.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+
+                {pendingStatusChange === 'published' && (
+                  <div className="mt-4 p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+                    <p className="text-sm text-blue-300">
+                      ✅ Publishing will make the event visible to voters and enable the voting link.
+                    </p>
+                  </div>
+                )}
+
+                {pendingStatusChange === 'draft' && (
+                  <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg">
+                    <p className="text-sm text-yellow-300">
+                      ⚠️ Unpublishing will hide the event from voters and disable voting.
+                    </p>
+                  </div>
+                )}
+
+                {pendingStatusChange === 'live' && (
+                  <div className="mt-4 p-3 bg-green-900/20 border border-green-700/50 rounded-lg">
+                    <p className="text-sm text-green-300">
+                      🎬 Starting the event will activate real-time voting and notifications.
+                    </p>
+                  </div>
+                )}
+
+                {pendingStatusChange === 'completed' && (
+                  <div className="mt-4 p-3 bg-red-900/20 border border-red-700/50 rounded-lg">
+                    <p className="text-sm text-red-300">
+                      🏁 Ending the event will stop all voting and lock results.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={cancelStatusChange}
+                  className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmStatusChange}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    pendingStatusChange === 'published' ? 'bg-accent-yellow text-black hover:bg-accent-yellow/90' :
+                    pendingStatusChange === 'live' ? 'bg-green-600 text-white hover:bg-green-700' :
+                    pendingStatusChange === 'completed' ? 'bg-red-600 text-white hover:bg-red-700' :
+                    'bg-gray-600 text-white hover:bg-gray-700'
+                  }`}
+                >
+                  Confirm
+                </button>
               </div>
             </div>
           </div>

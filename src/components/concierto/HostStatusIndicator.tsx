@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabaseClient'
 
@@ -17,7 +16,6 @@ interface HostStats {
 
 const HostStatusIndicator: React.FC<HostStatusIndicatorProps> = ({ className = '' }) => {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const [isHost, setIsHost] = useState(false)
   const [hostStats, setHostStats] = useState<HostStats | null>(null)
   const [showTooltip, setShowTooltip] = useState(false)
@@ -27,6 +25,7 @@ const HostStatusIndicator: React.FC<HostStatusIndicatorProps> = ({ className = '
     if (user) {
       checkHostStatus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const checkHostStatus = async () => {
@@ -83,7 +82,8 @@ const HostStatusIndicator: React.FC<HostStatusIndicatorProps> = ({ className = '
   }
 
   const handleHostClick = () => {
-    navigate('/host/dashboard')
+    // Use window.location for navigation since we might be outside Router context
+    window.location.href = '/host/dashboard'
   }
 
   if (!user || !isHost || loading) return null
