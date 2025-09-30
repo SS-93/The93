@@ -4,7 +4,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from './lib/stripeClient'
 import { AuthProvider } from './hooks/useAuth'
 import { AudioPlayerProvider } from './context/AudioPlayerContext'
-import BucketsSystemTray from './components/player/enhanced/BucketsSystemTray'
+import AppLayout from './components/AppLayout'
 import PlayerPage from './components/player/PlayerPage'
 import BucketDemo from './routes/bucket-demo'
 import LockerDemo from './routes/locker-demo'
@@ -162,16 +162,18 @@ const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' | 'de
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <LandingPage />,
-    errorElement: <ErrorBoundary />
-  },
-  // Test route for development - bypasses all auth guards
-  {
-    path: '/test',
-    element: <TestDashboard />,
-    errorElement: <ErrorBoundary />
-  },
+    element: <AppLayout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        path: '/',
+        element: <LandingPage />
+      },
+      // Test route for development - bypasses all auth guards
+      {
+        path: '/test',
+        element: <TestDashboard />
+      },
   {
     path: '/auto-route',
     element: <AutoRouter />,
@@ -396,21 +398,22 @@ const router = createBrowserRouter([
     element: <ConciertoRoutes />,
     errorElement: <ErrorBoundary />
   },
-  // Unauthorized access
-  {
-    path: '/unauthorized',
-    element: (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
-          <p className="text-gray-400 mb-8">You don't have permission to access this page.</p>
-          <a href="/" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold">
-            Go Home
-          </a>
-        </div>
-      </div>
-    ),
-    errorElement: <ErrorBoundary />
+      // Unauthorized access
+      {
+        path: '/unauthorized',
+        element: (
+          <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
+              <p className="text-gray-400 mb-8">You don't have permission to access this page.</p>
+              <a href="/" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold">
+                Go Home
+              </a>
+            </div>
+          </div>
+        )
+      }
+    ]
   }
 ])
 
@@ -419,14 +422,13 @@ function App() {
   console.log('Environment:', process.env.NODE_ENV)
   console.log('Supabase URL exists:', !!process.env.REACT_APP_SUPABASE_URL)
   console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY)
-  
+
   return (
     <Elements stripe={stripePromise}>
       <AuthProvider>
         <AudioPlayerProvider>
           <div className="min-h-screen bg-black text-white">
             <RouterProvider router={router} />
-            <BucketsSystemTray />
           </div>
         </AudioPlayerProvider>
       </AuthProvider>
