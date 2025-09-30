@@ -3,6 +3,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from './lib/stripeClient'
 import { AuthProvider } from './hooks/useAuth'
+import { AudioPlayerProvider } from './context/AudioPlayerContext'
+import AppLayout from './components/AppLayout'
+import PlayerPage from './components/player/PlayerPage'
 import BucketDemo from './routes/bucket-demo'
 import LockerDemo from './routes/locker-demo'
 import BucketTemplateUI from './components/BucketTemplateUI'
@@ -22,11 +25,18 @@ import BrandLogin from './components/auth/BrandLogin'
 import DeveloperLogin from './components/auth/DeveloperLogin'
 import DeveloperDashboard from './components/DeveloperDashboard'
 import TestDashboard from './components/TestDashboard'
+import UniversalSettingsPanel from './components/settings/UniversalSettingsPanel'
+import DedicatedUploadPage from './components/DedicatedUploadPage'
+import ContentLibraryManager from './components/ContentLibraryManager'
+import DiscoveryPage from './components/DiscoveryPage'
+import ListeningHistoryPortal from './components/ListeningHistoryPortal'
+import ConciertoRoutes from './components/concierto/ConciertoRoutes'
+import HostAdminDashboard from './components/concierto/HostAdminDashboard'
 
 // Mock data for the BTI route
 const mockBTIContent = [
   {
-    id: '1',
+    id: '550e8400-e29b-41d4-a716-446655440011',
     name: "LOYALTY - KENDRICK.MP3",
     type: 'audio' as const,
     size: '12MB',
@@ -36,7 +46,7 @@ const mockBTIContent = [
     metadata: { duration: '4:15', artist: 'Kendrick Lamar', album: 'DAMN.' }
   },
   {
-    id: '2',
+    id: '550e8400-e29b-41d4-a716-446655440012',
     name: "DNA - KENDRICK.MP3",
     type: 'audio' as const,
     size: '10MB',
@@ -46,7 +56,7 @@ const mockBTIContent = [
     metadata: { duration: '3:05', artist: 'Kendrick Lamar', album: 'DAMN.' }
   },
   {
-    id: '3',
+    id: '550e8400-e29b-41d4-a716-446655440013',
     name: "HUMBLE - KENDRICK.MP3",
     type: 'audio' as const,
     size: '9MB',
@@ -101,6 +111,12 @@ const LandingPage: React.FC = () => (
 
       <div className="space-y-4">
         <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <a href="/discover" className="glass border border-accent-yellow/30 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/70 transition-colors bg-accent-yellow/10">
+            🎵 Discover Music
+          </a>
+          <a href="/recents" className="glass border border-green-500/30 px-8 py-4 rounded-xl font-bold hover:border-green-500/70 transition-colors bg-green-500/10">
+            🕐 Listening History
+          </a>
           <a href="/catalog" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
             Explore Artists
           </a>
@@ -146,16 +162,18 @@ const DashboardWrapper: React.FC<{ initialRole: 'fan' | 'artist' | 'brand' | 'de
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <LandingPage />,
-    errorElement: <ErrorBoundary />
-  },
-  // Test route for development - bypasses all auth guards
-  {
-    path: '/test',
-    element: <TestDashboard />,
-    errorElement: <ErrorBoundary />
-  },
+    element: <AppLayout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        path: '/',
+        element: <LandingPage />
+      },
+      // Test route for development - bypasses all auth guards
+      {
+        path: '/test',
+        element: <TestDashboard />
+      },
   {
     path: '/auto-route',
     element: <AutoRouter />,
@@ -305,34 +323,114 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorBoundary />
   },
-  // Unauthorized access
+  // Settings Route
   {
-    path: '/unauthorized',
+    path: '/settings',
     element: (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
-          <p className="text-gray-400 mb-8">You don't have permission to access this page.</p>
-          <a href="/" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold">
-            Go Home
-          </a>
-        </div>
-      </div>
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <UniversalSettingsPanel />
+      </SmartRouteGuard>
     ),
     errorElement: <ErrorBoundary />
+  },
+  // Player Route
+  {
+    path: '/player',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <PlayerPage />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Discovery Route
+  {
+    path: '/discover',
+    element: (
+      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+        <DiscoveryPage />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Recents/Listening History Route
+  {
+    path: '/recents',
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <ListeningHistoryPortal />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Upload System Routes
+  {
+    path: '/upload',
+    element: (
+      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+        <DedicatedUploadPage />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/upload/library',
+    element: (
+      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+        <ContentLibraryManager />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Host Admin Dashboard - /host/dashboard
+  {
+    path: '/host/dashboard',
+    element: (
+      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+        <HostAdminDashboard />
+      </SmartRouteGuard>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  // Concierto Event Management & Voting System - buckets.media/events/*
+  {
+    path: '/events/*',
+    element: <ConciertoRoutes />,
+    errorElement: <ErrorBoundary />
+  },
+      // Unauthorized access
+      {
+        path: '/unauthorized',
+        element: (
+          <div className="min-h-screen bg-black text-white flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
+              <p className="text-gray-400 mb-8">You don't have permission to access this page.</p>
+              <a href="/" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold">
+                Go Home
+              </a>
+            </div>
+          </div>
+        )
+      }
+    ]
   }
 ])
 
 function App() {
-  console.log('URL:', process.env.REACT_APP_SUPABASE_URL)
-  console.log('KEY:', process.env.REACT_APP_SUPABASE_ANON_KEY)
-  
+  // ✅ Debug logging for Vercel
+  console.log('Environment:', process.env.NODE_ENV)
+  console.log('Supabase URL exists:', !!process.env.REACT_APP_SUPABASE_URL)
+  console.log('Supabase Key exists:', !!process.env.REACT_APP_SUPABASE_ANON_KEY)
+
   return (
     <Elements stripe={stripePromise}>
       <AuthProvider>
-        <div className="min-h-screen bg-black text-white">
-          <RouterProvider router={router} />
-        </div>
+        <AudioPlayerProvider>
+          <div className="min-h-screen bg-black text-white">
+            <RouterProvider router={router} />
+          </div>
+        </AudioPlayerProvider>
       </AuthProvider>
     </Elements>
   )

@@ -34,12 +34,15 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
 
     setLoading(true)
     try {
-      const { data, error } = await signUp(formData.email, formData.password, {
-        role: formData.role
-      })
-      
+      // Use direct Supabase Auth signup
+      const { data, error } = await signUp(
+        formData.email,
+        formData.password,
+        { role: formData.role, display_name: formData.email.split('@')[0] }
+      )
+
       if (error) throw error
-      
+
       onSuccess(data.user)
     } catch (err: any) {
       setError(err.message || 'Failed to create account')

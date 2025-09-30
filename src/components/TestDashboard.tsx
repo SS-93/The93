@@ -9,6 +9,10 @@ import UserCatalog from './UserCatalog'
 import BucketTemplateUI from './BucketTemplateUI'
 import LockerDemo from '../routes/locker-demo'
 import BucketDemo from '../routes/bucket-demo'
+import AudioProcessingDashboard from './AudioProcessingDashboard'
+import GlobalContentTest from './GlobalContentTest'
+import ListeningHistoryDebug from './ListeningHistoryDebug'
+import EnableVotingTool from './admin/EnableVotingTool'
 
 type ComponentType = 
   | 'landing'
@@ -22,6 +26,10 @@ type ComponentType =
   | 'locker-demo'
   | 'bucket-demo'
   | 'auth-flows'
+  | 'audio-processing'
+  | 'global-content-test'
+  | 'listening-history-debug'
+  | 'enable-voting'
 
 const TestDashboard: React.FC = () => {
   const [activeComponent, setActiveComponent] = useState<ComponentType>('landing')
@@ -70,7 +78,11 @@ const TestDashboard: React.FC = () => {
           { id: 'bucket-ui', label: '🪣 Bucket UI', color: 'bg-indigo-600' },
           { id: 'locker-demo', label: '🔒 Locker Demo', color: 'bg-red-600' },
           { id: 'bucket-demo', label: '🎵 Bucket Demo', color: 'bg-teal-600' },
-          { id: 'auth-flows', label: '🔑 Auth Flows', color: 'bg-cyan-600' }
+          { id: 'auth-flows', label: '🔑 Auth Flows', color: 'bg-cyan-600' },
+          { id: 'audio-processing', label: '🎼 Audio Processing', color: 'bg-amber-600' },
+          { id: 'global-content-test', label: '🌐 Global Content Test', color: 'bg-emerald-600' },
+          { id: 'listening-history-debug', label: '🕐 Listening History Debug', color: 'bg-green-600' },
+          { id: 'enable-voting', label: '🗳️ Enable Voting', color: 'bg-purple-600' }
         ].map((component) => (
           <button
             key={component.id}
@@ -242,6 +254,18 @@ const TestDashboard: React.FC = () => {
             </div>
           </div>
         )
+
+      case 'audio-processing':
+        return <AudioProcessingDashboard />
+
+      case 'global-content-test':
+        return <GlobalContentTest />
+
+      case 'listening-history-debug':
+        return <ListeningHistoryDebug />
+
+      case 'enable-voting':
+        return <EnableVotingTool />
 
       default:
         return <div className="text-white">Component not found</div>
