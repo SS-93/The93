@@ -387,7 +387,7 @@ const EventLandingPage: React.FC = () => {
           >
             🔗 Share this event
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
