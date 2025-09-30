@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { motion, PanInfo, useMotionValue, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from 'framer-motion'
 
 interface TouchGestureProps {
   children: React.ReactNode
