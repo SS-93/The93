@@ -20,11 +20,22 @@ code {
     monospace;
 }
 
-/* Glass morphism utility class */
+/* Glass morphism utility class - Apple-inspired */
 .glass {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Enhanced glass with stronger blur for panels */
+.glass-strong {
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* Custom Typography Utilities */
