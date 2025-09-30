@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Buckets",
+  "name": "Buckets | Privacy-First Music Platform",
+  "description": "Underground artists, exclusive drops, and MediaID experiences",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,8 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#FCD34D",
+  "background_color": "#000000",
+  "categories": ["music", "entertainment", "lifestyle"],
+  "orientation": "portrait-primary"
 }
