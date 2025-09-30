@@ -12,6 +12,7 @@ import BucketDemo from '../routes/bucket-demo'
 import AudioProcessingDashboard from './AudioProcessingDashboard'
 import GlobalContentTest from './GlobalContentTest'
 import ListeningHistoryDebug from './ListeningHistoryDebug'
+import EnableVotingTool from './admin/EnableVotingTool'
 
 type ComponentType = 
   | 'landing'
@@ -28,6 +29,7 @@ type ComponentType =
   | 'audio-processing'
   | 'global-content-test'
   | 'listening-history-debug'
+  | 'enable-voting'
 
 const TestDashboard: React.FC = () => {
   const [activeComponent, setActiveComponent] = useState<ComponentType>('landing')
@@ -79,7 +81,8 @@ const TestDashboard: React.FC = () => {
           { id: 'auth-flows', label: '🔑 Auth Flows', color: 'bg-cyan-600' },
           { id: 'audio-processing', label: '🎼 Audio Processing', color: 'bg-amber-600' },
           { id: 'global-content-test', label: '🌐 Global Content Test', color: 'bg-emerald-600' },
-          { id: 'listening-history-debug', label: '🕐 Listening History Debug', color: 'bg-green-600' }
+          { id: 'listening-history-debug', label: '🕐 Listening History Debug', color: 'bg-green-600' },
+          { id: 'enable-voting', label: '🗳️ Enable Voting', color: 'bg-purple-600' }
         ].map((component) => (
           <button
             key={component.id}
@@ -260,6 +263,9 @@ const TestDashboard: React.FC = () => {
 
       case 'listening-history-debug':
         return <ListeningHistoryDebug />
+
+      case 'enable-voting':
+        return <EnableVotingTool />
 
       default:
         return <div className="text-white">Component not found</div>

@@ -340,7 +340,7 @@ const EventCreator: React.FC = () => {
         allow_multiple_votes: formData.allowMultipleVotes,
         shareable_code: generateShareableCode(),
         host_user_id: user.id,
-        status: 'draft',
+        status: 'draft', // Create events as draft, publish them via dashboard
         mediaid_integration_enabled: true,
         privacy_mode: 'balanced'
       }
