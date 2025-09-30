@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { signupViaEdgeFunction, signUp, signInWithOAuth } from '../../lib/auth'
+import { signUp, signInWithOAuth } from '../../lib/auth'
 
 interface SignUpFormProps {
   onSuccess: (user: any) => void
@@ -34,27 +34,16 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onBack, defaultRole 
 
     setLoading(true)
     try {
-      // Try Edge Function first, fall back to direct signup if CORS fails
-      let result
-      try {
-        result = await signupViaEdgeFunction(
-          formData.email,
-          formData.password,
-          { role: formData.role, display_name: formData.email.split('@')[0] }
-        )
-      } catch (edgeFunctionError: any) {
-        console.warn('Edge function failed, using direct signup:', edgeFunctionError)
-        // Fallback to direct Supabase Auth
-        result = await signUp(
-          formData.email,
-          formData.password,
-          { role: formData.role, display_name: formData.email.split('@')[0] }
-        )
-      }
+      // Use direct Supabase Auth signup
+      const { data, error } = await signUp(
+        formData.email,
+        formData.password,
+        { role: formData.role, display_name: formData.email.split('@')[0] }
+      )
 
-      if (result.error) throw result.error
+      if (error) throw error
 
-      onSuccess(result.data.user)
+      onSuccess(data.user)
     } catch (err: any) {
       setError(err.message || 'Failed to create account')
     } finally {
