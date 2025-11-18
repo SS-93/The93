@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import ProfilePhotoUpload from './ProfilePhotoUpload'
+import ArtistPhotoUploader from './ArtistPhotoUploader'
 
 interface ArtistProspect {
   id: string
@@ -177,7 +177,19 @@ const ArtistRegistration: React.FC = () => {
           <h2 className="text-xl font-semibold text-accent-yellow mb-6">{event?.title}</h2>
 
           <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-4 mb-6 text-left">
-            <h3 className="font-medium mb-2">Your Information:</h3>
+            <h3 className="font-medium mb-3">Your Information:</h3>
+
+            {/* Artist Photo Preview */}
+            {formData.profilePhoto && (
+              <div className="flex justify-center mb-4">
+                <img
+                  src={formData.profilePhoto}
+                  alt={formData.name}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-accent-yellow"
+                />
+              </div>
+            )}
+
             <div className="space-y-1 text-sm text-gray-300">
               <p><strong>Name:</strong> {formData.name}</p>
               {formData.email && <p><strong>Email:</strong> {formData.email}</p>}
@@ -235,18 +247,17 @@ const ArtistRegistration: React.FC = () => {
           <div className="bg-gray-900/50 border border-gray-700/50 rounded-lg p-6">
             <h3 className="font-medium mb-6">Your Information</h3>
 
-            <div className="space-y-4">
-              {/* Profile Photo Upload */}
-              <div className="text-center">
-                <ProfilePhotoUpload
-                  userId={artist?.id}
+            <div className="space-y-6">
+              {/* Artist Photo Upload - Prominent */}
+              <div>
+                <label className="block text-sm font-medium mb-3 text-center">
+                  Artist Photo *
+                </label>
+                <ArtistPhotoUploader
                   currentPhotoUrl={formData.profilePhoto}
                   onPhotoUploaded={(photoUrl) => setFormData(prev => ({ ...prev, profilePhoto: photoUrl }))}
-                  size="large"
-                  userType="artist"
-                  className="mx-auto mb-2"
+                  artistId={artist?.id}
                 />
-                <p className="text-xs text-gray-400">Upload your artist photo</p>
               </div>
 
               <div>

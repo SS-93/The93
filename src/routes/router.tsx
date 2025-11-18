@@ -27,6 +27,9 @@ import DeveloperDashboardRoute from './dashboard/developer'
 import BucketDemo from './bucket-demo'
 import LockerDemo from './locker-demo'
 
+// Companon routes
+import CompanonRoute from './companon'
+
 // Unauthorized route component
 const UnauthorizedRoute = () => (
   <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -110,6 +113,12 @@ export const router = createBrowserRouter([
   {
     path: '/BTI',
     element: <BTIRoute />,
+    errorElement: <ErrorBoundary />
+  },
+  // Companon Routes (Brand Activation Dashboard)
+  {
+    path: '/companon/*',
+    element: <CompanonRoute />,
     errorElement: <ErrorBoundary />
   },
   // Protected Dashboard Routes

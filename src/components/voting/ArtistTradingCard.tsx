@@ -104,17 +104,17 @@ const ArtistTradingCard: React.FC<ArtistTradingCardProps> = ({
               {/* Card Header */}
               <div className="text-center mb-6">
                 <div className="relative mb-4">
-                  {/* Artist Photo */}
+                  {/* Artist Photo - Now using new photo system */}
                   <div className="relative">
                     {artist.profile_image_url ? (
                       <img
                         src={artist.profile_image_url}
                         alt={artist.artist_name}
-                        className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-accent-yellow"
+                        className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-accent-yellow shadow-xl"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-accent-yellow to-orange-500 text-black flex items-center justify-center font-bold text-2xl mx-auto border-4 border-accent-yellow">
-                        {artist.artist_name.charAt(0)}
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-accent-yellow to-orange-500 text-black flex items-center justify-center font-bold text-2xl mx-auto border-4 border-accent-yellow shadow-xl">
+                        {artist.artist_name.charAt(0).toUpperCase()}
                       </div>
                     )}
 

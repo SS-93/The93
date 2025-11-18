@@ -36,6 +36,8 @@ const EventLandingPage: React.FC = () => {
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [allowVoting, setAllowVoting] = useState(true)
+  const [allowScoring, setAllowScoring] = useState(true)
   const [timeRemaining, setTimeRemaining] = useState<{
     days: number
     hours: number
@@ -162,6 +164,9 @@ const EventLandingPage: React.FC = () => {
         email,
         name,
         session_token: sessionToken,
+        allow_voting: allowVoting,
+        allow_scoring: allowScoring,
+        consent_timestamp: new Date().toISOString(),
         registered_at: new Date().toISOString()
       })
 
@@ -314,13 +319,73 @@ const EventLandingPage: React.FC = () => {
                       required
                     />
                   </div>
+
+                  {/* Opt-In Checkboxes */}
+                  <div className="space-y-4 p-4 backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl">
+                    <p className="text-white font-medium mb-3">Participation Preferences</p>
+
+                    <label className="flex items-start space-x-3 cursor-pointer group">
+                      <div className="relative flex-shrink-0 mt-1">
+                        <input
+                          type="checkbox"
+                          checked={allowVoting}
+                          onChange={(e) => setAllowVoting(e.target.checked)}
+                          className="w-5 h-5 bg-white/10 border-2 border-white/30 rounded checked:bg-blue-500 checked:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-white group-hover:text-blue-300 transition-colors">
+                          🗳️ Allow Voting
+                        </span>
+                        <p className="text-gray-400 text-sm mt-1">
+                          I want to cast votes for artists in this event
+                        </p>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start space-x-3 cursor-pointer group">
+                      <div className="relative flex-shrink-0 mt-1">
+                        <input
+                          type="checkbox"
+                          checked={allowScoring}
+                          onChange={(e) => setAllowScoring(e.target.checked)}
+                          className="w-5 h-5 bg-white/10 border-2 border-white/30 rounded checked:bg-purple-500 checked:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-400 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-white group-hover:text-purple-300 transition-colors">
+                          ⭐ Allow Scoring
+                        </span>
+                        <p className="text-gray-400 text-sm mt-1">
+                          I want to rate and score artist performances
+                        </p>
+                      </div>
+                    </label>
+
+                    {!allowVoting && !allowScoring && (
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="text-amber-400 text-sm mt-2 flex items-center space-x-2"
+                      >
+                        <span>⚠️</span>
+                        <span>Please select at least one participation option</span>
+                      </motion.p>
+                    )}
+                  </div>
+
                   <motion.button
                     type="submit"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl text-white font-semibold shadow-lg"
+                    disabled={!allowVoting && !allowScoring}
+                    whileHover={allowVoting || allowScoring ? { scale: 1.05 } : {}}
+                    whileTap={allowVoting || allowScoring ? { scale: 0.95 } : {}}
+                    className={`w-full p-4 rounded-2xl text-white font-semibold shadow-lg transition-all ${
+                      allowVoting || allowScoring
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
+                        : 'bg-gray-600 cursor-not-allowed opacity-50'
+                    }`}
                   >
-                    🚀 Register for Voting
+                    🚀 Register for Event
                   </motion.button>
                 </form>
               </motion.div>

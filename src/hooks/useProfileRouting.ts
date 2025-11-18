@@ -203,13 +203,19 @@ export const useProfileRouting = () => {
     }
 
     // If user needs profile creation or hasn't completed onboarding
-    if (profileState.needsProfileCreation || !profileState.hasCompletedOnboarding || !profileState.hasMediaID) {
+    // Exception: admins bypass onboarding/MediaID requirements
+    if (profileState.selectedRole !== 'admin' && (profileState.needsProfileCreation || !profileState.hasCompletedOnboarding || !profileState.hasMediaID)) {
       navigate('/onboarding')
       return
     }
 
     // If user has completed onboarding, route to their selected dashboard
     if (profileState.selectedRole) {
+      // Special case: admin role goes to DIA instead of dashboard
+      if (profileState.selectedRole === 'admin') {
+        navigate('/dia')
+        return
+      }
       navigate(`/dashboard/${profileState.selectedRole}`)
       return
     }

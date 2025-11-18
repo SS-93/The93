@@ -32,6 +32,15 @@ import DiscoveryPage from './components/DiscoveryPage'
 import ListeningHistoryPortal from './components/ListeningHistoryPortal'
 import ConciertoRoutes from './components/concierto/ConciertoRoutes'
 import HostAdminDashboard from './components/concierto/HostAdminDashboard'
+import { DIADashboard } from './components/dia/DIADashboard'
+import { AdminLogin } from './components/auth/AdminLogin'
+import { PassportViewer } from './components/passport/PassportViewer'
+import TestCheckoutPage from './routes/test-checkout'
+import TestTreasuryPage from './routes/test-treasury'
+import TreasuryAdminDashboard from './routes/admin-treasury'
+import CheckoutSuccessPage from './routes/checkout-success'
+import CheckoutCancelPage from './routes/checkout-cancel'
+import WalletPage from './routes/wallet'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -173,6 +182,62 @@ const router = createBrowserRouter([
       {
         path: '/test',
         element: <TestDashboard />
+      },
+      // Treasury Test Routes
+      {
+        path: '/test-checkout',
+        element: <TestCheckoutPage />
+      },
+      {
+        path: '/test-treasury',
+        element: <TestTreasuryPage />
+      },
+      {
+        path: '/admin/treasury',
+        element: (
+          <SmartRouteGuard allowedRoles={['admin']} requireAuth={true}>
+            <TreasuryAdminDashboard />
+          </SmartRouteGuard>
+        )
+      },
+      {
+        path: '/checkout/success',
+        element: <CheckoutSuccessPage />
+      },
+      {
+        path: '/checkout/cancel',
+        element: <CheckoutCancelPage />
+      },
+      {
+        path: '/wallet',
+        element: (
+          <SmartRouteGuard requireAuth={true}>
+            <WalletPage />
+          </SmartRouteGuard>
+        )
+      },
+      // Secret admin login - not linked anywhere
+      {
+        path: '/admin/login',
+        element: <AdminLogin />
+      },
+      // DIA Dashboard - Admin only
+      {
+        path: '/dia/*',
+        element: (
+          <SmartRouteGuard allowedRoles={['admin']}>
+            <DIADashboard />
+          </SmartRouteGuard>
+        )
+      },
+      // Passport Viewer - Authenticated users
+      {
+        path: '/passport',
+        element: (
+          <SmartRouteGuard requireAuth={true}>
+            <PassportViewer />
+          </SmartRouteGuard>
+        )
       },
   {
     path: '/auto-route',

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ConciertoMediaIdService } from '../../lib/conciertoMediaIdService'
 import { supabase } from '../../lib/supabaseClient'
+import ArtistPhotoUploader from './ArtistPhotoUploader'
+import EventBannerUploader from './EventBannerUploader'
+import EventVideoPlayer from './EventVideoPlayer'
+import EventDetailsEditor from './EventDetailsEditor'
 
 interface EventDetails {
   id: string
@@ -14,6 +18,13 @@ interface EventDetails {
   max_votes_per_participant: number
   mediaid_integration_enabled: boolean
   privacy_mode: string
+  cover_image_url?: string
+  video_url?: string
+  video_thumbnail_url?: string
+  banner_settings?: {
+    applyToBackground: boolean
+    overlayOpacity: number
+  }
 }
 
 interface EventAnalytics {
@@ -43,6 +54,7 @@ interface Artist {
   lastContacted?: string
   createdAt: string
   registrationToken?: string
+  profilePhoto?: string
 }
 
 interface AudienceMember {
@@ -64,14 +76,15 @@ const EventDashboard: React.FC = () => {
   const [artists, setArtists] = useState<Artist[]>([])
   const [audienceMembers, setAudienceMembers] = useState<AudienceMember[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'artists' | 'audience' | 'share'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'artists' | 'audience' | 'media' | 'share'>('overview')
   const [showAddArtist, setShowAddArtist] = useState(false)
   const [isAddingArtist, setIsAddingArtist] = useState(false)
   const [newArtist, setNewArtist] = useState({
     name: '',
     email: '',
     bio: '',
-    instagram: ''
+    instagram: '',
+    profilePhoto: ''
   })
   const [showEditArtist, setShowEditArtist] = useState<string | null>(null)
   const [isEditingArtist, setIsEditingArtist] = useState(false)
@@ -81,10 +94,12 @@ const EventDashboard: React.FC = () => {
     bio: '',
     instagram: '',
     contactStatus: '',
-    notes: ''
+    notes: '',
+    profilePhoto: ''
   })
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [pendingStatusChange, setPendingStatusChange] = useState<string | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
 
   useEffect(() => {
     if (eventId) {
@@ -130,6 +145,7 @@ const EventDashboard: React.FC = () => {
           artist_name,
           email,
           instagram_handle,
+          bio,
           contact_status,
           vote_count,
           registration_token,
@@ -137,7 +153,8 @@ const EventDashboard: React.FC = () => {
           tags,
           priority,
           last_contacted_at,
-          created_at
+          created_at,
+          profile_image_url
         `)
         .eq('event_id', eventId)
         .order('created_at', { ascending: false })
@@ -158,7 +175,8 @@ const EventDashboard: React.FC = () => {
           tags: prospect.tags || [],
           priority: prospect.priority || 5,
           lastContacted: prospect.last_contacted_at,
-          createdAt: prospect.created_at
+          createdAt: prospect.created_at,
+          profilePhoto: prospect.profile_image_url
         }))
         setArtists(formattedArtists)
       }
@@ -263,12 +281,20 @@ const EventDashboard: React.FC = () => {
 
       console.log('✅ Artist prospect added successfully:', prospectId)
 
+      // Update profile photo if provided
+      if (newArtist.profilePhoto && prospectId) {
+        await supabase
+          .from('event_artist_prospects')
+          .update({ profile_image_url: newArtist.profilePhoto })
+          .eq('id', prospectId as string)
+      }
+
       // Refresh artists list
       await loadEventDashboard()
 
       // Reset form
       setShowAddArtist(false)
-      setNewArtist({ name: '', email: '', bio: '', instagram: '' })
+      setNewArtist({ name: '', email: '', bio: '', instagram: '', profilePhoto: '' })
 
     } catch (error) {
       console.error('Failed to add artist:', error)
@@ -284,7 +310,8 @@ const EventDashboard: React.FC = () => {
       bio: artist.bio || '',
       instagram: artist.instagram || '',
       contactStatus: artist.registration_status,
-      notes: artist.notes || ''
+      notes: artist.notes || '',
+      profilePhoto: artist.profilePhoto || ''
     })
     setShowEditArtist(artist.id)
   }
@@ -303,6 +330,7 @@ const EventDashboard: React.FC = () => {
           bio: editArtist.bio || null,
           contact_status: editArtist.contactStatus,
           host_notes: editArtist.notes || null,
+          profile_image_url: editArtist.profilePhoto || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', showEditArtist)
@@ -319,7 +347,7 @@ const EventDashboard: React.FC = () => {
 
       // Reset form
       setShowEditArtist(null)
-      setEditArtist({ name: '', email: '', bio: '', instagram: '', contactStatus: '', notes: '' })
+      setEditArtist({ name: '', email: '', bio: '', instagram: '', contactStatus: '', notes: '', profilePhoto: '' })
 
     } catch (error) {
       console.error('Failed to update artist:', error)
@@ -525,8 +553,20 @@ The Event Team
             </div>
           </div>
 
-          {/* Status Controls */}
-          <div className="flex space-x-3">
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3">
+            {/* Edit Details Button */}
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span>Edit Details</span>
+            </button>
+
+            {/* Status Controls */}
             {/* Publish/Unpublish Toggle */}
             {event.status === 'draft' && (
               <button
@@ -583,7 +623,7 @@ The Event Team
         {/* Navigation Tabs */}
         <div className="border-b border-gray-800 mb-8">
           <nav className="flex space-x-8">
-            {(['overview', 'analytics', 'artists', 'audience', 'share'] as const).map(tab => (
+            {(['overview', 'analytics', 'artists', 'audience', 'media', 'share'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -902,13 +942,22 @@ The Event Team
                         className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg focus:border-accent-yellow focus:outline-none"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Artist Photo (Optional)</label>
+                      <ArtistPhotoUploader
+                        currentPhotoUrl={newArtist.profilePhoto}
+                        onPhotoUploaded={(photoUrl) => setNewArtist(prev => ({ ...prev, profilePhoto: photoUrl }))}
+                        artistId={`temp_${Date.now()}`}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       onClick={() => {
                         setShowAddArtist(false)
-                        setNewArtist({ name: '', email: '', bio: '', instagram: '' })
+                        setNewArtist({ name: '', email: '', bio: '', instagram: '', profilePhoto: '' })
                       }}
                       className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
                     >
@@ -1009,13 +1058,22 @@ The Event Team
                         className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg focus:border-accent-yellow focus:outline-none"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Artist Photo</label>
+                      <ArtistPhotoUploader
+                        currentPhotoUrl={editArtist.profilePhoto}
+                        onPhotoUploaded={(photoUrl) => setEditArtist(prev => ({ ...prev, profilePhoto: photoUrl }))}
+                        artistId={showEditArtist || undefined}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       onClick={() => {
                         setShowEditArtist(null)
-                        setEditArtist({ name: '', email: '', bio: '', instagram: '', contactStatus: '', notes: '' })
+                        setEditArtist({ name: '', email: '', bio: '', instagram: '', contactStatus: '', notes: '', profilePhoto: '' })
                       }}
                       className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
                     >
@@ -1213,6 +1271,67 @@ The Event Team
           </div>
         )}
 
+        {activeTab === 'media' && (
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Event Media</h2>
+              <p className="text-gray-400 mb-6">
+                Customize your event's visual appearance with a banner photo and promotional video
+              </p>
+            </div>
+
+            {/* Banner & Video Upload */}
+            <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
+              <h3 className="text-lg font-medium mb-4">📸 Event Banner & Video</h3>
+              <EventBannerUploader
+                eventId={event.id}
+                currentBannerUrl={event.cover_image_url}
+                currentVideoUrl={event.video_url}
+                applyToBackground={event.banner_settings?.applyToBackground || false}
+                onBannerUploaded={(url) => {
+                  setEvent(prev => prev ? { ...prev, cover_image_url: url } : null)
+                }}
+                onVideoUploaded={(url) => {
+                  setEvent(prev => prev ? { ...prev, video_url: url } : null)
+                }}
+                onBackgroundToggle={(apply) => {
+                  setEvent(prev => prev ? {
+                    ...prev,
+                    banner_settings: {
+                      applyToBackground: apply,
+                      overlayOpacity: 0.5
+                    }
+                  } : null)
+                }}
+              />
+            </div>
+
+            {/* Video Preview */}
+            {event.video_url && (
+              <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
+                <h3 className="text-lg font-medium mb-4">🎥 Video Preview</h3>
+                <EventVideoPlayer
+                  videoUrl={event.video_url}
+                  thumbnailUrl={event.video_thumbnail_url}
+                  eventTitle={event.title}
+                />
+              </div>
+            )}
+
+            {/* Media Tips */}
+            <div className="p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+              <h4 className="font-medium text-blue-300 mb-2">💡 Media Tips</h4>
+              <ul className="text-sm text-gray-300 space-y-1">
+                <li>• Banner photos work best at 3:1 aspect ratio (e.g., 1500x500px)</li>
+                <li>• Use "Apply to Background" to show your banner behind event content</li>
+                <li>• Videos should be under 50MB for optimal loading</li>
+                <li>• Supported formats: MP4, WebM, MOV for videos</li>
+                <li>• Your media will appear on the public event page and voting interface</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'share' && (
           <div className="max-w-2xl mx-auto">
             <div className="p-8 bg-gray-900/50 border border-gray-700/50 rounded-lg text-center">
@@ -1351,6 +1470,19 @@ The Event Team
               </div>
             </div>
           </div>
+        )}
+
+        {/* Edit Event Details Modal */}
+        {showEditModal && event && (
+          <EventDetailsEditor
+            event={event}
+            onSave={(updatedEvent) => {
+              // Merge updated fields while preserving other event properties
+              setEvent(prev => prev ? { ...prev, ...updatedEvent } : null)
+              setShowEditModal(false)
+            }}
+            onCancel={() => setShowEditModal(false)}
+          />
         )}
       </div>
     </div>

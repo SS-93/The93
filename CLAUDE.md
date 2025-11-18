@@ -32,6 +32,57 @@ npm run build && node serve-with-headers.js
 node serve-with-headers.js
 ```
 
+### Supabase Database Sync Protocol
+
+**Project Setup:**
+- Frontend: `/Users/pks.ml/Desktop/93/my-app` (linked to production)
+- Backend: `/Users/pks.ml/Desktop/EPK-93/Buckets_SB` (linked to production)
+- Project Name: `Buckets_V1`
+- Project Ref: `iutnwgvzwyupsuguxnls`
+
+**Migration Strategy:**
+
+Due to CLI connection pooler issues with `supabase db push`, use one of these methods:
+
+**Option 1: Direct psql (Recommended for CLI)**
+```bash
+cd /Users/pks.ml/Desktop/EPK-93/Buckets_SB
+PGPASSWORD=<DB_PASSWORD> psql "postgresql://postgres.iutnwgvzwyupsuguxnls:<DB_PASSWORD>@aws-0-us-east-2.pooler.supabase.com:6543/postgres" -f migration_file.sql
+```
+
+**Option 2: Supabase Dashboard SQL Editor (Most Reliable)**
+```
+1. Go to: https://supabase.com/dashboard/project/iutnwgvzwyupsuguxnls/sql/new
+2. Copy migration SQL file contents
+3. Paste and run in editor
+4. Verify success messages
+```
+
+**Known CLI Issues:**
+- `db push` may fail with "prepared statement already exists" errors (pooler conflict)
+- `db pull` may show migration history mismatches
+- Auth can fail even with correct `SUPABASE_ACCESS_TOKEN` + password
+
+**Migration Files Location:**
+- Backend: `/Users/pks.ml/Desktop/EPK-93/Buckets_SB/supabase/migrations/`
+- Frontend: `/Users/pks.ml/Desktop/93/my-app/supabase/migrations/`
+
+**Best Practice:**
+1. Create migrations in backend repo
+2. Test via psql or Dashboard
+3. Once verified, copy to frontend repo if needed
+4. Both repos are linked to same production project
+
+**Manual Application Template:**
+For complex migrations, create a standalone SQL file with:
+- DO blocks for conditional logic
+- IF NOT EXISTS checks
+- Dynamic column detection
+- Error handling
+- Verification queries at end
+
+See: `/Users/pks.ml/Desktop/EPK-93/Buckets_SB/APPLY_FEATURE_MIGRATIONS.sql` for reference.
+
 ## Architecture Overview
 
 ### Core Structure

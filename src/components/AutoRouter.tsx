@@ -10,10 +10,19 @@ export const AutoRouter: React.FC = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (authLoading || profileLoading) return
+    console.log('🔄 [AutoRouter] Effect triggered')
+    console.log('🔄 [AutoRouter] authLoading:', authLoading, 'profileLoading:', profileLoading)
+    console.log('🔄 [AutoRouter] user:', user?.id)
+    console.log('🔄 [AutoRouter] profileState:', profileState)
+
+    if (authLoading || profileLoading) {
+      console.log('⏳ [AutoRouter] Still loading, waiting...')
+      return
+    }
 
     // If no user, go to welcome
     if (!user) {
+      console.log('👤 [AutoRouter] No user found, redirecting to /welcome')
       navigate('/welcome', { replace: true })
       return
     }
@@ -21,24 +30,36 @@ export const AutoRouter: React.FC = () => {
     // If database isn't available, route directly to dashboard
     if (!profileState.databaseAvailable) {
       const role = profileState.selectedRole || 'fan'
-      console.log(`Database not ready, routing to ${role} dashboard`)
+      console.log(`🗄️ [AutoRouter] Database not ready, routing to ${role} dashboard`)
       navigate(`/dashboard/${role}`, { replace: true })
       return
     }
 
     // If user hasn't completed onboarding, go to onboarding
-    if (!profileState.hasCompletedOnboarding || !profileState.hasMediaID) {
+    // Exception: admins bypass onboarding/MediaID requirements
+    if (profileState.selectedRole !== 'admin' && (!profileState.hasCompletedOnboarding || !profileState.hasMediaID)) {
+      console.log('📋 [AutoRouter] Onboarding incomplete, redirecting to /onboarding')
+      console.log('📋 [AutoRouter] - hasCompletedOnboarding:', profileState.hasCompletedOnboarding)
+      console.log('📋 [AutoRouter] - hasMediaID:', profileState.hasMediaID)
       navigate('/onboarding', { replace: true })
       return
     }
 
     // If user has completed onboarding, route to their dashboard
     if (profileState.selectedRole) {
+      // Special case: admin role goes to DIA instead of dashboard
+      if (profileState.selectedRole === 'admin') {
+        console.log('👑 [AutoRouter] Admin detected, redirecting to /dia')
+        navigate('/dia', { replace: true })
+        return
+      }
+      console.log(`🎯 [AutoRouter] Routing to dashboard/${profileState.selectedRole}`)
       navigate(`/dashboard/${profileState.selectedRole}`, { replace: true })
       return
     }
 
     // Fallback to onboarding if no role
+    console.log('❓ [AutoRouter] No role found, fallback to /onboarding')
     navigate('/onboarding', { replace: true })
   }, [user, profileState, authLoading, profileLoading, navigate])
 

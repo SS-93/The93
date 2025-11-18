@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabaseClient'
+import EventVideoPlayer from './EventVideoPlayer'
 
 interface EventInfo {
   id: string
@@ -13,7 +14,13 @@ interface EventInfo {
   shareable_code: string
   host_user_id: string
   status: string
-  cover_image?: string
+  cover_image_url?: string
+  video_url?: string
+  video_thumbnail_url?: string
+  banner_settings?: {
+    applyToBackground: boolean
+    overlayOpacity: number
+  }
 }
 
 interface CountdownTime {
@@ -220,8 +227,38 @@ const PublicEventView: React.FC = () => {
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section with Countdown */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-black/50 to-black"></div>
+        {/* Banner Background (if applyToBackground is true) */}
+        {event.cover_image_url && event.banner_settings?.applyToBackground && (
+          <>
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${event.cover_image_url})` }}
+            />
+            <div
+              className="absolute inset-0 bg-black"
+              style={{ opacity: event.banner_settings?.overlayOpacity || 0.5 }}
+            />
+          </>
+        )}
+        {!event.banner_settings?.applyToBackground && (
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-900/30 via-black/50 to-black"></div>
+        )}
+
         <div className="relative max-w-6xl mx-auto px-4 py-16">
+          {/* Banner Photo (if not applied to background) */}
+          {event.cover_image_url && !event.banner_settings?.applyToBackground && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 rounded-2xl overflow-hidden"
+            >
+              <img
+                src={event.cover_image_url}
+                alt={event.title}
+                className="w-full aspect-[3/1] object-cover"
+              />
+            </motion.div>
+          )}
 
           {/* Event Status Banner */}
           <motion.div
@@ -385,24 +422,38 @@ const PublicEventView: React.FC = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
-                  <h3 className="text-xl font-bold mb-4">Event Details</h3>
-                  <div className="space-y-3">
-                    <p><strong>Start:</strong> {new Date(event.start_date).toLocaleString()}</p>
-                    <p><strong>End:</strong> {new Date(event.end_date).toLocaleString()}</p>
-                    <p><strong>Status:</strong> <span className="capitalize">{event.status}</span></p>
-                    {event.location && <p><strong>Location:</strong> {event.location}</p>}
+              <div className="space-y-8">
+                {/* Event Video (if exists) */}
+                {event.video_url && (
+                  <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
+                    <h3 className="text-xl font-bold mb-4">🎥 Event Promo Video</h3>
+                    <EventVideoPlayer
+                      videoUrl={event.video_url}
+                      thumbnailUrl={event.video_thumbnail_url}
+                      eventTitle={event.title}
+                    />
                   </div>
-                </div>
+                )}
 
-                <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
-                  <h3 className="text-xl font-bold mb-4">How It Works</h3>
-                  <div className="space-y-2 text-sm">
-                    <p>🎫 Register to join the community</p>
-                    <p>🗳️ Vote for your favorite artists when voting opens</p>
-                    <p>📺 Watch videos and connect with other music lovers</p>
-                    <p>🏆 See results and celebrate the winners</p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
+                    <h3 className="text-xl font-bold mb-4">Event Details</h3>
+                    <div className="space-y-3">
+                      <p><strong>Start:</strong> {new Date(event.start_date).toLocaleString()}</p>
+                      <p><strong>End:</strong> {new Date(event.end_date).toLocaleString()}</p>
+                      <p><strong>Status:</strong> <span className="capitalize">{event.status}</span></p>
+                      {event.location && <p><strong>Location:</strong> {event.location}</p>}
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
+                    <h3 className="text-xl font-bold mb-4">How It Works</h3>
+                    <div className="space-y-2 text-sm">
+                      <p>🎫 Register to join the community</p>
+                      <p>🗳️ Vote for your favorite artists when voting opens</p>
+                      <p>📺 Watch videos and connect with other music lovers</p>
+                      <p>🏆 See results and celebrate the winners</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -461,52 +512,47 @@ const PublicEventView: React.FC = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8"
             >
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold">Event Videos</h3>
-                <button className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors">
-                  📹 Upload Video
-                </button>
-              </div>
+              <h3 className="text-2xl font-bold">Event Videos</h3>
 
-              <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
-                <h4 className="font-bold mb-2">🚀 Video Upload System</h4>
-                <p className="text-gray-400 text-sm mb-4">
-                  Store videos in public-assets bucket linked by event ID and host ID for community sharing
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>• Event highlights and behind-the-scenes</div>
-                  <div>• Artist performances and interviews</div>
-                  <div>• Community reactions and testimonials</div>
-                  <div>• Sponsor content and announcements</div>
-                </div>
-              </div>
-
-              {eventVideos.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {eventVideos.map(video => (
-                    <div key={video.id} className="bg-gray-900/50 border border-gray-700/50 rounded-lg overflow-hidden">
-                      <div className="aspect-video bg-gray-800 flex items-center justify-center">
-                        <div className="text-4xl">📺</div>
-                      </div>
-                      <div className="p-4">
-                        <h4 className="font-medium mb-1">{video.title}</h4>
-                        <p className="text-sm text-gray-400 mb-2">{video.description}</p>
-                        <p className="text-xs text-gray-500">
-                          By {video.uploaded_by} • {new Date(video.upload_timestamp).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+              {/* Main Event Video */}
+              {event.video_url ? (
+                <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-xl font-semibold">🎬 Official Event Video</h4>
+                    <span className="px-3 py-1 bg-red-600 text-white text-xs rounded-full">Featured</span>
+                  </div>
+                  <EventVideoPlayer
+                    videoUrl={event.video_url}
+                    thumbnailUrl={event.video_thumbnail_url}
+                    eventTitle={event.title}
+                  />
+                  <p className="text-sm text-gray-400 mt-4">
+                    Official promotional video for {event.title}
+                  </p>
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <div className="text-4xl mb-4">📹</div>
-                  <p className="text-gray-400 mb-4">No videos uploaded yet</p>
-                  <button className="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors">
-                    Upload First Video
-                  </button>
+                <div className="p-6 bg-gray-900/50 border border-gray-700/50 rounded-lg text-center">
+                  <div className="text-4xl mb-4">🎥</div>
+                  <h4 className="font-semibold mb-2">No Event Video Yet</h4>
+                  <p className="text-sm text-gray-400">
+                    The event organizer hasn't uploaded a promotional video yet. Check back soon!
+                  </p>
                 </div>
               )}
+
+              {/* Additional community videos would go here */}
+              <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
+                <h4 className="font-bold mb-2">📹 Community Videos</h4>
+                <p className="text-gray-400 text-sm mb-4">
+                  Additional videos from artists, highlights, and community members coming soon!
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
+                  <div>• Artist performances and interviews</div>
+                  <div>• Behind-the-scenes footage</div>
+                  <div>• Community reactions and testimonials</div>
+                  <div>• Event highlights and recaps</div>
+                </div>
+              </div>
             </motion.div>
           )}
 

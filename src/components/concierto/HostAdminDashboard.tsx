@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabaseClient'
+import EventDetailsEditor from './EventDetailsEditor'
 
 interface Event {
   id: string
@@ -43,6 +44,7 @@ const HostAdminDashboard: React.FC = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'analytics' | 'audience'>('overview')
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [dateRange, setDateRange] = useState<DateRange>({
     start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     end: new Date().toISOString().split('T')[0],
@@ -541,6 +543,23 @@ const HostAdminDashboard: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Event Modal */}
+      {editingEvent && (
+        <EventDetailsEditor
+          event={editingEvent}
+          onSave={(updatedEvent) => {
+            setEvents(prev => prev.map(e => e.id === updatedEvent.id ? {
+              ...e,
+              ...updatedEvent,
+              audience_count: e.audience_count,
+              total_votes: e.total_votes
+            } : e))
+            setEditingEvent(null)
+          }}
+          onCancel={() => setEditingEvent(null)}
+        />
+      )}
     </div>
   )
 }

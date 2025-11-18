@@ -1,0 +1,96 @@
+.dia-matrix-header {
+  margin-bottom: 24px;
+}
+
+.dia-matrix-header .header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.dia-matrix-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+}
+
+.dia-matrix-header .header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.dia-matrix-header .btn-icon {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+
+.dia-matrix-header .btn-icon:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.dia-matrix-header .btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dia-matrix-header .header-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.dia-matrix-header .stat-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dia-matrix-header .stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+  letter-spacing: 0.5px;
+}
+
+.dia-matrix-header .stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #212529;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dia-matrix-header .stat-icon {
+  font-size: 20px;
+}
+
+.dia-matrix-header .stat-trend {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dia-matrix-header .stat-trend.trend-up {
+  color: #28a745;
+}
+
+.dia-matrix-header .stat-trend.trend-down {
+  color: #dc3545;
+}
+
+.dia-matrix-header .stat-trend.trend-neutral {
+  color: #6c757d;
+}

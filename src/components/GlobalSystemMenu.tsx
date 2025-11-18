@@ -37,10 +37,11 @@ const GlobalSystemMenu: React.FC<GlobalSystemMenuProps> = ({ isOpen, onClose }) 
 
   // Menu sections
   const quickActions = [
+    { label: 'Passport', icon: '🧬', path: '/passport', color: 'from-cyan-500 to-blue-600', requiresAuth: true },
     { label: 'Discover', icon: '🔍', path: '/discover', color: 'from-purple-500 to-blue-500' },
     { label: 'Events', icon: '🎪', path: '/events', color: 'from-orange-500 to-red-500' },
     { label: 'Library', icon: '📚', path: '/library', color: 'from-green-500 to-teal-500' },
-    { label: 'Settings', icon: '⚙️', path: '/settings', color: 'from-gray-500 to-gray-700' }
+    { label: 'Settings', icon: '⚙️', path: '/settings', color: 'from-gray-500 to-gray-700', requiresAuth: true }
   ]
 
   const eventActions = [
@@ -250,21 +251,26 @@ const GlobalSystemMenu: React.FC<GlobalSystemMenuProps> = ({ isOpen, onClose }) 
               >
                 <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Quick Access</h3>
                 <div className="grid grid-cols-2 gap-3">
-                  {quickActions.map((action) => (
-                    <button
-                      key={action.label}
-                      onClick={() => {
-                        navigate(action.path)
-                        onClose()
-                      }}
-                      className="glass p-4 rounded-xl hover:bg-white/10 transition-all group"
-                    >
-                      <div className={`w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br ${action.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform`}>
-                        {action.icon}
-                      </div>
-                      <p className="text-sm font-medium text-white">{action.label}</p>
-                    </button>
-                  ))}
+                  {quickActions.map((action) => {
+                    // Hide auth-required actions for non-authenticated users
+                    if (action.requiresAuth && !user) return null
+
+                    return (
+                      <button
+                        key={action.label}
+                        onClick={() => {
+                          navigate(action.path)
+                          onClose()
+                        }}
+                        className="glass p-4 rounded-xl hover:bg-white/10 transition-all group"
+                      >
+                        <div className={`w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br ${action.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform`}>
+                          {action.icon}
+                        </div>
+                        <p className="text-sm font-medium text-white">{action.label}</p>
+                      </button>
+                    )
+                  })}
                 </div>
               </motion.div>
 

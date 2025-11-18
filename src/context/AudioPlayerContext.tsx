@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useReducer, useRef, useEffect } from 'react'
 import { listeningHistoryService, trackPlay } from '../lib/listeningHistory'
 import { useAuth } from '../hooks/useAuth'
+import { usePassport } from '../hooks/usePassport'
 
 // Types for the audio player
 export interface Track {
@@ -292,15 +293,25 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [state, dispatch] = useReducer(playerReducer, initialState)
   const audioRef = useRef<HTMLAudioElement>(null)
   const { user } = useAuth()
+  const { logEvent } = usePassport()
   const playStartTimeRef = useRef<number | null>(null)
   const currentSessionRef = useRef<string | null>(null)
 
   // Helper functions
   const playTrack = async (track: Track) => {
+    console.log('🎵 ========================================')
+    console.log('🎵 [AudioPlayer] playTrack() called')
+    console.log('🎵 Track:', track.title, 'by', track.artist)
+    console.log('🎵 Track ID:', track.id)
+    console.log('🎵 User authenticated:', !!user)
+    console.log('🎵 User ID:', user?.id)
+    console.log('🎵 ========================================')
+
     dispatch({ type: 'PLAY_TRACK', payload: track })
-    
+
     // Start listening session if user is authenticated
     if (user && !currentSessionRef.current) {
+      console.log('🔄 [Session] Starting new listening session...')
       try {
         const sessionId = await listeningHistoryService.startSession(
           user.id,
@@ -309,40 +320,129 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           'global_player'
         )
         currentSessionRef.current = sessionId
+        console.log('✅ [Session] Session started:', sessionId)
       } catch (error) {
-        console.warn('Failed to start listening session:', error)
+        console.error('❌ [Session] Failed to start listening session:', error)
       }
+    } else if (currentSessionRef.current) {
+      console.log('🔄 [Session] Using existing session:', currentSessionRef.current)
+    } else {
+      console.log('⚠️ [Session] No user authenticated - skipping session')
     }
-    
+
+    // Log to Passport
+    if (user) {
+      console.log('📋 [Passport] Logging player.track_played event...')
+      const passportPayload = {
+        entity_type: 'track',
+        entity_id: track.id,
+        trackTitle: track.title,
+        artistId: track.artistId,
+        artistName: track.artist,
+        duration: track.duration,
+        source: 'global_player',
+        audioUrl: track.audioUrl,
+        features: track.audioFeatures,
+        moodTags: track.moodTags?.tags
+      }
+      console.log('📋 [Passport] Payload:', passportPayload)
+
+      logEvent('player.track_played', passportPayload)
+
+      console.log('✅ [Passport] Event logged: player.track_played')
+      console.log('📊 [Passport] Track:', track.title)
+      console.log('📊 [Passport] User:', user.email)
+    } else {
+      console.log('⚠️ [Passport] No user authenticated - skipping passport log')
+    }
+
     // Track play start time
     playStartTimeRef.current = Date.now()
+    console.log('⏱️ [Tracking] Play start time recorded:', new Date().toISOString())
   }
 
   const togglePlay = async () => {
+    console.log('⏯️ [AudioPlayer] togglePlay() called')
+    console.log('⏯️ Current state:', state.isPlaying ? 'PLAYING' : 'PAUSED')
+    console.log('⏯️ Current track:', state.currentTrack?.title)
+
     if (audioRef.current) {
       if (state.isPlaying) {
+        console.log('⏸️ [AudioPlayer] Pausing playback...')
         // Track listening event before pausing
         await trackListeningEvent('paused')
         audioRef.current.pause()
+        console.log('✅ [AudioPlayer] Playback paused')
       } else {
+        console.log('▶️ [AudioPlayer] Resuming playback...')
         audioRef.current.play()
         // Reset play start time when resuming
         playStartTimeRef.current = Date.now()
+        console.log('✅ [AudioPlayer] Playback resumed')
+        console.log('⏱️ [Tracking] Play start time reset:', new Date().toISOString())
       }
     }
     dispatch({ type: 'TOGGLE_PLAY' })
   }
 
   const nextTrack = async () => {
+    console.log('⏭️ [AudioPlayer] nextTrack() called')
+    console.log('⏭️ Current track:', state.currentTrack?.title)
+    console.log('⏭️ Current time:', state.currentTime, '/', state.duration)
+
     // Track current song before changing
     await trackListeningEvent('played')
+
+    // Log skip to Passport
+    if (user && state.currentTrack) {
+      const percentComplete = (state.currentTime / (state.duration || 1)) * 100
+      console.log('📋 [Passport] Logging player.track_skipped (next button)...')
+      console.log('📋 [Passport] Percent complete:', percentComplete.toFixed(2) + '%')
+
+      logEvent('player.track_skipped', {
+        entity_type: 'track',
+        entity_id: state.currentTrack.id,
+        trackTitle: state.currentTrack.title,
+        artistId: state.currentTrack.artistId,
+        currentTime: state.currentTime,
+        percentComplete: percentComplete,
+        reason: 'next_button'
+      })
+      console.log('✅ [Passport] Event logged: player.track_skipped')
+    }
+
     dispatch({ type: 'NEXT_TRACK' })
+    console.log('✅ [AudioPlayer] Moved to next track')
   }
 
   const previousTrack = async () => {
+    console.log('⏮️ [AudioPlayer] previousTrack() called')
+    console.log('⏮️ Current track:', state.currentTrack?.title)
+    console.log('⏮️ Current time:', state.currentTime, '/', state.duration)
+
     // Track current song before changing
     await trackListeningEvent('played')
+
+    // Log skip to Passport
+    if (user && state.currentTrack) {
+      const percentComplete = (state.currentTime / (state.duration || 1)) * 100
+      console.log('📋 [Passport] Logging player.track_skipped (previous button)...')
+      console.log('📋 [Passport] Percent complete:', percentComplete.toFixed(2) + '%')
+
+      logEvent('player.track_skipped', {
+        entity_type: 'track',
+        entity_id: state.currentTrack.id,
+        trackTitle: state.currentTrack.title,
+        artistId: state.currentTrack.artistId,
+        currentTime: state.currentTime,
+        percentComplete: percentComplete,
+        reason: 'previous_button'
+      })
+      console.log('✅ [Passport] Event logged: player.track_skipped')
+    }
+
     dispatch({ type: 'PREVIOUS_TRACK' })
+    console.log('✅ [AudioPlayer] Moved to previous track')
   }
 
   const seekTo = (time: number) => {
@@ -438,13 +538,35 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       dispatch({ type: 'UPDATE_TIME', payload: audio.currentTime })
     }
     const handleEnded = async () => {
+      console.log('🏁 [AudioPlayer] Track ended')
+      console.log('🏁 Track:', state.currentTrack?.title)
+      console.log('🏁 Duration:', state.duration, 'seconds')
+
       // Track listening event when track ends
       await trackListeningEvent('completed')
-      
+
+      // Log completion to Passport
+      if (user && state.currentTrack) {
+        console.log('📋 [Passport] Logging player.track_completed...')
+        logEvent('player.track_completed', {
+          entity_type: 'track',
+          entity_id: state.currentTrack.id,
+          trackTitle: state.currentTrack.title,
+          artistId: state.currentTrack.artistId,
+          duration: state.duration,
+          listenedSeconds: Math.floor(state.duration),
+          completionPercent: 100
+        })
+        console.log('✅ [Passport] Event logged: player.track_completed')
+        console.log('🎯 [Passport] Track:', state.currentTrack.title, '- 100% complete')
+      }
+
       if (state.repeatMode === 'track') {
+        console.log('🔁 [AudioPlayer] Repeat mode - restarting track')
         audio.currentTime = 0
         audio.play()
       } else {
+        console.log('⏭️ [AudioPlayer] Moving to next track')
         nextTrack()
       }
     }

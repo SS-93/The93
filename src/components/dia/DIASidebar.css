@@ -1,0 +1,128 @@
+.dia-sidebar {
+  width: 280px;
+  background: #212529;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.dia-sidebar .sidebar-header {
+  padding: 32px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dia-sidebar h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: 2px;
+}
+
+.dia-sidebar .sidebar-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dia-sidebar .sidebar-nav {
+  flex: 1;
+  padding: 24px 0;
+  overflow-y: auto;
+}
+
+.dia-sidebar .nav-section {
+  margin-bottom: 32px;
+}
+
+.dia-sidebar .nav-section-title {
+  padding: 0 24px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dia-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.dia-sidebar .nav-link:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.dia-sidebar .nav-link.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-left: 3px solid #007bff;
+  padding-left: 21px;
+}
+
+.dia-sidebar .nav-link.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dia-sidebar .nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.dia-sidebar .nav-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dia-sidebar .nav-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dia-sidebar .sidebar-footer {
+  padding: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dia-sidebar .system-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dia-sidebar .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6c757d;
+}
+
+.dia-sidebar .status-dot.active {
+  background: #28a745;
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
