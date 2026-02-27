@@ -151,7 +151,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
         from: document.referrer || 'direct',
         to: pathname,
         brand_id: companonUser.brand_id,
-      }, ['coliseum']);
+      }, { affects_systems: ['coliseum'] });
     }
   }, [pathname, companonUser]);
 
