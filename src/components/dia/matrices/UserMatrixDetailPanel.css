@@ -1,0 +1,198 @@
+.user-matrix-detail {
+  background: white;
+  border-radius: 8px;
+}
+
+.user-matrix-detail .detail-tabs {
+  display: flex;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 20px;
+}
+
+.user-matrix-detail .detail-tabs button {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6c757d;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+
+.user-matrix-detail .detail-tabs button:hover {
+  color: #495057;
+}
+
+.user-matrix-detail .detail-tabs button.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+
+.user-matrix-detail .detail-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 16px;
+}
+
+.user-matrix-detail .detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.user-matrix-detail .detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-matrix-detail .detail-field label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+  letter-spacing: 0.5px;
+}
+
+.user-matrix-detail .detail-field span {
+  font-size: 14px;
+  color: #212529;
+}
+
+.user-matrix-detail .stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.user-matrix-detail .stat-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.user-matrix-detail .stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #007bff;
+  margin-bottom: 8px;
+}
+
+.user-matrix-detail .stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+  letter-spacing: 0.5px;
+}
+
+.user-matrix-detail .atgc-bases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.user-matrix-detail .base-card {
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.user-matrix-detail .base-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 12px;
+}
+
+.user-matrix-detail .base-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 12px;
+}
+
+.user-matrix-detail .base-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-matrix-detail .base-card li {
+  padding: 6px 0;
+  font-size: 13px;
+  color: #495057;
+}
+
+.user-matrix-detail .base-card .empty {
+  font-size: 13px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.user-matrix-detail .base-card pre {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 12px;
+  overflow-x: auto;
+}
+
+.user-matrix-detail .dna-state {
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.user-matrix-detail .dna-status {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.user-matrix-detail .btn-primary {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.user-matrix-detail .btn-primary:hover {
+  background: #0056b3;
+}
+
+.user-matrix-detail .empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.user-matrix-detail .coming-soon {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.user-matrix-detail .detail-loading,
+.user-matrix-detail .detail-error {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+}

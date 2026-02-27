@@ -1,0 +1,73 @@
+-- Create events table for Concierto
+CREATE TABLE IF NOT EXISTS events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Basic event info
+  title TEXT NOT NULL,
+  description TEXT,
+
+  -- Timing
+  start_date TIMESTAMPTZ NOT NULL,
+  end_date TIMESTAMPTZ NOT NULL,
+
+  -- Event configuration
+  shareable_code TEXT UNIQUE NOT NULL,
+  max_votes_per_participant INTEGER DEFAULT 5,
+  allow_multiple_votes BOOLEAN DEFAULT false,
+
+  -- Ownership and status
+  host_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'live', 'completed', 'cancelled')),
+
+  -- MediaID integration
+  mediaid_integration_enabled BOOLEAN DEFAULT true,
+  privacy_mode TEXT DEFAULT 'balanced' CHECK (privacy_mode IN ('minimal', 'balanced', 'enhanced')),
+
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Create event_artists table
+CREATE TABLE IF NOT EXISTS event_artists (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  artist_profile_id UUID NOT NULL REFERENCES artist_profiles(id) ON DELETE CASCADE,
+
+  -- Registration details
+  registration_status TEXT NOT NULL DEFAULT 'pending' CHECK (registration_status IN ('pending', 'confirmed', 'declined')),
+  registration_token TEXT UNIQUE,
+  contact_email TEXT,
+
+  -- Voting data
+  vote_count INTEGER DEFAULT 0,
+
+  created_at TIMESTAMPTZ DEFAULT now(),
+
+  UNIQUE(event_id, artist_profile_id)
+);
+
+-- Enable Row Level Security
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_artists ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for events
+CREATE POLICY "Users can view events they host" ON events
+  FOR SELECT USING (host_user_id = auth.uid());
+
+CREATE POLICY "Users can create their own events" ON events
+  FOR INSERT WITH CHECK (host_user_id = auth.uid());
+
+CREATE POLICY "Users can update events they host" ON events
+  FOR UPDATE USING (host_user_id = auth.uid());
+
+-- Create policies for event_artists
+CREATE POLICY "Users can manage artists in their events" ON event_artists
+  FOR ALL USING (
+    EXISTS(SELECT 1 FROM events WHERE id = event_id AND host_user_id = auth.uid())
+  );
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_events_host ON events(host_user_id);
+CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
+CREATE INDEX IF NOT EXISTS idx_events_shareable_code ON events(shareable_code);
+CREATE INDEX IF NOT EXISTS idx_event_artists_event ON event_artists(event_id);

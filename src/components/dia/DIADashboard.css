@@ -1,0 +1,30 @@
+.dia-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.dia-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.coming-soon-page {
+  padding: 80px;
+  text-align: center;
+  background: white;
+  margin: 24px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.coming-soon-page h2 {
+  font-size: 32px;
+  color: #212529;
+  margin-bottom: 16px;
+}
+
+.coming-soon-page p {
+  font-size: 16px;
+  color: #6c757d;
+}

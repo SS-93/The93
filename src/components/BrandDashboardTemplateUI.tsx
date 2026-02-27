@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import RoleManager from './RoleManager'
 
 // Mock data for brand analytics
 const mockBrandData = {
@@ -43,10 +44,14 @@ const mockBrandData = {
 
 interface BrandDashboardProps {
   brandData?: any
+  userRole?: 'fan' | 'artist' | 'brand' | 'developer'
+  onRoleSwitch?: (role: 'fan' | 'artist' | 'brand' | 'developer') => void
 }
 
 const BrandDashboardTemplateUI: React.FC<BrandDashboardProps> = ({ 
-  brandData = mockBrandData 
+  brandData = mockBrandData,
+  userRole = 'brand',
+  onRoleSwitch
 }) => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('30d')
 
@@ -316,6 +321,24 @@ const BrandDashboardTemplateUI: React.FC<BrandDashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
+      {/* Header with Role Switcher */}
+      {onRoleSwitch && (
+        <header className="glass border-b border-white/10 p-4 mb-8">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold text-accent-yellow">Bucket</h1>
+              <div className="h-6 w-px bg-gray-600"></div>
+              <span className="text-gray-300">Brand Dashboard</span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Role Switcher */}
+              <RoleManager currentRole={userRole} compact={true} />
+            </div>
+          </div>
+        </header>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-12">
         <div className="flex items-center space-x-6">

@@ -1,0 +1,2332 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - alert [ref=e4]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - heading "Oops! Something Went Wrong." [level=1] [ref=e9]
+      - paragraph [ref=e10]: 404 Not Found
+      - paragraph [ref=e11]: We've encountered an unexpected issue. The details have been logged to the developer console.
+      - paragraph [ref=e13]:
+        - strong [ref=e14]: "Error:"
+        - text: A routing error occurred.
+      - button "Go to Homepage" [ref=e15] [cursor=pointer]
+  - iframe [ref=e16]:
+    - generic [ref=f1e2]:
+      - generic [ref=f1e3]: "Compiled with problems:"
+      - button "Dismiss" [ref=f1e4] [cursor=pointer]: ×
+      - generic [ref=f1e5]:
+        - generic [ref=f1e6]:
+          - generic [ref=f1e7]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:31:24
+          - generic [ref=f1e8]:
+            - text: "TS2307: Cannot find module './MetricCard' or its corresponding type declarations."
+            - generic [ref=f1e9]:
+              - text: "29 | import { usePassport } from '@/hooks/usePassport'; 30 | import { useColiseum } from '@/hooks/useColiseum';"
+              - generic [ref=f1e10]: ">"
+              - text: 31 | import MetricCard from './MetricCard'; |
+              - generic [ref=f1e11]: ^
+              - generic [ref=f1e12]: ^
+              - generic [ref=f1e13]: ^
+              - generic [ref=f1e14]: ^
+              - generic [ref=f1e15]: ^
+              - generic [ref=f1e16]: ^
+              - generic [ref=f1e17]: ^
+              - generic [ref=f1e18]: ^
+              - generic [ref=f1e19]: ^
+              - generic [ref=f1e20]: ^
+              - generic [ref=f1e21]: ^
+              - generic [ref=f1e22]: ^
+              - generic [ref=f1e23]: ^
+              - generic [ref=f1e24]: ^
+              - text: "32 | import QuickActionButton from './QuickActionButton'; 33 | import ActivityFeed from './ActivityFeed'; 34 | import type { DashboardOverviewData, CompanonBrand } from '@/types/companon';"
+        - generic [ref=f1e25]:
+          - generic [ref=f1e26]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:32:31
+          - generic [ref=f1e27]:
+            - text: "TS2307: Cannot find module './QuickActionButton' or its corresponding type declarations."
+            - generic [ref=f1e28]:
+              - text: "30 | import { useColiseum } from '@/hooks/useColiseum'; 31 | import MetricCard from './MetricCard';"
+              - generic [ref=f1e29]: ">"
+              - text: 32 | import QuickActionButton from './QuickActionButton'; |
+              - generic [ref=f1e30]: ^
+              - generic [ref=f1e31]: ^
+              - generic [ref=f1e32]: ^
+              - generic [ref=f1e33]: ^
+              - generic [ref=f1e34]: ^
+              - generic [ref=f1e35]: ^
+              - generic [ref=f1e36]: ^
+              - generic [ref=f1e37]: ^
+              - generic [ref=f1e38]: ^
+              - generic [ref=f1e39]: ^
+              - generic [ref=f1e40]: ^
+              - generic [ref=f1e41]: ^
+              - generic [ref=f1e42]: ^
+              - generic [ref=f1e43]: ^
+              - generic [ref=f1e44]: ^
+              - generic [ref=f1e45]: ^
+              - generic [ref=f1e46]: ^
+              - generic [ref=f1e47]: ^
+              - generic [ref=f1e48]: ^
+              - generic [ref=f1e49]: ^
+              - generic [ref=f1e50]: ^
+              - text: "33 | import ActivityFeed from './ActivityFeed'; 34 | import type { DashboardOverviewData, CompanonBrand } from '@/types/companon'; 35 |"
+        - generic [ref=f1e51]:
+          - generic [ref=f1e52]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:33:26
+          - generic [ref=f1e53]:
+            - text: "TS2307: Cannot find module './ActivityFeed' or its corresponding type declarations."
+            - generic [ref=f1e54]:
+              - text: 31 | import MetricCard from './MetricCard'; 32 | import QuickActionButton from './QuickActionButton';
+              - generic [ref=f1e55]: ">"
+              - text: 33 | import ActivityFeed from './ActivityFeed'; |
+              - generic [ref=f1e56]: ^
+              - generic [ref=f1e57]: ^
+              - generic [ref=f1e58]: ^
+              - generic [ref=f1e59]: ^
+              - generic [ref=f1e60]: ^
+              - generic [ref=f1e61]: ^
+              - generic [ref=f1e62]: ^
+              - generic [ref=f1e63]: ^
+              - generic [ref=f1e64]: ^
+              - generic [ref=f1e65]: ^
+              - generic [ref=f1e66]: ^
+              - generic [ref=f1e67]: ^
+              - generic [ref=f1e68]: ^
+              - generic [ref=f1e69]: ^
+              - generic [ref=f1e70]: ^
+              - generic [ref=f1e71]: ^
+              - text: "34 | import type { DashboardOverviewData, CompanonBrand } from '@/types/companon'; 35 | 36 | interface DashboardOverviewProps {"
+        - generic [ref=f1e72]:
+          - generic [ref=f1e73]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:44:11
+          - generic [ref=f1e74]:
+            - text: "TS2339: Property 'fetchMetrics' does not exist on type 'UseColiseumReturn'."
+            - generic [ref=f1e75]:
+              - text: "42 | const supabase = useSupabaseClient(); 43 | const { logEvent } = usePassport();"
+              - generic [ref=f1e76]: ">"
+              - text: "44 | const { fetchMetrics } = useColiseum(); |"
+              - generic [ref=f1e77]: ^
+              - generic [ref=f1e78]: ^
+              - generic [ref=f1e79]: ^
+              - generic [ref=f1e80]: ^
+              - generic [ref=f1e81]: ^
+              - generic [ref=f1e82]: ^
+              - generic [ref=f1e83]: ^
+              - generic [ref=f1e84]: ^
+              - generic [ref=f1e85]: ^
+              - generic [ref=f1e86]: ^
+              - generic [ref=f1e87]: ^
+              - generic [ref=f1e88]: ^
+              - text: 45 | 46 | // ============================================================================ 47 | // STATE
+        - generic [ref=f1e89]:
+          - generic [ref=f1e90]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:62:14
+          - generic [ref=f1e91]:
+            - text: "TS2345: Argument of type '\"companon.dashboard.viewed\"' is not assignable to parameter of type 'PassportEventType'."
+            - generic [ref=f1e92]:
+              - text: 60 | 61 | // Log dashboard view to Passport
+              - generic [ref=f1e93]: ">"
+              - text: "62 | logEvent('companon.dashboard.viewed', { |"
+              - generic [ref=f1e94]: ^
+              - generic [ref=f1e95]: ^
+              - generic [ref=f1e96]: ^
+              - generic [ref=f1e97]: ^
+              - generic [ref=f1e98]: ^
+              - generic [ref=f1e99]: ^
+              - generic [ref=f1e100]: ^
+              - generic [ref=f1e101]: ^
+              - generic [ref=f1e102]: ^
+              - generic [ref=f1e103]: ^
+              - generic [ref=f1e104]: ^
+              - generic [ref=f1e105]: ^
+              - generic [ref=f1e106]: ^
+              - generic [ref=f1e107]: ^
+              - generic [ref=f1e108]: ^
+              - generic [ref=f1e109]: ^
+              - generic [ref=f1e110]: ^
+              - generic [ref=f1e111]: ^
+              - generic [ref=f1e112]: ^
+              - generic [ref=f1e113]: ^
+              - generic [ref=f1e114]: ^
+              - generic [ref=f1e115]: ^
+              - generic [ref=f1e116]: ^
+              - generic [ref=f1e117]: ^
+              - generic [ref=f1e118]: ^
+              - generic [ref=f1e119]: ^
+              - generic [ref=f1e120]: ^
+              - text: "63 | brand_id: brand.id, 64 | time_range: timeRange, 65 | }, ['coliseum']);"
+        - generic [ref=f1e121]:
+          - generic [ref=f1e122]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:111:14
+          - generic [ref=f1e123]:
+            - text: "TS2345: Argument of type '\"companon.quick_action\"' is not assignable to parameter of type 'PassportEventType'."
+            - generic [ref=f1e124]:
+              - text: "109 | 110 | const handleBuildAudience = () => {"
+              - generic [ref=f1e125]: ">"
+              - text: "111 | logEvent('companon.quick_action', { |"
+              - generic [ref=f1e126]: ^
+              - generic [ref=f1e127]: ^
+              - generic [ref=f1e128]: ^
+              - generic [ref=f1e129]: ^
+              - generic [ref=f1e130]: ^
+              - generic [ref=f1e131]: ^
+              - generic [ref=f1e132]: ^
+              - generic [ref=f1e133]: ^
+              - generic [ref=f1e134]: ^
+              - generic [ref=f1e135]: ^
+              - generic [ref=f1e136]: ^
+              - generic [ref=f1e137]: ^
+              - generic [ref=f1e138]: ^
+              - generic [ref=f1e139]: ^
+              - generic [ref=f1e140]: ^
+              - generic [ref=f1e141]: ^
+              - generic [ref=f1e142]: ^
+              - generic [ref=f1e143]: ^
+              - generic [ref=f1e144]: ^
+              - generic [ref=f1e145]: ^
+              - generic [ref=f1e146]: ^
+              - generic [ref=f1e147]: ^
+              - generic [ref=f1e148]: ^
+              - text: "112 | action: 'build_audience', 113 | brand_id: brand.id, 114 | }, ['coliseum']);"
+        - generic [ref=f1e149]:
+          - generic [ref=f1e150]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:119:14
+          - generic [ref=f1e151]:
+            - text: "TS2345: Argument of type '\"companon.quick_action\"' is not assignable to parameter of type 'PassportEventType'."
+            - generic [ref=f1e152]:
+              - text: "117 | 118 | const handleLaunchCampaign = () => {"
+              - generic [ref=f1e153]: ">"
+              - text: "119 | logEvent('companon.quick_action', { |"
+              - generic [ref=f1e154]: ^
+              - generic [ref=f1e155]: ^
+              - generic [ref=f1e156]: ^
+              - generic [ref=f1e157]: ^
+              - generic [ref=f1e158]: ^
+              - generic [ref=f1e159]: ^
+              - generic [ref=f1e160]: ^
+              - generic [ref=f1e161]: ^
+              - generic [ref=f1e162]: ^
+              - generic [ref=f1e163]: ^
+              - generic [ref=f1e164]: ^
+              - generic [ref=f1e165]: ^
+              - generic [ref=f1e166]: ^
+              - generic [ref=f1e167]: ^
+              - generic [ref=f1e168]: ^
+              - generic [ref=f1e169]: ^
+              - generic [ref=f1e170]: ^
+              - generic [ref=f1e171]: ^
+              - generic [ref=f1e172]: ^
+              - generic [ref=f1e173]: ^
+              - generic [ref=f1e174]: ^
+              - generic [ref=f1e175]: ^
+              - generic [ref=f1e176]: ^
+              - text: "120 | action: 'launch_campaign', 121 | brand_id: brand.id, 122 | }, ['coliseum']);"
+        - generic [ref=f1e177]:
+          - generic [ref=f1e178]: ERROR in src/components/companon/dashboard/DashboardOverview.tsx:127:14
+          - generic [ref=f1e179]:
+            - text: "TS2345: Argument of type '\"companon.quick_action\"' is not assignable to parameter of type 'PassportEventType'."
+            - generic [ref=f1e180]:
+              - text: "125 | 126 | const handleViewAnalytics = () => {"
+              - generic [ref=f1e181]: ">"
+              - text: "127 | logEvent('companon.quick_action', { |"
+              - generic [ref=f1e182]: ^
+              - generic [ref=f1e183]: ^
+              - generic [ref=f1e184]: ^
+              - generic [ref=f1e185]: ^
+              - generic [ref=f1e186]: ^
+              - generic [ref=f1e187]: ^
+              - generic [ref=f1e188]: ^
+              - generic [ref=f1e189]: ^
+              - generic [ref=f1e190]: ^
+              - generic [ref=f1e191]: ^
+              - generic [ref=f1e192]: ^
+              - generic [ref=f1e193]: ^
+              - generic [ref=f1e194]: ^
+              - generic [ref=f1e195]: ^
+              - generic [ref=f1e196]: ^
+              - generic [ref=f1e197]: ^
+              - generic [ref=f1e198]: ^
+              - generic [ref=f1e199]: ^
+              - generic [ref=f1e200]: ^
+              - generic [ref=f1e201]: ^
+              - generic [ref=f1e202]: ^
+              - generic [ref=f1e203]: ^
+              - generic [ref=f1e204]: ^
+              - text: "128 | action: 'view_analytics', 129 | brand_id: brand.id, 130 | }, ['coliseum']);"
+        - generic [ref=f1e205]:
+          - generic [ref=f1e206]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:36:28
+          - generic [ref=f1e207]:
+            - text: "TS2307: Cannot find module './DNAFilterPanel' or its corresponding type declarations."
+            - generic [ref=f1e208]:
+              - text: "34 | import React, { useState, useEffect, useCallback } from 'react'; 35 | import { useNavigate } from 'react-router-dom';"
+              - generic [ref=f1e209]: ">"
+              - text: 36 | import DNAFilterPanel from './DNAFilterPanel'; |
+              - generic [ref=f1e210]: ^
+              - generic [ref=f1e211]: ^
+              - generic [ref=f1e212]: ^
+              - generic [ref=f1e213]: ^
+              - generic [ref=f1e214]: ^
+              - generic [ref=f1e215]: ^
+              - generic [ref=f1e216]: ^
+              - generic [ref=f1e217]: ^
+              - generic [ref=f1e218]: ^
+              - generic [ref=f1e219]: ^
+              - generic [ref=f1e220]: ^
+              - generic [ref=f1e221]: ^
+              - generic [ref=f1e222]: ^
+              - generic [ref=f1e223]: ^
+              - generic [ref=f1e224]: ^
+              - generic [ref=f1e225]: ^
+              - generic [ref=f1e226]: ^
+              - generic [ref=f1e227]: ^
+              - text: 37 | import DNAPreviewPanel from './DNAPreviewPanel'; 38 | import DNAHeatMap from './DNAHeatMap'; 39 | import ConsentGate from './ConsentGate';
+        - generic [ref=f1e228]:
+          - generic [ref=f1e229]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:37:29
+          - generic [ref=f1e230]:
+            - text: "TS2307: Cannot find module './DNAPreviewPanel' or its corresponding type declarations."
+            - generic [ref=f1e231]:
+              - text: "35 | import { useNavigate } from 'react-router-dom'; 36 | import DNAFilterPanel from './DNAFilterPanel';"
+              - generic [ref=f1e232]: ">"
+              - text: 37 | import DNAPreviewPanel from './DNAPreviewPanel'; |
+              - generic [ref=f1e233]: ^
+              - generic [ref=f1e234]: ^
+              - generic [ref=f1e235]: ^
+              - generic [ref=f1e236]: ^
+              - generic [ref=f1e237]: ^
+              - generic [ref=f1e238]: ^
+              - generic [ref=f1e239]: ^
+              - generic [ref=f1e240]: ^
+              - generic [ref=f1e241]: ^
+              - generic [ref=f1e242]: ^
+              - generic [ref=f1e243]: ^
+              - generic [ref=f1e244]: ^
+              - generic [ref=f1e245]: ^
+              - generic [ref=f1e246]: ^
+              - generic [ref=f1e247]: ^
+              - generic [ref=f1e248]: ^
+              - generic [ref=f1e249]: ^
+              - generic [ref=f1e250]: ^
+              - generic [ref=f1e251]: ^
+              - text: 38 | import DNAHeatMap from './DNAHeatMap'; 39 | import ConsentGate from './ConsentGate'; 40 | import SegmentSaveModal from './SegmentSaveModal';
+        - generic [ref=f1e252]:
+          - generic [ref=f1e253]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:38:24
+          - generic [ref=f1e254]:
+            - text: "TS2307: Cannot find module './DNAHeatMap' or its corresponding type declarations."
+            - generic [ref=f1e255]:
+              - text: 36 | import DNAFilterPanel from './DNAFilterPanel'; 37 | import DNAPreviewPanel from './DNAPreviewPanel';
+              - generic [ref=f1e256]: ">"
+              - text: 38 | import DNAHeatMap from './DNAHeatMap'; |
+              - generic [ref=f1e257]: ^
+              - generic [ref=f1e258]: ^
+              - generic [ref=f1e259]: ^
+              - generic [ref=f1e260]: ^
+              - generic [ref=f1e261]: ^
+              - generic [ref=f1e262]: ^
+              - generic [ref=f1e263]: ^
+              - generic [ref=f1e264]: ^
+              - generic [ref=f1e265]: ^
+              - generic [ref=f1e266]: ^
+              - generic [ref=f1e267]: ^
+              - generic [ref=f1e268]: ^
+              - generic [ref=f1e269]: ^
+              - generic [ref=f1e270]: ^
+              - text: "39 | import ConsentGate from './ConsentGate'; 40 | import SegmentSaveModal from './SegmentSaveModal'; 41 | import type {"
+        - generic [ref=f1e271]:
+          - generic [ref=f1e272]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:39:25
+          - generic [ref=f1e273]:
+            - text: "TS2307: Cannot find module './ConsentGate' or its corresponding type declarations."
+            - generic [ref=f1e274]:
+              - text: 37 | import DNAPreviewPanel from './DNAPreviewPanel'; 38 | import DNAHeatMap from './DNAHeatMap';
+              - generic [ref=f1e275]: ">"
+              - text: 39 | import ConsentGate from './ConsentGate'; |
+              - generic [ref=f1e276]: ^
+              - generic [ref=f1e277]: ^
+              - generic [ref=f1e278]: ^
+              - generic [ref=f1e279]: ^
+              - generic [ref=f1e280]: ^
+              - generic [ref=f1e281]: ^
+              - generic [ref=f1e282]: ^
+              - generic [ref=f1e283]: ^
+              - generic [ref=f1e284]: ^
+              - generic [ref=f1e285]: ^
+              - generic [ref=f1e286]: ^
+              - generic [ref=f1e287]: ^
+              - generic [ref=f1e288]: ^
+              - generic [ref=f1e289]: ^
+              - generic [ref=f1e290]: ^
+              - text: "40 | import SegmentSaveModal from './SegmentSaveModal'; 41 | import type { 42 | DNAQueryDefinition,"
+        - generic [ref=f1e291]:
+          - generic [ref=f1e292]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:40:30
+          - generic [ref=f1e293]:
+            - text: "TS2307: Cannot find module './SegmentSaveModal' or its corresponding type declarations."
+            - generic [ref=f1e294]:
+              - text: 38 | import DNAHeatMap from './DNAHeatMap'; 39 | import ConsentGate from './ConsentGate';
+              - generic [ref=f1e295]: ">"
+              - text: 40 | import SegmentSaveModal from './SegmentSaveModal'; |
+              - generic [ref=f1e296]: ^
+              - generic [ref=f1e297]: ^
+              - generic [ref=f1e298]: ^
+              - generic [ref=f1e299]: ^
+              - generic [ref=f1e300]: ^
+              - generic [ref=f1e301]: ^
+              - generic [ref=f1e302]: ^
+              - generic [ref=f1e303]: ^
+              - generic [ref=f1e304]: ^
+              - generic [ref=f1e305]: ^
+              - generic [ref=f1e306]: ^
+              - generic [ref=f1e307]: ^
+              - generic [ref=f1e308]: ^
+              - generic [ref=f1e309]: ^
+              - generic [ref=f1e310]: ^
+              - generic [ref=f1e311]: ^
+              - generic [ref=f1e312]: ^
+              - generic [ref=f1e313]: ^
+              - generic [ref=f1e314]: ^
+              - generic [ref=f1e315]: ^
+              - text: "41 | import type { 42 | DNAQueryDefinition, 43 | DNAQueryPreview,"
+        - generic [ref=f1e316]:
+          - generic [ref=f1e317]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:73:5
+          - generic [ref=f1e318]:
+            - text: "TS2304: Cannot find name 'debounce'."
+            - generic [ref=f1e319]:
+              - text: 71 | // Debounce query preview to avoid excessive API calls 72 | const debouncedPreview = useCallback(
+              - generic [ref=f1e320]: ">"
+              - text: "73 | debounce(async (query: DNAQueryDefinition) => { |"
+              - generic [ref=f1e321]: ^
+              - generic [ref=f1e322]: ^
+              - generic [ref=f1e323]: ^
+              - generic [ref=f1e324]: ^
+              - generic [ref=f1e325]: ^
+              - generic [ref=f1e326]: ^
+              - generic [ref=f1e327]: ^
+              - generic [ref=f1e328]: ^
+              - text: "74 | await fetchPreview(query); 75 | }, 300), 76 | []"
+        - generic [ref=f1e329]:
+          - generic [ref=f1e330]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:91:7
+          - generic [ref=f1e331]:
+            - text: "TS2552: Cannot find name 'logEvent'. Did you mean 'BlobEvent'?"
+            - generic [ref=f1e332]:
+              - text: 89 | 90 | // Log query to Passport for audit trail
+              - generic [ref=f1e333]: ">"
+              - text: "91 | logEvent('companon.dna_query', { |"
+              - generic [ref=f1e334]: ^
+              - generic [ref=f1e335]: ^
+              - generic [ref=f1e336]: ^
+              - generic [ref=f1e337]: ^
+              - generic [ref=f1e338]: ^
+              - generic [ref=f1e339]: ^
+              - generic [ref=f1e340]: ^
+              - generic [ref=f1e341]: ^
+              - text: "92 | brand_id: brand.id, 93 | query: query, 94 | is_detailed: consentGranted,"
+        - generic [ref=f1e342]:
+          - generic [ref=f1e343]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:156:5
+          - generic [ref=f1e344]:
+            - text: "TS2552: Cannot find name 'logEvent'. Did you mean 'BlobEvent'?"
+            - generic [ref=f1e345]:
+              - text: 154 | 155 | // Log consent grant to Passport
+              - generic [ref=f1e346]: ">"
+              - text: "156 | logEvent('companon.dna_query.consent_granted', { |"
+              - generic [ref=f1e347]: ^
+              - generic [ref=f1e348]: ^
+              - generic [ref=f1e349]: ^
+              - generic [ref=f1e350]: ^
+              - generic [ref=f1e351]: ^
+              - generic [ref=f1e352]: ^
+              - generic [ref=f1e353]: ^
+              - generic [ref=f1e354]: ^
+              - text: "157 | brand_id: brand.id, 158 | query: queryDefinition, 159 | }, ['mediaid']);"
+        - generic [ref=f1e355]:
+          - generic [ref=f1e356]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:187:37
+          - generic [ref=f1e357]:
+            - text: "TS2304: Cannot find name 'supabase'."
+            - generic [ref=f1e358]:
+              - text: "185 | }; 186 |"
+              - generic [ref=f1e359]: ">"
+              - text: "187 | const { data, error } = await supabase |"
+              - generic [ref=f1e360]: ^
+              - generic [ref=f1e361]: ^
+              - generic [ref=f1e362]: ^
+              - generic [ref=f1e363]: ^
+              - generic [ref=f1e364]: ^
+              - generic [ref=f1e365]: ^
+              - generic [ref=f1e366]: ^
+              - generic [ref=f1e367]: ^
+              - text: 188 | .from('audience_segments') 189 | .insert(segment) 190 | .select()
+        - generic [ref=f1e368]:
+          - generic [ref=f1e369]: ERROR in src/components/companon/dna/DNAQueryBuilder.tsx:196:7
+          - generic [ref=f1e370]:
+            - text: "TS2552: Cannot find name 'logEvent'. Did you mean 'BlobEvent'?"
+            - generic [ref=f1e371]:
+              - text: 194 | 195 | // Log segment creation to Passport
+              - generic [ref=f1e372]: ">"
+              - text: "196 | logEvent('companon.audience_segment.created', { |"
+              - generic [ref=f1e373]: ^
+              - generic [ref=f1e374]: ^
+              - generic [ref=f1e375]: ^
+              - generic [ref=f1e376]: ^
+              - generic [ref=f1e377]: ^
+              - generic [ref=f1e378]: ^
+              - generic [ref=f1e379]: ^
+              - generic [ref=f1e380]: ^
+              - text: "197 | segment_id: data.id, 198 | brand_id: brand.id, 199 | estimated_size: preview.estimated_count,"
+        - generic [ref=f1e381]:
+          - generic [ref=f1e382]: ERROR in src/components/companon/layout/CompanonShell.tsx:29:28
+          - generic [ref=f1e383]:
+            - text: "TS2307: Cannot find module './CompanonHeader' or its corresponding type declarations."
+            - generic [ref=f1e384]:
+              - text: "27 | import { useSupabaseClient, useUser } from '@/lib/supabaseClient'; 28 | import { usePassport } from '@/hooks/usePassport';"
+              - generic [ref=f1e385]: ">"
+              - text: 29 | import CompanonHeader from './CompanonHeader'; |
+              - generic [ref=f1e386]: ^
+              - generic [ref=f1e387]: ^
+              - generic [ref=f1e388]: ^
+              - generic [ref=f1e389]: ^
+              - generic [ref=f1e390]: ^
+              - generic [ref=f1e391]: ^
+              - generic [ref=f1e392]: ^
+              - generic [ref=f1e393]: ^
+              - generic [ref=f1e394]: ^
+              - generic [ref=f1e395]: ^
+              - generic [ref=f1e396]: ^
+              - generic [ref=f1e397]: ^
+              - generic [ref=f1e398]: ^
+              - generic [ref=f1e399]: ^
+              - generic [ref=f1e400]: ^
+              - generic [ref=f1e401]: ^
+              - generic [ref=f1e402]: ^
+              - generic [ref=f1e403]: ^
+              - text: "30 | import CompanonSidebar from './CompanonSidebar'; 31 | import type { CompanonBrand, CompanonUser, SystemHealthIndicator } from '@/types/companon'; 32 |"
+        - generic [ref=f1e404]:
+          - generic [ref=f1e405]: ERROR in src/components/companon/layout/CompanonShell.tsx:30:29
+          - generic [ref=f1e406]:
+            - text: "TS2307: Cannot find module './CompanonSidebar' or its corresponding type declarations."
+            - generic [ref=f1e407]:
+              - text: "28 | import { usePassport } from '@/hooks/usePassport'; 29 | import CompanonHeader from './CompanonHeader';"
+              - generic [ref=f1e408]: ">"
+              - text: 30 | import CompanonSidebar from './CompanonSidebar'; |
+              - generic [ref=f1e409]: ^
+              - generic [ref=f1e410]: ^
+              - generic [ref=f1e411]: ^
+              - generic [ref=f1e412]: ^
+              - generic [ref=f1e413]: ^
+              - generic [ref=f1e414]: ^
+              - generic [ref=f1e415]: ^
+              - generic [ref=f1e416]: ^
+              - generic [ref=f1e417]: ^
+              - generic [ref=f1e418]: ^
+              - generic [ref=f1e419]: ^
+              - generic [ref=f1e420]: ^
+              - generic [ref=f1e421]: ^
+              - generic [ref=f1e422]: ^
+              - generic [ref=f1e423]: ^
+              - generic [ref=f1e424]: ^
+              - generic [ref=f1e425]: ^
+              - generic [ref=f1e426]: ^
+              - generic [ref=f1e427]: ^
+              - text: "31 | import type { CompanonBrand, CompanonUser, SystemHealthIndicator } from '@/types/companon'; 32 | 33 | interface CompanonShellProps {"
+        - generic [ref=f1e428]:
+          - generic [ref=f1e429]: ERROR in src/components/companon/layout/CompanonShell.tsx:40:20
+          - generic [ref=f1e430]:
+            - text: "TS2552: Cannot find name 'usePathname'. Did you mean 'pathname'?"
+            - generic [ref=f1e431]:
+              - text: 38 | const navigate = useNavigate(); 39 | const location = useLocation();
+              - generic [ref=f1e432]: ">"
+              - text: 40 | const pathname = usePathname(); |
+              - generic [ref=f1e433]: ^
+              - generic [ref=f1e434]: ^
+              - generic [ref=f1e435]: ^
+              - generic [ref=f1e436]: ^
+              - generic [ref=f1e437]: ^
+              - generic [ref=f1e438]: ^
+              - generic [ref=f1e439]: ^
+              - generic [ref=f1e440]: ^
+              - generic [ref=f1e441]: ^
+              - generic [ref=f1e442]: ^
+              - generic [ref=f1e443]: ^
+              - text: "41 | const supabase = useSupabaseClient(); 42 | const { data: authUser } = useUser(); 43 | const { logEvent } = usePassport();"
+        - generic [ref=f1e444]:
+          - generic [ref=f1e445]: ERROR in src/components/companon/layout/CompanonShell.tsx:87:16
+          - generic [ref=f1e446]:
+            - text: "TS2345: Argument of type '\"companon.session.started\"' is not assignable to parameter of type 'PassportEventType'."
+            - generic [ref=f1e447]:
+              - text: 85 | 86 | // Log session start to Passport
+              - generic [ref=f1e448]: ">"
+              - text: "87 | logEvent('companon.session.started', { |"
+              - generic [ref=f1e449]: ^
+              - generic [ref=f1e450]: ^
+              - generic [ref=f1e451]: ^
+              - generic [ref=f1e452]: ^
+              - generic [ref=f1e453]: ^
+              - generic [ref=f1e454]: ^
+              - generic [ref=f1e455]: ^
+              - generic [ref=f1e456]: ^
+              - generic [ref=f1e457]: ^
+              - generic [ref=f1e458]: ^
+              - generic [ref=f1e459]: ^
+              - generic [ref=f1e460]: ^
+              - generic [ref=f1e461]: ^
+              - generic [ref=f1e462]: ^
+              - generic [ref=f1e463]: ^
+              - generic [ref=f1e464]: ^
+              - generic [ref=f1e465]: ^
+              - generic [ref=f1e466]: ^
+              - generic [ref=f1e467]: ^
+              - generic [ref=f1e468]: ^
+              - generic [ref=f1e469]: ^
+              - generic [ref=f1e470]: ^
+              - generic [ref=f1e471]: ^
+              - generic [ref=f1e472]: ^
+              - generic [ref=f1e473]: ^
+              - generic [ref=f1e474]: ^
+              - text: "88 | user_id: authUser.id, 89 | brand_id: userData.brand_id, 90 | role: userData.role,"
+        - generic [ref=f1e475]:
+          - generic [ref=f1e476]: ERROR in src/components/companon/layout/CompanonShell.tsx:150:16
+          - generic [ref=f1e477]:
+            - text: "TS2345: Argument of type '\"companon.navigation\"' is not assignable to parameter of type 'PassportEventType'."
+            - generic [ref=f1e478]:
+              - text: "148 | useEffect(() => { 149 | if (companonUser && pathname) {"
+              - generic [ref=f1e479]: ">"
+              - text: "150 | logEvent('companon.navigation', { |"
+              - generic [ref=f1e480]: ^
+              - generic [ref=f1e481]: ^
+              - generic [ref=f1e482]: ^
+              - generic [ref=f1e483]: ^
+              - generic [ref=f1e484]: ^
+              - generic [ref=f1e485]: ^
+              - generic [ref=f1e486]: ^
+              - generic [ref=f1e487]: ^
+              - generic [ref=f1e488]: ^
+              - generic [ref=f1e489]: ^
+              - generic [ref=f1e490]: ^
+              - generic [ref=f1e491]: ^
+              - generic [ref=f1e492]: ^
+              - generic [ref=f1e493]: ^
+              - generic [ref=f1e494]: ^
+              - generic [ref=f1e495]: ^
+              - generic [ref=f1e496]: ^
+              - generic [ref=f1e497]: ^
+              - generic [ref=f1e498]: ^
+              - generic [ref=f1e499]: ^
+              - generic [ref=f1e500]: ^
+              - text: "151 | from: document.referrer || 'direct', 152 | to: pathname, 153 | brand_id: companonUser.brand_id,"
+        - generic [ref=f1e501]:
+          - generic [ref=f1e502]: ERROR in src/components/concierto/HostAdminDashboard.tsx:550:11
+          - generic [ref=f1e503]:
+            - text: "TS2739: Type 'Event' is missing the following properties from type 'EventDetails': max_votes_per_participant, privacy_mode"
+            - generic [ref=f1e504]:
+              - text: "548 | {editingEvent && ( 549 | <EventDetailsEditor"
+              - generic [ref=f1e505]: ">"
+              - text: "550 | event={editingEvent} |"
+              - generic [ref=f1e506]: ^
+              - generic [ref=f1e507]: ^
+              - generic [ref=f1e508]: ^
+              - generic [ref=f1e509]: ^
+              - generic [ref=f1e510]: ^
+              - text: "551 | onSave={(updatedEvent) => { 552 | setEvents(prev => prev.map(e => e.id === updatedEvent.id ? { 553 | ...e,"
+        - generic [ref=f1e511]:
+          - generic [ref=f1e512]: ERROR in src/components/concierto/RevenueSplitSettings.tsx:574:12
+          - generic [ref=f1e513]:
+            - text: "TS2345: Argument of type '{ partner_name: string; recipient_type: \"artist\" | \"venue\" | \"promoter\" | \"sponsor\" | \"other\"; recipient_email: string; split_percent: number; }' is not assignable to parameter of type 'Omit<ProfitSharePartner, \"id\" | \"partner_key\" | \"qr_code_data\">'. Property 'is_active' is missing in type '{ partner_name: string; recipient_type: \"artist\" | \"venue\" | \"promoter\" | \"sponsor\" | \"other\"; recipient_email: string; split_percent: number; }' but required in type 'Omit<ProfitSharePartner, \"id\" | \"partner_key\" | \"qr_code_data\">'."
+            - generic [ref=f1e514]:
+              - text: "572 | return; 573 | }"
+              - generic [ref=f1e515]: ">"
+              - text: 574 | onSave(formData); |
+              - generic [ref=f1e516]: ^
+              - generic [ref=f1e517]: ^
+              - generic [ref=f1e518]: ^
+              - generic [ref=f1e519]: ^
+              - generic [ref=f1e520]: ^
+              - generic [ref=f1e521]: ^
+              - generic [ref=f1e522]: ^
+              - generic [ref=f1e523]: ^
+              - text: "575 | }; 576 | 577 | return ("
+        - generic [ref=f1e524]:
+          - generic [ref=f1e525]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:102:7
+          - generic [ref=f1e526]:
+            - text: "TS2322: Type '{ key: string; label: string; sortable: true; width: string; render: (entry: any) => Element; }' is not assignable to type 'ColumnDef<PassportEntry>'. Object literal may only specify known properties, and 'key' does not exist in type 'ColumnDef<PassportEntry>'."
+            - generic [ref=f1e527]:
+              - text: "100 | const columns: ColumnDef<PassportEntry>[] = [ 101 | {"
+              - generic [ref=f1e528]: ">"
+              - text: "102 | key: 'user_email', |"
+              - generic [ref=f1e529]: ^
+              - generic [ref=f1e530]: ^
+              - generic [ref=f1e531]: ^
+              - generic [ref=f1e532]: ^
+              - generic [ref=f1e533]: ^
+              - generic [ref=f1e534]: ^
+              - generic [ref=f1e535]: ^
+              - generic [ref=f1e536]: ^
+              - generic [ref=f1e537]: ^
+              - generic [ref=f1e538]: ^
+              - generic [ref=f1e539]: ^
+              - generic [ref=f1e540]: ^
+              - generic [ref=f1e541]: ^
+              - generic [ref=f1e542]: ^
+              - generic [ref=f1e543]: ^
+              - generic [ref=f1e544]: ^
+              - generic [ref=f1e545]: ^
+              - text: "103 | label: 'User', 104 | sortable: true, 105 | width: '200px',"
+        - generic [ref=f1e546]:
+          - generic [ref=f1e547]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:116:7
+          - generic [ref=f1e548]:
+            - text: "TS2322: Type '{ key: string; label: string; sortable: true; width: string; render: (entry: any) => Element; }' is not assignable to type 'ColumnDef<PassportEntry>'. Object literal may only specify known properties, and 'key' does not exist in type 'ColumnDef<PassportEntry>'."
+            - generic [ref=f1e549]:
+              - text: "114 | }, 115 | {"
+              - generic [ref=f1e550]: ">"
+              - text: "116 | key: 'event_type', |"
+              - generic [ref=f1e551]: ^
+              - generic [ref=f1e552]: ^
+              - generic [ref=f1e553]: ^
+              - generic [ref=f1e554]: ^
+              - generic [ref=f1e555]: ^
+              - generic [ref=f1e556]: ^
+              - generic [ref=f1e557]: ^
+              - generic [ref=f1e558]: ^
+              - generic [ref=f1e559]: ^
+              - generic [ref=f1e560]: ^
+              - generic [ref=f1e561]: ^
+              - generic [ref=f1e562]: ^
+              - generic [ref=f1e563]: ^
+              - generic [ref=f1e564]: ^
+              - generic [ref=f1e565]: ^
+              - generic [ref=f1e566]: ^
+              - generic [ref=f1e567]: ^
+              - text: "117 | label: 'Event Type', 118 | sortable: true, 119 | width: '220px',"
+        - generic [ref=f1e568]:
+          - generic [ref=f1e569]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:128:7
+          - generic [ref=f1e570]:
+            - text: "TS2322: Type '{ key: string; label: string; sortable: true; width: string; render: (entry: any) => Element; }' is not assignable to type 'ColumnDef<PassportEntry>'. Object literal may only specify known properties, and 'key' does not exist in type 'ColumnDef<PassportEntry>'."
+            - generic [ref=f1e571]:
+              - text: "126 | }, 127 | {"
+              - generic [ref=f1e572]: ">"
+              - text: "128 | key: 'entity_type', |"
+              - generic [ref=f1e573]: ^
+              - generic [ref=f1e574]: ^
+              - generic [ref=f1e575]: ^
+              - generic [ref=f1e576]: ^
+              - generic [ref=f1e577]: ^
+              - generic [ref=f1e578]: ^
+              - generic [ref=f1e579]: ^
+              - generic [ref=f1e580]: ^
+              - generic [ref=f1e581]: ^
+              - generic [ref=f1e582]: ^
+              - generic [ref=f1e583]: ^
+              - generic [ref=f1e584]: ^
+              - generic [ref=f1e585]: ^
+              - generic [ref=f1e586]: ^
+              - generic [ref=f1e587]: ^
+              - generic [ref=f1e588]: ^
+              - generic [ref=f1e589]: ^
+              - generic [ref=f1e590]: ^
+              - text: "129 | label: 'Entity', 130 | sortable: true, 131 | width: '150px',"
+        - generic [ref=f1e591]:
+          - generic [ref=f1e592]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:150:7
+          - generic [ref=f1e593]:
+            - text: "TS2322: Type '{ key: string; label: string; sortable: false; width: string; render: (entry: any) => Element; }' is not assignable to type 'ColumnDef<PassportEntry>'. Object literal may only specify known properties, and 'key' does not exist in type 'ColumnDef<PassportEntry>'."
+            - generic [ref=f1e594]:
+              - text: "148 | }, 149 | {"
+              - generic [ref=f1e595]: ">"
+              - text: "150 | key: 'processed', |"
+              - generic [ref=f1e596]: ^
+              - generic [ref=f1e597]: ^
+              - generic [ref=f1e598]: ^
+              - generic [ref=f1e599]: ^
+              - generic [ref=f1e600]: ^
+              - generic [ref=f1e601]: ^
+              - generic [ref=f1e602]: ^
+              - generic [ref=f1e603]: ^
+              - generic [ref=f1e604]: ^
+              - generic [ref=f1e605]: ^
+              - generic [ref=f1e606]: ^
+              - generic [ref=f1e607]: ^
+              - generic [ref=f1e608]: ^
+              - generic [ref=f1e609]: ^
+              - generic [ref=f1e610]: ^
+              - generic [ref=f1e611]: ^
+              - text: "151 | label: 'Processed', 152 | sortable: false, 153 | width: '180px',"
+        - generic [ref=f1e612]:
+          - generic [ref=f1e613]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:163:7
+          - generic [ref=f1e614]:
+            - text: "TS2322: Type '{ key: string; label: string; sortable: false; width: string; render: (entry: any) => Element; }' is not assignable to type 'ColumnDef<PassportEntry>'. Object literal may only specify known properties, and 'key' does not exist in type 'ColumnDef<PassportEntry>'."
+            - generic [ref=f1e615]:
+              - text: "161 | }, 162 | {"
+              - generic [ref=f1e616]: ">"
+              - text: "163 | key: 'dna_influence', |"
+              - generic [ref=f1e617]: ^
+              - generic [ref=f1e618]: ^
+              - generic [ref=f1e619]: ^
+              - generic [ref=f1e620]: ^
+              - generic [ref=f1e621]: ^
+              - generic [ref=f1e622]: ^
+              - generic [ref=f1e623]: ^
+              - generic [ref=f1e624]: ^
+              - generic [ref=f1e625]: ^
+              - generic [ref=f1e626]: ^
+              - generic [ref=f1e627]: ^
+              - generic [ref=f1e628]: ^
+              - generic [ref=f1e629]: ^
+              - generic [ref=f1e630]: ^
+              - generic [ref=f1e631]: ^
+              - generic [ref=f1e632]: ^
+              - generic [ref=f1e633]: ^
+              - generic [ref=f1e634]: ^
+              - generic [ref=f1e635]: ^
+              - generic [ref=f1e636]: ^
+              - text: "164 | label: 'DNA', 165 | sortable: false, 166 | width: '80px',"
+        - generic [ref=f1e637]:
+          - generic [ref=f1e638]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:178:7
+          - generic [ref=f1e639]:
+            - text: "TS2322: Type '{ key: string; label: string; sortable: true; width: string; render: (entry: any) => Element; }' is not assignable to type 'ColumnDef<PassportEntry>'. Object literal may only specify known properties, and 'key' does not exist in type 'ColumnDef<PassportEntry>'."
+            - generic [ref=f1e640]:
+              - text: "176 | }, 177 | {"
+              - generic [ref=f1e641]: ">"
+              - text: "178 | key: 'created_at', |"
+              - generic [ref=f1e642]: ^
+              - generic [ref=f1e643]: ^
+              - generic [ref=f1e644]: ^
+              - generic [ref=f1e645]: ^
+              - generic [ref=f1e646]: ^
+              - generic [ref=f1e647]: ^
+              - generic [ref=f1e648]: ^
+              - generic [ref=f1e649]: ^
+              - generic [ref=f1e650]: ^
+              - generic [ref=f1e651]: ^
+              - generic [ref=f1e652]: ^
+              - generic [ref=f1e653]: ^
+              - generic [ref=f1e654]: ^
+              - generic [ref=f1e655]: ^
+              - generic [ref=f1e656]: ^
+              - generic [ref=f1e657]: ^
+              - generic [ref=f1e658]: ^
+              - text: "179 | label: 'Timestamp', 180 | sortable: true, 181 | width: '180px',"
+        - generic [ref=f1e659]:
+          - generic [ref=f1e660]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:193:7
+          - generic [ref=f1e661]:
+            - text: "TS2322: Type '{ key: string; label: string; type: \"text\"; placeholder: string; }' is not assignable to type 'FilterDef'. Object literal may only specify known properties, and 'key' does not exist in type 'FilterDef'."
+            - generic [ref=f1e662]:
+              - text: "191 | const filters: FilterDef[] = [ 192 | {"
+              - generic [ref=f1e663]: ">"
+              - text: "193 | key: 'search', |"
+              - generic [ref=f1e664]: ^
+              - generic [ref=f1e665]: ^
+              - generic [ref=f1e666]: ^
+              - generic [ref=f1e667]: ^
+              - generic [ref=f1e668]: ^
+              - generic [ref=f1e669]: ^
+              - generic [ref=f1e670]: ^
+              - generic [ref=f1e671]: ^
+              - generic [ref=f1e672]: ^
+              - generic [ref=f1e673]: ^
+              - generic [ref=f1e674]: ^
+              - generic [ref=f1e675]: ^
+              - generic [ref=f1e676]: ^
+              - text: "194 | label: 'Search', 195 | type: 'text', 196 | placeholder: 'Search user email, event type...'"
+        - generic [ref=f1e677]:
+          - generic [ref=f1e678]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:199:7
+          - generic [ref=f1e679]:
+            - text: "TS2322: Type '{ key: string; label: string; type: \"select\"; options: { value: string; label: string; }[]; }' is not assignable to type 'FilterDef'. Object literal may only specify known properties, and 'key' does not exist in type 'FilterDef'."
+            - generic [ref=f1e680]:
+              - text: "197 | }, 198 | {"
+              - generic [ref=f1e681]: ">"
+              - text: "199 | key: 'event_category', |"
+              - generic [ref=f1e682]: ^
+              - generic [ref=f1e683]: ^
+              - generic [ref=f1e684]: ^
+              - generic [ref=f1e685]: ^
+              - generic [ref=f1e686]: ^
+              - generic [ref=f1e687]: ^
+              - generic [ref=f1e688]: ^
+              - generic [ref=f1e689]: ^
+              - generic [ref=f1e690]: ^
+              - generic [ref=f1e691]: ^
+              - generic [ref=f1e692]: ^
+              - generic [ref=f1e693]: ^
+              - generic [ref=f1e694]: ^
+              - generic [ref=f1e695]: ^
+              - generic [ref=f1e696]: ^
+              - generic [ref=f1e697]: ^
+              - generic [ref=f1e698]: ^
+              - generic [ref=f1e699]: ^
+              - generic [ref=f1e700]: ^
+              - generic [ref=f1e701]: ^
+              - generic [ref=f1e702]: ^
+              - text: "200 | label: 'Category', 201 | type: 'select', 202 | options: ["
+        - generic [ref=f1e703]:
+          - generic [ref=f1e704]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:213:7
+          - generic [ref=f1e705]:
+            - text: "TS2322: Type '{ key: string; label: string; type: \"select\"; options: { value: string; label: string; }[]; }' is not assignable to type 'FilterDef'. Object literal may only specify known properties, and 'key' does not exist in type 'FilterDef'."
+            - generic [ref=f1e706]:
+              - text: "211 | }, 212 | {"
+              - generic [ref=f1e707]: ">"
+              - text: "213 | key: 'processed', |"
+              - generic [ref=f1e708]: ^
+              - generic [ref=f1e709]: ^
+              - generic [ref=f1e710]: ^
+              - generic [ref=f1e711]: ^
+              - generic [ref=f1e712]: ^
+              - generic [ref=f1e713]: ^
+              - generic [ref=f1e714]: ^
+              - generic [ref=f1e715]: ^
+              - generic [ref=f1e716]: ^
+              - generic [ref=f1e717]: ^
+              - generic [ref=f1e718]: ^
+              - generic [ref=f1e719]: ^
+              - generic [ref=f1e720]: ^
+              - generic [ref=f1e721]: ^
+              - generic [ref=f1e722]: ^
+              - generic [ref=f1e723]: ^
+              - text: "214 | label: 'Processing Status', 215 | type: 'select', 216 | options: ["
+        - generic [ref=f1e724]:
+          - generic [ref=f1e725]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:293:13
+          - generic [ref=f1e726]:
+            - text: "TS2322: Type '{ label: string; value: number; color: string; }' is not assignable to type 'MatrixStats'. Object literal may only specify known properties, and 'color' does not exist in type 'MatrixStats'."
+            - generic [ref=f1e727]:
+              - text: "291 | label: 'Total Events', 292 | value: data.length,"
+              - generic [ref=f1e728]: ">"
+              - text: "293 | color: 'cyan' |"
+              - generic [ref=f1e729]: ^
+              - generic [ref=f1e730]: ^
+              - generic [ref=f1e731]: ^
+              - generic [ref=f1e732]: ^
+              - generic [ref=f1e733]: ^
+              - generic [ref=f1e734]: ^
+              - generic [ref=f1e735]: ^
+              - generic [ref=f1e736]: ^
+              - generic [ref=f1e737]: ^
+              - generic [ref=f1e738]: ^
+              - generic [ref=f1e739]: ^
+              - generic [ref=f1e740]: ^
+              - generic [ref=f1e741]: ^
+              - text: "294 | }, 295 | { 296 | label: 'Unique Users',"
+        - generic [ref=f1e742]:
+          - generic [ref=f1e743]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:298:13
+          - generic [ref=f1e744]:
+            - text: "TS2322: Type '{ label: string; value: number; color: string; }' is not assignable to type 'MatrixStats'. Object literal may only specify known properties, and 'color' does not exist in type 'MatrixStats'."
+            - generic [ref=f1e745]:
+              - text: "296 | label: 'Unique Users', 297 | value: new Set(data.map(e => e.user_id)).size,"
+              - generic [ref=f1e746]: ">"
+              - text: "298 | color: 'blue' |"
+              - generic [ref=f1e747]: ^
+              - generic [ref=f1e748]: ^
+              - generic [ref=f1e749]: ^
+              - generic [ref=f1e750]: ^
+              - generic [ref=f1e751]: ^
+              - generic [ref=f1e752]: ^
+              - generic [ref=f1e753]: ^
+              - generic [ref=f1e754]: ^
+              - generic [ref=f1e755]: ^
+              - generic [ref=f1e756]: ^
+              - generic [ref=f1e757]: ^
+              - generic [ref=f1e758]: ^
+              - generic [ref=f1e759]: ^
+              - text: "299 | }, 300 | { 301 | label: 'Processed',"
+        - generic [ref=f1e760]:
+          - generic [ref=f1e761]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:303:13
+          - generic [ref=f1e762]:
+            - text: "TS2322: Type '{ label: string; value: number; color: string; }' is not assignable to type 'MatrixStats'. Object literal may only specify known properties, and 'color' does not exist in type 'MatrixStats'."
+            - generic [ref=f1e763]:
+              - text: "301 | label: 'Processed', 302 | value: data.filter(e => e.processed_by_mediaid && e.processed_by_treasury && e.processed_by_coliseum).length,"
+              - generic [ref=f1e764]: ">"
+              - text: "303 | color: 'green' |"
+              - generic [ref=f1e765]: ^
+              - generic [ref=f1e766]: ^
+              - generic [ref=f1e767]: ^
+              - generic [ref=f1e768]: ^
+              - generic [ref=f1e769]: ^
+              - generic [ref=f1e770]: ^
+              - generic [ref=f1e771]: ^
+              - generic [ref=f1e772]: ^
+              - generic [ref=f1e773]: ^
+              - generic [ref=f1e774]: ^
+              - generic [ref=f1e775]: ^
+              - generic [ref=f1e776]: ^
+              - generic [ref=f1e777]: ^
+              - generic [ref=f1e778]: ^
+              - text: "304 | }, 305 | { 306 | label: 'With DNA',"
+        - generic [ref=f1e779]:
+          - generic [ref=f1e780]: ERROR in src/components/dia/matrices/PassportMatrix.tsx:308:13
+          - generic [ref=f1e781]:
+            - text: "TS2322: Type '{ label: string; value: number; color: string; }' is not assignable to type 'MatrixStats'. Object literal may only specify known properties, and 'color' does not exist in type 'MatrixStats'."
+            - generic [ref=f1e782]:
+              - text: "306 | label: 'With DNA', 307 | value: data.filter(e => e.dna_influence).length,"
+              - generic [ref=f1e783]: ">"
+              - text: "308 | color: 'purple' |"
+              - generic [ref=f1e784]: ^
+              - generic [ref=f1e785]: ^
+              - generic [ref=f1e786]: ^
+              - generic [ref=f1e787]: ^
+              - generic [ref=f1e788]: ^
+              - generic [ref=f1e789]: ^
+              - generic [ref=f1e790]: ^
+              - generic [ref=f1e791]: ^
+              - generic [ref=f1e792]: ^
+              - generic [ref=f1e793]: ^
+              - generic [ref=f1e794]: ^
+              - generic [ref=f1e795]: ^
+              - generic [ref=f1e796]: ^
+              - generic [ref=f1e797]: ^
+              - generic [ref=f1e798]: ^
+              - text: "309 | } 310 | ]} 311 | />"
+        - generic [ref=f1e799]:
+          - generic [ref=f1e800]: ERROR in src/hooks/useColiseum.tsx:70:3
+          - generic [ref=f1e801]:
+            - text: "TS2459: Module '\"@/types/coliseum\"' declares 'TimeRange' locally, but it is not exported."
+            - generic [ref=f1e802]:
+              - text: 68 | LeaderboardEntry, 69 | AnalyticsReport,
+              - generic [ref=f1e803]: ">"
+              - text: 70 | TimeRange |
+              - generic [ref=f1e804]: ^
+              - generic [ref=f1e805]: ^
+              - generic [ref=f1e806]: ^
+              - generic [ref=f1e807]: ^
+              - generic [ref=f1e808]: ^
+              - generic [ref=f1e809]: ^
+              - generic [ref=f1e810]: ^
+              - generic [ref=f1e811]: ^
+              - generic [ref=f1e812]: ^
+              - text: "71 | } from '@/types/coliseum' 72 | 73 | // ============================================================================="
+        - generic [ref=f1e813]:
+          - generic [ref=f1e814]: ERROR in src/hooks/usePassport.tsx:76:30
+          - generic [ref=f1e815]:
+            - text: "TS7016: Could not find a declaration file for module 'uuid'. '/Users/pks.ml/Desktop/93/my-app/node_modules/uuid/dist/index.js' implicitly has an 'any' type. Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`"
+            - generic [ref=f1e816]:
+              - text: "74 | PassportEventCategory 75 | } from '@/types/passport'"
+              - generic [ref=f1e817]: ">"
+              - text: "76 | import { v4 as uuidv4 } from 'uuid' |"
+              - generic [ref=f1e818]: ^
+              - generic [ref=f1e819]: ^
+              - generic [ref=f1e820]: ^
+              - generic [ref=f1e821]: ^
+              - generic [ref=f1e822]: ^
+              - generic [ref=f1e823]: ^
+              - text: 77 | 78 | // ============================================================================= 79 | // HOOK INTERFACE
+        - generic [ref=f1e824]:
+          - generic [ref=f1e825]: ERROR in src/hooks/usePassport.tsx:338:9
+          - generic [ref=f1e826]:
+            - text: "TS2352: Conversion of type '{ id: any; created_at: Date; mediaid_id: any; affects_systems: PassportSystem[]; payload: PassportPayload; timestamp: Date; source: \"web\"; processed: boolean; ... 12 more ...; dna_influence: null; }' to type 'PassportEntry' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first. Types of property 'device_id' are incompatible. Type 'null' is not comparable to type 'string | undefined'."
+            - generic [ref=f1e827]:
+              - text: 336 | // Update recent entries (optimistic) 337 | setRecentEntries(prev => [
+              - generic [ref=f1e828]: ">"
+              - text: "338 | { |"
+              - generic [ref=f1e829]: ^
+              - generic [ref=f1e830]: ">"
+              - text: 339 | ...entry, |
+              - generic [ref=f1e831]: ^
+              - generic [ref=f1e832]: ^
+              - generic [ref=f1e833]: ^
+              - generic [ref=f1e834]: ^
+              - generic [ref=f1e835]: ^
+              - generic [ref=f1e836]: ^
+              - generic [ref=f1e837]: ^
+              - generic [ref=f1e838]: ^
+              - generic [ref=f1e839]: ^
+              - generic [ref=f1e840]: ^
+              - generic [ref=f1e841]: ^
+              - generic [ref=f1e842]: ^
+              - generic [ref=f1e843]: ^
+              - generic [ref=f1e844]: ^
+              - generic [ref=f1e845]: ^
+              - generic [ref=f1e846]: ^
+              - generic [ref=f1e847]: ^
+              - generic [ref=f1e848]: ^
+              - generic [ref=f1e849]: ^
+              - generic [ref=f1e850]: ">"
+              - text: "340 | id: uuidv4(), |"
+              - generic [ref=f1e851]: ^
+              - generic [ref=f1e852]: ^
+              - generic [ref=f1e853]: ^
+              - generic [ref=f1e854]: ^
+              - generic [ref=f1e855]: ^
+              - generic [ref=f1e856]: ^
+              - generic [ref=f1e857]: ^
+              - generic [ref=f1e858]: ^
+              - generic [ref=f1e859]: ^
+              - generic [ref=f1e860]: ^
+              - generic [ref=f1e861]: ^
+              - generic [ref=f1e862]: ^
+              - generic [ref=f1e863]: ^
+              - generic [ref=f1e864]: ^
+              - generic [ref=f1e865]: ^
+              - generic [ref=f1e866]: ^
+              - generic [ref=f1e867]: ^
+              - generic [ref=f1e868]: ^
+              - generic [ref=f1e869]: ^
+              - generic [ref=f1e870]: ">"
+              - text: "341 | created_at: new Date(), |"
+              - generic [ref=f1e871]: ^
+              - generic [ref=f1e872]: ^
+              - generic [ref=f1e873]: ^
+              - generic [ref=f1e874]: ^
+              - generic [ref=f1e875]: ^
+              - generic [ref=f1e876]: ^
+              - generic [ref=f1e877]: ^
+              - generic [ref=f1e878]: ^
+              - generic [ref=f1e879]: ^
+              - generic [ref=f1e880]: ^
+              - generic [ref=f1e881]: ^
+              - generic [ref=f1e882]: ^
+              - generic [ref=f1e883]: ^
+              - generic [ref=f1e884]: ^
+              - generic [ref=f1e885]: ^
+              - generic [ref=f1e886]: ^
+              - generic [ref=f1e887]: ^
+              - generic [ref=f1e888]: ^
+              - generic [ref=f1e889]: ^
+              - generic [ref=f1e890]: ">"
+              - text: 342 | // Map new schema to old types for compatibility |
+              - generic [ref=f1e891]: ^
+              - generic [ref=f1e892]: ^
+              - generic [ref=f1e893]: ^
+              - generic [ref=f1e894]: ^
+              - generic [ref=f1e895]: ^
+              - generic [ref=f1e896]: ^
+              - generic [ref=f1e897]: ^
+              - generic [ref=f1e898]: ^
+              - generic [ref=f1e899]: ^
+              - generic [ref=f1e900]: ^
+              - generic [ref=f1e901]: ^
+              - generic [ref=f1e902]: ^
+              - generic [ref=f1e903]: ^
+              - generic [ref=f1e904]: ^
+              - generic [ref=f1e905]: ^
+              - generic [ref=f1e906]: ^
+              - generic [ref=f1e907]: ^
+              - generic [ref=f1e908]: ^
+              - generic [ref=f1e909]: ^
+              - generic [ref=f1e910]: ">"
+              - text: "343 | mediaid_id: mediaId?.id || user.id, |"
+              - generic [ref=f1e911]: ^
+              - generic [ref=f1e912]: ^
+              - generic [ref=f1e913]: ^
+              - generic [ref=f1e914]: ^
+              - generic [ref=f1e915]: ^
+              - generic [ref=f1e916]: ^
+              - generic [ref=f1e917]: ^
+              - generic [ref=f1e918]: ^
+              - generic [ref=f1e919]: ^
+              - generic [ref=f1e920]: ^
+              - generic [ref=f1e921]: ^
+              - generic [ref=f1e922]: ^
+              - generic [ref=f1e923]: ^
+              - generic [ref=f1e924]: ^
+              - generic [ref=f1e925]: ^
+              - generic [ref=f1e926]: ^
+              - generic [ref=f1e927]: ^
+              - generic [ref=f1e928]: ^
+              - generic [ref=f1e929]: ^
+              - generic [ref=f1e930]: ">"
+              - text: "344 | affects_systems: routing.affects_systems, |"
+              - generic [ref=f1e931]: ^
+              - generic [ref=f1e932]: ^
+              - generic [ref=f1e933]: ^
+              - generic [ref=f1e934]: ^
+              - generic [ref=f1e935]: ^
+              - generic [ref=f1e936]: ^
+              - generic [ref=f1e937]: ^
+              - generic [ref=f1e938]: ^
+              - generic [ref=f1e939]: ^
+              - generic [ref=f1e940]: ^
+              - generic [ref=f1e941]: ^
+              - generic [ref=f1e942]: ^
+              - generic [ref=f1e943]: ^
+              - generic [ref=f1e944]: ^
+              - generic [ref=f1e945]: ^
+              - generic [ref=f1e946]: ^
+              - generic [ref=f1e947]: ^
+              - generic [ref=f1e948]: ^
+              - generic [ref=f1e949]: ^
+              - generic [ref=f1e950]: ">"
+              - text: "345 | payload: payload, |"
+              - generic [ref=f1e951]: ^
+              - generic [ref=f1e952]: ^
+              - generic [ref=f1e953]: ^
+              - generic [ref=f1e954]: ^
+              - generic [ref=f1e955]: ^
+              - generic [ref=f1e956]: ^
+              - generic [ref=f1e957]: ^
+              - generic [ref=f1e958]: ^
+              - generic [ref=f1e959]: ^
+              - generic [ref=f1e960]: ^
+              - generic [ref=f1e961]: ^
+              - generic [ref=f1e962]: ^
+              - generic [ref=f1e963]: ^
+              - generic [ref=f1e964]: ^
+              - generic [ref=f1e965]: ^
+              - generic [ref=f1e966]: ^
+              - generic [ref=f1e967]: ^
+              - generic [ref=f1e968]: ^
+              - generic [ref=f1e969]: ^
+              - generic [ref=f1e970]: ">"
+              - text: "346 | timestamp: new Date(), |"
+              - generic [ref=f1e971]: ^
+              - generic [ref=f1e972]: ^
+              - generic [ref=f1e973]: ^
+              - generic [ref=f1e974]: ^
+              - generic [ref=f1e975]: ^
+              - generic [ref=f1e976]: ^
+              - generic [ref=f1e977]: ^
+              - generic [ref=f1e978]: ^
+              - generic [ref=f1e979]: ^
+              - generic [ref=f1e980]: ^
+              - generic [ref=f1e981]: ^
+              - generic [ref=f1e982]: ^
+              - generic [ref=f1e983]: ^
+              - generic [ref=f1e984]: ^
+              - generic [ref=f1e985]: ^
+              - generic [ref=f1e986]: ^
+              - generic [ref=f1e987]: ^
+              - generic [ref=f1e988]: ^
+              - generic [ref=f1e989]: ^
+              - generic [ref=f1e990]: ">"
+              - text: "347 | source: 'web' as const, |"
+              - generic [ref=f1e991]: ^
+              - generic [ref=f1e992]: ^
+              - generic [ref=f1e993]: ^
+              - generic [ref=f1e994]: ^
+              - generic [ref=f1e995]: ^
+              - generic [ref=f1e996]: ^
+              - generic [ref=f1e997]: ^
+              - generic [ref=f1e998]: ^
+              - generic [ref=f1e999]: ^
+              - generic [ref=f1e1000]: ^
+              - generic [ref=f1e1001]: ^
+              - generic [ref=f1e1002]: ^
+              - generic [ref=f1e1003]: ^
+              - generic [ref=f1e1004]: ^
+              - generic [ref=f1e1005]: ^
+              - generic [ref=f1e1006]: ^
+              - generic [ref=f1e1007]: ^
+              - generic [ref=f1e1008]: ^
+              - generic [ref=f1e1009]: ^
+              - generic [ref=f1e1010]: ">"
+              - text: "348 | processed: false, |"
+              - generic [ref=f1e1011]: ^
+              - generic [ref=f1e1012]: ^
+              - generic [ref=f1e1013]: ^
+              - generic [ref=f1e1014]: ^
+              - generic [ref=f1e1015]: ^
+              - generic [ref=f1e1016]: ^
+              - generic [ref=f1e1017]: ^
+              - generic [ref=f1e1018]: ^
+              - generic [ref=f1e1019]: ^
+              - generic [ref=f1e1020]: ^
+              - generic [ref=f1e1021]: ^
+              - generic [ref=f1e1022]: ^
+              - generic [ref=f1e1023]: ^
+              - generic [ref=f1e1024]: ^
+              - generic [ref=f1e1025]: ^
+              - generic [ref=f1e1026]: ^
+              - generic [ref=f1e1027]: ^
+              - generic [ref=f1e1028]: ^
+              - generic [ref=f1e1029]: ^
+              - generic [ref=f1e1030]: ">"
+              - text: "349 | processing_attempts: 0 |"
+              - generic [ref=f1e1031]: ^
+              - generic [ref=f1e1032]: ^
+              - generic [ref=f1e1033]: ^
+              - generic [ref=f1e1034]: ^
+              - generic [ref=f1e1035]: ^
+              - generic [ref=f1e1036]: ^
+              - generic [ref=f1e1037]: ^
+              - generic [ref=f1e1038]: ^
+              - generic [ref=f1e1039]: ^
+              - generic [ref=f1e1040]: ^
+              - generic [ref=f1e1041]: ^
+              - generic [ref=f1e1042]: ^
+              - generic [ref=f1e1043]: ^
+              - generic [ref=f1e1044]: ^
+              - generic [ref=f1e1045]: ^
+              - generic [ref=f1e1046]: ^
+              - generic [ref=f1e1047]: ^
+              - generic [ref=f1e1048]: ^
+              - generic [ref=f1e1049]: ^
+              - generic [ref=f1e1050]: ">"
+              - text: "350 | } as PassportEntry, |"
+              - generic [ref=f1e1051]: ^
+              - generic [ref=f1e1052]: ^
+              - generic [ref=f1e1053]: ^
+              - generic [ref=f1e1054]: ^
+              - generic [ref=f1e1055]: ^
+              - generic [ref=f1e1056]: ^
+              - generic [ref=f1e1057]: ^
+              - generic [ref=f1e1058]: ^
+              - generic [ref=f1e1059]: ^
+              - generic [ref=f1e1060]: ^
+              - generic [ref=f1e1061]: ^
+              - generic [ref=f1e1062]: ^
+              - generic [ref=f1e1063]: ^
+              - generic [ref=f1e1064]: ^
+              - generic [ref=f1e1065]: ^
+              - generic [ref=f1e1066]: ^
+              - generic [ref=f1e1067]: ^
+              - generic [ref=f1e1068]: ^
+              - generic [ref=f1e1069]: ^
+              - generic [ref=f1e1070]: ^
+              - generic [ref=f1e1071]: ^
+              - generic [ref=f1e1072]: ^
+              - generic [ref=f1e1073]: ^
+              - generic [ref=f1e1074]: ^
+              - generic [ref=f1e1075]: ^
+              - generic [ref=f1e1076]: ^
+              - generic [ref=f1e1077]: ^
+              - text: "351 | ...prev.slice(0, 9) // Keep last 10 352 | ]) 353 | } catch (err) {"
+        - generic [ref=f1e1078]:
+          - generic [ref=f1e1079]: ERROR in src/lib/coliseum/domainCalculator.ts:11:15
+          - generic [ref=f1e1080]:
+            - text: "TS2724: '\"../passport/events\"' has no exported member named 'PassportEvent'. Did you mean 'PassportEventType'?"
+            - generic [ref=f1e1081]:
+              - text: "9 | 10 | import { createClient, SupabaseClient } from '@supabase/supabase-js';"
+              - generic [ref=f1e1082]: ">"
+              - text: "11 | import type { PassportEvent } from '../passport/events'; |"
+              - generic [ref=f1e1083]: ^
+              - generic [ref=f1e1084]: ^
+              - generic [ref=f1e1085]: ^
+              - generic [ref=f1e1086]: ^
+              - generic [ref=f1e1087]: ^
+              - generic [ref=f1e1088]: ^
+              - generic [ref=f1e1089]: ^
+              - generic [ref=f1e1090]: ^
+              - generic [ref=f1e1091]: ^
+              - generic [ref=f1e1092]: ^
+              - generic [ref=f1e1093]: ^
+              - generic [ref=f1e1094]: ^
+              - generic [ref=f1e1095]: ^
+              - text: 12 | 13 | // ============================================================================ 14 | // TYPES
+        - generic [ref=f1e1096]:
+          - generic [ref=f1e1097]: ERROR in src/lib/coliseum/domainCalculator.ts:452:24
+          - generic [ref=f1e1098]:
+            - text: "TS2802: Type 'Set<any>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher."
+            - generic [ref=f1e1099]:
+              - text: "450 | ): Promise<ThymineMetadata> { 451 | // Fetch unique fans"
+              - generic [ref=f1e1100]: ">"
+              - text: 452 | const fanIds = [...new Set(events.map((e) => e.user_id))]; |
+              - generic [ref=f1e1101]: ^
+              - generic [ref=f1e1102]: ^
+              - generic [ref=f1e1103]: ^
+              - generic [ref=f1e1104]: ^
+              - generic [ref=f1e1105]: ^
+              - generic [ref=f1e1106]: ^
+              - generic [ref=f1e1107]: ^
+              - generic [ref=f1e1108]: ^
+              - generic [ref=f1e1109]: ^
+              - generic [ref=f1e1110]: ^
+              - generic [ref=f1e1111]: ^
+              - generic [ref=f1e1112]: ^
+              - generic [ref=f1e1113]: ^
+              - generic [ref=f1e1114]: ^
+              - generic [ref=f1e1115]: ^
+              - generic [ref=f1e1116]: ^
+              - generic [ref=f1e1117]: ^
+              - generic [ref=f1e1118]: ^
+              - generic [ref=f1e1119]: ^
+              - generic [ref=f1e1120]: ^
+              - generic [ref=f1e1121]: ^
+              - generic [ref=f1e1122]: ^
+              - generic [ref=f1e1123]: ^
+              - generic [ref=f1e1124]: ^
+              - generic [ref=f1e1125]: ^
+              - generic [ref=f1e1126]: ^
+              - generic [ref=f1e1127]: ^
+              - generic [ref=f1e1128]: ^
+              - generic [ref=f1e1129]: ^
+              - generic [ref=f1e1130]: ^
+              - generic [ref=f1e1131]: ^
+              - generic [ref=f1e1132]: ^
+              - generic [ref=f1e1133]: ^
+              - generic [ref=f1e1134]: ^
+              - generic [ref=f1e1135]: ^
+              - generic [ref=f1e1136]: ^
+              - generic [ref=f1e1137]: ^
+              - text: 453 | const totalFans = fanIds.length; 454 | 455 | // Calculate repeat interactions
+        - generic [ref=f1e1138]:
+          - generic [ref=f1e1139]: ERROR in src/lib/coliseum/domainCalculator.ts:531:28
+          - generic [ref=f1e1140]:
+            - text: "TS2802: Type 'Set<any>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher."
+            - generic [ref=f1e1141]:
+              - text: 529 | 530 | // LTV per fan (placeholder - would need predictive model)
+              - generic [ref=f1e1142]: ">"
+              - text: 531 | const uniqueFans = [...new Set(events.map((e) => e.user_id))].length; |
+              - generic [ref=f1e1143]: ^
+              - generic [ref=f1e1144]: ^
+              - generic [ref=f1e1145]: ^
+              - generic [ref=f1e1146]: ^
+              - generic [ref=f1e1147]: ^
+              - generic [ref=f1e1148]: ^
+              - generic [ref=f1e1149]: ^
+              - generic [ref=f1e1150]: ^
+              - generic [ref=f1e1151]: ^
+              - generic [ref=f1e1152]: ^
+              - generic [ref=f1e1153]: ^
+              - generic [ref=f1e1154]: ^
+              - generic [ref=f1e1155]: ^
+              - generic [ref=f1e1156]: ^
+              - generic [ref=f1e1157]: ^
+              - generic [ref=f1e1158]: ^
+              - generic [ref=f1e1159]: ^
+              - generic [ref=f1e1160]: ^
+              - generic [ref=f1e1161]: ^
+              - generic [ref=f1e1162]: ^
+              - generic [ref=f1e1163]: ^
+              - generic [ref=f1e1164]: ^
+              - generic [ref=f1e1165]: ^
+              - generic [ref=f1e1166]: ^
+              - generic [ref=f1e1167]: ^
+              - generic [ref=f1e1168]: ^
+              - generic [ref=f1e1169]: ^
+              - generic [ref=f1e1170]: ^
+              - generic [ref=f1e1171]: ^
+              - generic [ref=f1e1172]: ^
+              - generic [ref=f1e1173]: ^
+              - generic [ref=f1e1174]: ^
+              - generic [ref=f1e1175]: ^
+              - generic [ref=f1e1176]: ^
+              - generic [ref=f1e1177]: ^
+              - generic [ref=f1e1178]: ^
+              - generic [ref=f1e1179]: ^
+              - text: "532 | const lifetime_value_per_fan = uniqueFans > 0 ? total_revenue_cents / uniqueFans / 100 : 0; 533 | 534 | // Monetization efficiency (revenue / engagement)"
+        - generic [ref=f1e1180]:
+          - generic [ref=f1e1181]: ERROR in src/lib/coliseum/mockData.ts:10:15
+          - generic [ref=f1e1182]:
+            - text: "TS2614: Module '\"./entitlements\"' has no exported member 'DNADomain'. Did you mean to use 'import DNADomain from \"./entitlements\"' instead?"
+            - generic [ref=f1e1183]:
+              - text: 8 | */ 9 |
+              - generic [ref=f1e1184]: ">"
+              - text: "10 | import type { DNADomain } from './entitlements'; |"
+              - generic [ref=f1e1185]: ^
+              - generic [ref=f1e1186]: ^
+              - generic [ref=f1e1187]: ^
+              - generic [ref=f1e1188]: ^
+              - generic [ref=f1e1189]: ^
+              - generic [ref=f1e1190]: ^
+              - generic [ref=f1e1191]: ^
+              - generic [ref=f1e1192]: ^
+              - generic [ref=f1e1193]: ^
+              - text: 11 | 12 | // Artist names pool 13 | const ARTIST_NAMES = [
+        - generic [ref=f1e1194]:
+          - generic [ref=f1e1195]: ERROR in src/lib/coliseum/mockData.ts:309:10
+          - generic [ref=f1e1196]:
+            - text: "TS7053: Element implicitly has an 'any' type because expression of type 'DNADomain' can't be used to index type '{ A: { name: string; icon: string; color: string; description: string; targetCustomer: string; keyMetrics: string[]; }; T: { name: string; icon: string; color: string; description: string; targetCustomer: string; keyMetrics: string[]; }; G: { ...; }; C: { ...; }; }'."
+            - generic [ref=f1e1197]:
+              - text: "307 | }; 308 |"
+              - generic [ref=f1e1198]: ">"
+              - text: 309 | return info[domain]; |
+              - generic [ref=f1e1199]: ^
+              - generic [ref=f1e1200]: ^
+              - generic [ref=f1e1201]: ^
+              - generic [ref=f1e1202]: ^
+              - generic [ref=f1e1203]: ^
+              - generic [ref=f1e1204]: ^
+              - generic [ref=f1e1205]: ^
+              - generic [ref=f1e1206]: ^
+              - generic [ref=f1e1207]: ^
+              - generic [ref=f1e1208]: ^
+              - generic [ref=f1e1209]: ^
+              - generic [ref=f1e1210]: ^
+              - text: "310 | } 311 |"
+        - generic [ref=f1e1211]:
+          - generic [ref=f1e1212]: ERROR in src/lib/coliseum/processor-logic.ts:144:54
+          - generic [ref=f1e1213]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1214]:
+              - text: "142 | const mutations: DNAMutation[] = []; 143 | const baseWeight = getEventWeight(entry.event_type);"
+              - generic [ref=f1e1215]: ">"
+              - text: 144 | const recencyDecay = calculateRecencyDecay(entry.timestamp || entry.created_at, entry.event_type); |
+              - generic [ref=f1e1216]: ^
+              - generic [ref=f1e1217]: ^
+              - generic [ref=f1e1218]: ^
+              - generic [ref=f1e1219]: ^
+              - generic [ref=f1e1220]: ^
+              - generic [ref=f1e1221]: ^
+              - generic [ref=f1e1222]: ^
+              - generic [ref=f1e1223]: ^
+              - generic [ref=f1e1224]: ^
+              - text: "145 | const metadata = entry.metadata || {}; 146 | 147 | // Resolve artist ID (either direct or via track/event)"
+        - generic [ref=f1e1225]:
+          - generic [ref=f1e1226]: ERROR in src/lib/coliseum/processor-logic.ts:160:17
+          - generic [ref=f1e1227]:
+            - text: "TS2322: Type '\"A\"' is not assignable to type 'DNADomain'."
+            - generic [ref=f1e1228]:
+              - text: "158 | user_id: entry.user_id, 159 | artist_id: artistId,"
+              - generic [ref=f1e1229]: ">"
+              - text: "160 | domain: 'A', |"
+              - generic [ref=f1e1230]: ^
+              - generic [ref=f1e1231]: ^
+              - generic [ref=f1e1232]: ^
+              - generic [ref=f1e1233]: ^
+              - generic [ref=f1e1234]: ^
+              - generic [ref=f1e1235]: ^
+              - text: "161 | key: genre, 162 | delta, 163 | weight: baseWeight,"
+        - generic [ref=f1e1236]:
+          - generic [ref=f1e1237]: ERROR in src/lib/coliseum/processor-logic.ts:166:45
+          - generic [ref=f1e1238]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1239]:
+              - text: "164 | recency_decay: recencyDecay, 165 | effective_delta: delta * baseWeight * recencyDecay,"
+              - generic [ref=f1e1240]: ">"
+              - text: "166 | occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(), |"
+              - generic [ref=f1e1241]: ^
+              - generic [ref=f1e1242]: ^
+              - generic [ref=f1e1243]: ^
+              - generic [ref=f1e1244]: ^
+              - generic [ref=f1e1245]: ^
+              - generic [ref=f1e1246]: ^
+              - generic [ref=f1e1247]: ^
+              - generic [ref=f1e1248]: ^
+              - generic [ref=f1e1249]: ^
+              - text: "167 | }); 168 | } 169 | } else {"
+        - generic [ref=f1e1250]:
+          - generic [ref=f1e1251]: ERROR in src/lib/coliseum/processor-logic.ts:176:13
+          - generic [ref=f1e1252]:
+            - text: "TS2322: Type '\"A\"' is not assignable to type 'DNADomain'."
+            - generic [ref=f1e1253]:
+              - text: "174 | user_id: entry.user_id, 175 | artist_id: artistId,"
+              - generic [ref=f1e1254]: ">"
+              - text: "176 | domain: 'A', |"
+              - generic [ref=f1e1255]: ^
+              - generic [ref=f1e1256]: ^
+              - generic [ref=f1e1257]: ^
+              - generic [ref=f1e1258]: ^
+              - generic [ref=f1e1259]: ^
+              - generic [ref=f1e1260]: ^
+              - text: "177 | key: 'general_engagement', 178 | delta, 179 | weight: baseWeight,"
+        - generic [ref=f1e1261]:
+          - generic [ref=f1e1262]: ERROR in src/lib/coliseum/processor-logic.ts:182:41
+          - generic [ref=f1e1263]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1264]:
+              - text: "180 | recency_decay: recencyDecay, 181 | effective_delta: delta * baseWeight * recencyDecay,"
+              - generic [ref=f1e1265]: ">"
+              - text: "182 | occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(), |"
+              - generic [ref=f1e1266]: ^
+              - generic [ref=f1e1267]: ^
+              - generic [ref=f1e1268]: ^
+              - generic [ref=f1e1269]: ^
+              - generic [ref=f1e1270]: ^
+              - generic [ref=f1e1271]: ^
+              - generic [ref=f1e1272]: ^
+              - generic [ref=f1e1273]: ^
+              - generic [ref=f1e1274]: ^
+              - text: "183 | }); 184 | } 185 |"
+        - generic [ref=f1e1275]:
+          - generic [ref=f1e1276]: ERROR in src/lib/coliseum/processor-logic.ts:192:9
+          - generic [ref=f1e1277]:
+            - text: "TS2322: Type '\"T\"' is not assignable to type 'DNADomain'."
+            - generic [ref=f1e1278]:
+              - text: "190 | user_id: entry.user_id, 191 | artist_id: artistId,"
+              - generic [ref=f1e1279]: ">"
+              - text: "192 | domain: 'T', |"
+              - generic [ref=f1e1280]: ^
+              - generic [ref=f1e1281]: ^
+              - generic [ref=f1e1282]: ^
+              - generic [ref=f1e1283]: ^
+              - generic [ref=f1e1284]: ^
+              - generic [ref=f1e1285]: ^
+              - text: "193 | key: 'engagement', 194 | delta: tDelta, 195 | weight: baseWeight,"
+        - generic [ref=f1e1286]:
+          - generic [ref=f1e1287]: ERROR in src/lib/coliseum/processor-logic.ts:198:37
+          - generic [ref=f1e1288]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1289]:
+              - text: "196 | recency_decay: recencyDecay, 197 | effective_delta: tDelta * baseWeight * recencyDecay,"
+              - generic [ref=f1e1290]: ">"
+              - text: "198 | occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(), |"
+              - generic [ref=f1e1291]: ^
+              - generic [ref=f1e1292]: ^
+              - generic [ref=f1e1293]: ^
+              - generic [ref=f1e1294]: ^
+              - generic [ref=f1e1295]: ^
+              - generic [ref=f1e1296]: ^
+              - generic [ref=f1e1297]: ^
+              - generic [ref=f1e1298]: ^
+              - generic [ref=f1e1299]: ^
+              - text: "199 | }); 200 | 201 | // G-Domain: Economic"
+        - generic [ref=f1e1300]:
+          - generic [ref=f1e1301]: ERROR in src/lib/coliseum/processor-logic.ts:208:13
+          - generic [ref=f1e1302]:
+            - text: "TS2322: Type '\"G\"' is not assignable to type 'DNADomain'."
+            - generic [ref=f1e1303]:
+              - text: "206 | user_id: entry.user_id, 207 | artist_id: artistId,"
+              - generic [ref=f1e1304]: ">"
+              - text: "208 | domain: 'G', |"
+              - generic [ref=f1e1305]: ^
+              - generic [ref=f1e1306]: ^
+              - generic [ref=f1e1307]: ^
+              - generic [ref=f1e1308]: ^
+              - generic [ref=f1e1309]: ^
+              - generic [ref=f1e1310]: ^
+              - text: "209 | key: 'revenue', 210 | delta: gDelta, 211 | weight: baseWeight,"
+        - generic [ref=f1e1311]:
+          - generic [ref=f1e1312]: ERROR in src/lib/coliseum/processor-logic.ts:214:41
+          - generic [ref=f1e1313]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1314]:
+              - text: "212 | recency_decay: recencyDecay, 213 | effective_delta: gDelta * baseWeight * recencyDecay,"
+              - generic [ref=f1e1315]: ">"
+              - text: "214 | occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(), |"
+              - generic [ref=f1e1316]: ^
+              - generic [ref=f1e1317]: ^
+              - generic [ref=f1e1318]: ^
+              - generic [ref=f1e1319]: ^
+              - generic [ref=f1e1320]: ^
+              - generic [ref=f1e1321]: ^
+              - generic [ref=f1e1322]: ^
+              - generic [ref=f1e1323]: ^
+              - generic [ref=f1e1324]: ^
+              - text: "215 | }); 216 | } 217 |"
+        - generic [ref=f1e1325]:
+          - generic [ref=f1e1326]: ERROR in src/lib/coliseum/processor-logic.ts:225:13
+          - generic [ref=f1e1327]:
+            - text: "TS2322: Type '\"C\"' is not assignable to type 'DNADomain'."
+            - generic [ref=f1e1328]:
+              - text: "223 | user_id: entry.user_id, 224 | artist_id: artistId,"
+              - generic [ref=f1e1329]: ">"
+              - text: "225 | domain: 'C', |"
+              - generic [ref=f1e1330]: ^
+              - generic [ref=f1e1331]: ^
+              - generic [ref=f1e1332]: ^
+              - generic [ref=f1e1333]: ^
+              - generic [ref=f1e1334]: ^
+              - generic [ref=f1e1335]: ^
+              - text: "226 | key: `city:${metadata.city}`, 227 | delta: cDelta, 228 | weight: baseWeight,"
+        - generic [ref=f1e1336]:
+          - generic [ref=f1e1337]: ERROR in src/lib/coliseum/processor-logic.ts:231:41
+          - generic [ref=f1e1338]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1339]:
+              - text: "229 | recency_decay: recencyDecay, 230 | effective_delta: cDelta * baseWeight * recencyDecay,"
+              - generic [ref=f1e1340]: ">"
+              - text: "231 | occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(), |"
+              - generic [ref=f1e1341]: ^
+              - generic [ref=f1e1342]: ^
+              - generic [ref=f1e1343]: ^
+              - generic [ref=f1e1344]: ^
+              - generic [ref=f1e1345]: ^
+              - generic [ref=f1e1346]: ^
+              - generic [ref=f1e1347]: ^
+              - generic [ref=f1e1348]: ^
+              - generic [ref=f1e1349]: ^
+              - text: "232 | }); 233 | } 234 |"
+        - generic [ref=f1e1350]:
+          - generic [ref=f1e1351]: ERROR in src/lib/concierto/attendeeConversion.ts:176:22
+          - generic [ref=f1e1352]:
+            - text: "TS18048: 'updateResult' is possibly 'undefined'."
+            - generic [ref=f1e1353]:
+              - text: 174 | attendeeType, 175 | attendeeId,
+              - generic [ref=f1e1354]: ">"
+              - text: "176 | originalEmail: updateResult.data?.email || '', |"
+              - generic [ref=f1e1355]: ^
+              - generic [ref=f1e1356]: ^
+              - generic [ref=f1e1357]: ^
+              - generic [ref=f1e1358]: ^
+              - generic [ref=f1e1359]: ^
+              - generic [ref=f1e1360]: ^
+              - generic [ref=f1e1361]: ^
+              - generic [ref=f1e1362]: ^
+              - generic [ref=f1e1363]: ^
+              - generic [ref=f1e1364]: ^
+              - generic [ref=f1e1365]: ^
+              - generic [ref=f1e1366]: ^
+              - text: "177 | originalName: updateResult.data?.name || updateResult.data?.artist_name || '', 178 | convertedUserId: userId, 179 | conversionSource"
+        - generic [ref=f1e1367]:
+          - generic [ref=f1e1368]: ERROR in src/lib/concierto/attendeeConversion.ts:177:21
+          - generic [ref=f1e1369]:
+            - text: "TS18048: 'updateResult' is possibly 'undefined'."
+            - generic [ref=f1e1370]:
+              - text: "175 | attendeeId, 176 | originalEmail: updateResult.data?.email || '',"
+              - generic [ref=f1e1371]: ">"
+              - text: "177 | originalName: updateResult.data?.name || updateResult.data?.artist_name || '', |"
+              - generic [ref=f1e1372]: ^
+              - generic [ref=f1e1373]: ^
+              - generic [ref=f1e1374]: ^
+              - generic [ref=f1e1375]: ^
+              - generic [ref=f1e1376]: ^
+              - generic [ref=f1e1377]: ^
+              - generic [ref=f1e1378]: ^
+              - generic [ref=f1e1379]: ^
+              - generic [ref=f1e1380]: ^
+              - generic [ref=f1e1381]: ^
+              - generic [ref=f1e1382]: ^
+              - generic [ref=f1e1383]: ^
+              - text: "178 | convertedUserId: userId, 179 | conversionSource 180 | });"
+        - generic [ref=f1e1384]:
+          - generic [ref=f1e1385]: ERROR in src/lib/concierto/attendeeConversion.ts:177:48
+          - generic [ref=f1e1386]:
+            - text: "TS18048: 'updateResult' is possibly 'undefined'."
+            - generic [ref=f1e1387]:
+              - text: "175 | attendeeId, 176 | originalEmail: updateResult.data?.email || '',"
+              - generic [ref=f1e1388]: ">"
+              - text: "177 | originalName: updateResult.data?.name || updateResult.data?.artist_name || '', |"
+              - generic [ref=f1e1389]: ^
+              - generic [ref=f1e1390]: ^
+              - generic [ref=f1e1391]: ^
+              - generic [ref=f1e1392]: ^
+              - generic [ref=f1e1393]: ^
+              - generic [ref=f1e1394]: ^
+              - generic [ref=f1e1395]: ^
+              - generic [ref=f1e1396]: ^
+              - generic [ref=f1e1397]: ^
+              - generic [ref=f1e1398]: ^
+              - generic [ref=f1e1399]: ^
+              - generic [ref=f1e1400]: ^
+              - text: "178 | convertedUserId: userId, 179 | conversionSource 180 | });"
+        - generic [ref=f1e1401]:
+          - generic [ref=f1e1402]: ERROR in src/lib/dna/mirroring.ts:45:10
+          - generic [ref=f1e1403]:
+            - text: "TS2459: Module '\"./decay\"' declares 'calculateDecayFactor' locally, but it is not exported."
+            - generic [ref=f1e1404]:
+              - text: "43 | DNAMirroringContext 44 | } from './influenceWeights'"
+              - generic [ref=f1e1405]: ">"
+              - text: "45 | import { calculateDecayFactor } from './decay' |"
+              - generic [ref=f1e1406]: ^
+              - generic [ref=f1e1407]: ^
+              - generic [ref=f1e1408]: ^
+              - generic [ref=f1e1409]: ^
+              - generic [ref=f1e1410]: ^
+              - generic [ref=f1e1411]: ^
+              - generic [ref=f1e1412]: ^
+              - generic [ref=f1e1413]: ^
+              - generic [ref=f1e1414]: ^
+              - generic [ref=f1e1415]: ^
+              - generic [ref=f1e1416]: ^
+              - generic [ref=f1e1417]: ^
+              - generic [ref=f1e1418]: ^
+              - generic [ref=f1e1419]: ^
+              - generic [ref=f1e1420]: ^
+              - generic [ref=f1e1421]: ^
+              - generic [ref=f1e1422]: ^
+              - generic [ref=f1e1423]: ^
+              - generic [ref=f1e1424]: ^
+              - generic [ref=f1e1425]: ^
+              - text: 46 | 47 | // ============================================================================= 48 | // TYPE DEFINITIONS
+        - generic [ref=f1e1426]:
+          - generic [ref=f1e1427]: ERROR in src/lib/dna/mirroring.ts:276:7
+          - generic [ref=f1e1428]:
+            - text: "TS2322: Type 'MediaIDDNA | null' is not assignable to type 'MediaIDDNA'. Type 'null' is not assignable to type 'MediaIDDNA'."
+            - generic [ref=f1e1429]:
+              - text: "274 | spatialDeltaNorm: 0, 275 | compositeDeltaNorm: 0,"
+              - generic [ref=f1e1430]: ">"
+              - text: "276 | newDNA: await getUserDNA(context.userId)!, |"
+              - generic [ref=f1e1431]: ^
+              - generic [ref=f1e1432]: ^
+              - generic [ref=f1e1433]: ^
+              - generic [ref=f1e1434]: ^
+              - generic [ref=f1e1435]: ^
+              - generic [ref=f1e1436]: ^
+              - text: "277 | processingTimeMs: Date.now() - startTime, 278 | error: error.message 279 | }"
+        - generic [ref=f1e1437]:
+          - generic [ref=f1e1438]: ERROR in src/lib/dna/mirroring.ts:291:23
+          - generic [ref=f1e1439]:
+            - text: "TS2323: Cannot redeclare exported variable 'getUserDNA'."
+            - generic [ref=f1e1440]:
+              - text: 289 | * Converts from single 1536-d vector to 4-domain structure 290 | */
+              - generic [ref=f1e1441]: ">"
+              - text: "291 | export async function getUserDNA(userId: string): Promise<MediaIDDNA | null> { |"
+              - generic [ref=f1e1442]: ^
+              - generic [ref=f1e1443]: ^
+              - generic [ref=f1e1444]: ^
+              - generic [ref=f1e1445]: ^
+              - generic [ref=f1e1446]: ^
+              - generic [ref=f1e1447]: ^
+              - generic [ref=f1e1448]: ^
+              - generic [ref=f1e1449]: ^
+              - generic [ref=f1e1450]: ^
+              - generic [ref=f1e1451]: ^
+              - text: "292 | try { 293 | const { data, error } = await supabase 294 | .from('media_ids')"
+        - generic [ref=f1e1452]:
+          - generic [ref=f1e1453]: ERROR in src/lib/dna/mirroring.ts:337:23
+          - generic [ref=f1e1454]:
+            - text: "TS2323: Cannot redeclare exported variable 'saveUserDNA'."
+            - generic [ref=f1e1455]:
+              - text: 335 | * Combines 4 domains back into single 1536-d vector 336 | */
+              - generic [ref=f1e1456]: ">"
+              - text: "337 | export async function saveUserDNA(dna: MediaIDDNA): Promise<boolean> { |"
+              - generic [ref=f1e1457]: ^
+              - generic [ref=f1e1458]: ^
+              - generic [ref=f1e1459]: ^
+              - generic [ref=f1e1460]: ^
+              - generic [ref=f1e1461]: ^
+              - generic [ref=f1e1462]: ^
+              - generic [ref=f1e1463]: ^
+              - generic [ref=f1e1464]: ^
+              - generic [ref=f1e1465]: ^
+              - generic [ref=f1e1466]: ^
+              - generic [ref=f1e1467]: ^
+              - text: "338 | try { 339 | const { error } = await supabase 340 | .from('media_ids')"
+        - generic [ref=f1e1468]:
+          - generic [ref=f1e1469]: ERROR in src/lib/dna/mirroring.ts:365:23
+          - generic [ref=f1e1470]:
+            - text: "TS2323: Cannot redeclare exported variable 'getEntityDNA'."
+            - generic [ref=f1e1471]:
+              - text: 363 | * In production, this should be pre-computed and cached 364 | */
+              - generic [ref=f1e1472]: ">"
+              - text: 365 | export async function getEntityDNA( |
+              - generic [ref=f1e1473]: ^
+              - generic [ref=f1e1474]: ^
+              - generic [ref=f1e1475]: ^
+              - generic [ref=f1e1476]: ^
+              - generic [ref=f1e1477]: ^
+              - generic [ref=f1e1478]: ^
+              - generic [ref=f1e1479]: ^
+              - generic [ref=f1e1480]: ^
+              - generic [ref=f1e1481]: ^
+              - generic [ref=f1e1482]: ^
+              - generic [ref=f1e1483]: ^
+              - generic [ref=f1e1484]: ^
+              - text: "366 | entityId: string, 367 | entityType: 'track' | 'artist' | 'event' | 'brand' | 'content' 368 | ): Promise<EntityDNA | null> {"
+        - generic [ref=f1e1485]:
+          - generic [ref=f1e1486]: ERROR in src/lib/dna/mirroring.ts:441:23
+          - generic [ref=f1e1487]:
+            - text: "TS2323: Cannot redeclare exported variable 'getUserInfluencePreferences'."
+            - generic [ref=f1e1488]:
+              - text: 439 | * Stored in media_ids.content_flags.dna_preferences 440 | */
+              - generic [ref=f1e1489]: ">"
+              - text: 441 | export async function getUserInfluencePreferences( |
+              - generic [ref=f1e1490]: ^
+              - generic [ref=f1e1491]: ^
+              - generic [ref=f1e1492]: ^
+              - generic [ref=f1e1493]: ^
+              - generic [ref=f1e1494]: ^
+              - generic [ref=f1e1495]: ^
+              - generic [ref=f1e1496]: ^
+              - generic [ref=f1e1497]: ^
+              - generic [ref=f1e1498]: ^
+              - generic [ref=f1e1499]: ^
+              - generic [ref=f1e1500]: ^
+              - generic [ref=f1e1501]: ^
+              - generic [ref=f1e1502]: ^
+              - generic [ref=f1e1503]: ^
+              - generic [ref=f1e1504]: ^
+              - generic [ref=f1e1505]: ^
+              - generic [ref=f1e1506]: ^
+              - generic [ref=f1e1507]: ^
+              - generic [ref=f1e1508]: ^
+              - generic [ref=f1e1509]: ^
+              - generic [ref=f1e1510]: ^
+              - generic [ref=f1e1511]: ^
+              - generic [ref=f1e1512]: ^
+              - generic [ref=f1e1513]: ^
+              - generic [ref=f1e1514]: ^
+              - generic [ref=f1e1515]: ^
+              - generic [ref=f1e1516]: ^
+              - text: "442 | userId: string 443 | ): Promise<UserInfluencePreferences> { 444 | try {"
+        - generic [ref=f1e1517]:
+          - generic [ref=f1e1518]: ERROR in src/lib/dna/mirroring.ts:480:23
+          - generic [ref=f1e1519]:
+            - text: "TS2323: Cannot redeclare exported variable 'saveUserInfluencePreferences'."
+            - generic [ref=f1e1520]:
+              - text: 478 | * Save user's influence preferences to MediaID settings 479 | */
+              - generic [ref=f1e1521]: ">"
+              - text: 480 | export async function saveUserInfluencePreferences( |
+              - generic [ref=f1e1522]: ^
+              - generic [ref=f1e1523]: ^
+              - generic [ref=f1e1524]: ^
+              - generic [ref=f1e1525]: ^
+              - generic [ref=f1e1526]: ^
+              - generic [ref=f1e1527]: ^
+              - generic [ref=f1e1528]: ^
+              - generic [ref=f1e1529]: ^
+              - generic [ref=f1e1530]: ^
+              - generic [ref=f1e1531]: ^
+              - generic [ref=f1e1532]: ^
+              - generic [ref=f1e1533]: ^
+              - generic [ref=f1e1534]: ^
+              - generic [ref=f1e1535]: ^
+              - generic [ref=f1e1536]: ^
+              - generic [ref=f1e1537]: ^
+              - generic [ref=f1e1538]: ^
+              - generic [ref=f1e1539]: ^
+              - generic [ref=f1e1540]: ^
+              - generic [ref=f1e1541]: ^
+              - generic [ref=f1e1542]: ^
+              - generic [ref=f1e1543]: ^
+              - generic [ref=f1e1544]: ^
+              - generic [ref=f1e1545]: ^
+              - generic [ref=f1e1546]: ^
+              - generic [ref=f1e1547]: ^
+              - generic [ref=f1e1548]: ^
+              - generic [ref=f1e1549]: ^
+              - text: "481 | preferences: UserInfluencePreferences 482 | ): Promise<boolean> { 483 | try {"
+        - generic [ref=f1e1550]:
+          - generic [ref=f1e1551]: ERROR in src/lib/dna/mirroring.ts:638:3
+          - generic [ref=f1e1552]:
+            - text: "TS2323: Cannot redeclare exported variable 'getUserDNA'."
+            - generic [ref=f1e1553]:
+              - text: "636 | export { 637 | mirrorInteractionToDNA as default,"
+              - generic [ref=f1e1554]: ">"
+              - text: 638 | getUserDNA, |
+              - generic [ref=f1e1555]: ^
+              - generic [ref=f1e1556]: ^
+              - generic [ref=f1e1557]: ^
+              - generic [ref=f1e1558]: ^
+              - generic [ref=f1e1559]: ^
+              - generic [ref=f1e1560]: ^
+              - generic [ref=f1e1561]: ^
+              - generic [ref=f1e1562]: ^
+              - generic [ref=f1e1563]: ^
+              - generic [ref=f1e1564]: ^
+              - text: 639 | saveUserDNA, 640 | getEntityDNA, 641 | getUserInfluencePreferences,
+        - generic [ref=f1e1565]:
+          - generic [ref=f1e1566]: ERROR in src/lib/dna/mirroring.ts:638:3
+          - generic [ref=f1e1567]:
+            - text: "TS2484: Export declaration conflicts with exported declaration of 'getUserDNA'."
+            - generic [ref=f1e1568]:
+              - text: "636 | export { 637 | mirrorInteractionToDNA as default,"
+              - generic [ref=f1e1569]: ">"
+              - text: 638 | getUserDNA, |
+              - generic [ref=f1e1570]: ^
+              - generic [ref=f1e1571]: ^
+              - generic [ref=f1e1572]: ^
+              - generic [ref=f1e1573]: ^
+              - generic [ref=f1e1574]: ^
+              - generic [ref=f1e1575]: ^
+              - generic [ref=f1e1576]: ^
+              - generic [ref=f1e1577]: ^
+              - generic [ref=f1e1578]: ^
+              - generic [ref=f1e1579]: ^
+              - text: 639 | saveUserDNA, 640 | getEntityDNA, 641 | getUserInfluencePreferences,
+        - generic [ref=f1e1580]:
+          - generic [ref=f1e1581]: ERROR in src/lib/dna/mirroring.ts:639:3
+          - generic [ref=f1e1582]:
+            - text: "TS2323: Cannot redeclare exported variable 'saveUserDNA'."
+            - generic [ref=f1e1583]:
+              - text: 637 | mirrorInteractionToDNA as default, 638 | getUserDNA,
+              - generic [ref=f1e1584]: ">"
+              - text: 639 | saveUserDNA, |
+              - generic [ref=f1e1585]: ^
+              - generic [ref=f1e1586]: ^
+              - generic [ref=f1e1587]: ^
+              - generic [ref=f1e1588]: ^
+              - generic [ref=f1e1589]: ^
+              - generic [ref=f1e1590]: ^
+              - generic [ref=f1e1591]: ^
+              - generic [ref=f1e1592]: ^
+              - generic [ref=f1e1593]: ^
+              - generic [ref=f1e1594]: ^
+              - generic [ref=f1e1595]: ^
+              - text: 640 | getEntityDNA, 641 | getUserInfluencePreferences, 642 | saveUserInfluencePreferences,
+        - generic [ref=f1e1596]:
+          - generic [ref=f1e1597]: ERROR in src/lib/dna/mirroring.ts:639:3
+          - generic [ref=f1e1598]:
+            - text: "TS2484: Export declaration conflicts with exported declaration of 'saveUserDNA'."
+            - generic [ref=f1e1599]:
+              - text: 637 | mirrorInteractionToDNA as default, 638 | getUserDNA,
+              - generic [ref=f1e1600]: ">"
+              - text: 639 | saveUserDNA, |
+              - generic [ref=f1e1601]: ^
+              - generic [ref=f1e1602]: ^
+              - generic [ref=f1e1603]: ^
+              - generic [ref=f1e1604]: ^
+              - generic [ref=f1e1605]: ^
+              - generic [ref=f1e1606]: ^
+              - generic [ref=f1e1607]: ^
+              - generic [ref=f1e1608]: ^
+              - generic [ref=f1e1609]: ^
+              - generic [ref=f1e1610]: ^
+              - generic [ref=f1e1611]: ^
+              - text: 640 | getEntityDNA, 641 | getUserInfluencePreferences, 642 | saveUserInfluencePreferences,
+        - generic [ref=f1e1612]:
+          - generic [ref=f1e1613]: ERROR in src/lib/dna/mirroring.ts:640:3
+          - generic [ref=f1e1614]:
+            - text: "TS2323: Cannot redeclare exported variable 'getEntityDNA'."
+            - generic [ref=f1e1615]:
+              - text: 638 | getUserDNA, 639 | saveUserDNA,
+              - generic [ref=f1e1616]: ">"
+              - text: 640 | getEntityDNA, |
+              - generic [ref=f1e1617]: ^
+              - generic [ref=f1e1618]: ^
+              - generic [ref=f1e1619]: ^
+              - generic [ref=f1e1620]: ^
+              - generic [ref=f1e1621]: ^
+              - generic [ref=f1e1622]: ^
+              - generic [ref=f1e1623]: ^
+              - generic [ref=f1e1624]: ^
+              - generic [ref=f1e1625]: ^
+              - generic [ref=f1e1626]: ^
+              - generic [ref=f1e1627]: ^
+              - generic [ref=f1e1628]: ^
+              - text: 641 | getUserInfluencePreferences, 642 | saveUserInfluencePreferences, 643 | computeCompositeDNA
+        - generic [ref=f1e1629]:
+          - generic [ref=f1e1630]: ERROR in src/lib/dna/mirroring.ts:640:3
+          - generic [ref=f1e1631]:
+            - text: "TS2484: Export declaration conflicts with exported declaration of 'getEntityDNA'."
+            - generic [ref=f1e1632]:
+              - text: 638 | getUserDNA, 639 | saveUserDNA,
+              - generic [ref=f1e1633]: ">"
+              - text: 640 | getEntityDNA, |
+              - generic [ref=f1e1634]: ^
+              - generic [ref=f1e1635]: ^
+              - generic [ref=f1e1636]: ^
+              - generic [ref=f1e1637]: ^
+              - generic [ref=f1e1638]: ^
+              - generic [ref=f1e1639]: ^
+              - generic [ref=f1e1640]: ^
+              - generic [ref=f1e1641]: ^
+              - generic [ref=f1e1642]: ^
+              - generic [ref=f1e1643]: ^
+              - generic [ref=f1e1644]: ^
+              - generic [ref=f1e1645]: ^
+              - text: 641 | getUserInfluencePreferences, 642 | saveUserInfluencePreferences, 643 | computeCompositeDNA
+        - generic [ref=f1e1646]:
+          - generic [ref=f1e1647]: ERROR in src/lib/dna/mirroring.ts:641:3
+          - generic [ref=f1e1648]:
+            - text: "TS2323: Cannot redeclare exported variable 'getUserInfluencePreferences'."
+            - generic [ref=f1e1649]:
+              - text: 639 | saveUserDNA, 640 | getEntityDNA,
+              - generic [ref=f1e1650]: ">"
+              - text: 641 | getUserInfluencePreferences, |
+              - generic [ref=f1e1651]: ^
+              - generic [ref=f1e1652]: ^
+              - generic [ref=f1e1653]: ^
+              - generic [ref=f1e1654]: ^
+              - generic [ref=f1e1655]: ^
+              - generic [ref=f1e1656]: ^
+              - generic [ref=f1e1657]: ^
+              - generic [ref=f1e1658]: ^
+              - generic [ref=f1e1659]: ^
+              - generic [ref=f1e1660]: ^
+              - generic [ref=f1e1661]: ^
+              - generic [ref=f1e1662]: ^
+              - generic [ref=f1e1663]: ^
+              - generic [ref=f1e1664]: ^
+              - generic [ref=f1e1665]: ^
+              - generic [ref=f1e1666]: ^
+              - generic [ref=f1e1667]: ^
+              - generic [ref=f1e1668]: ^
+              - generic [ref=f1e1669]: ^
+              - generic [ref=f1e1670]: ^
+              - generic [ref=f1e1671]: ^
+              - generic [ref=f1e1672]: ^
+              - generic [ref=f1e1673]: ^
+              - generic [ref=f1e1674]: ^
+              - generic [ref=f1e1675]: ^
+              - generic [ref=f1e1676]: ^
+              - generic [ref=f1e1677]: ^
+              - text: "642 | saveUserInfluencePreferences, 643 | computeCompositeDNA 644 | }"
+        - generic [ref=f1e1678]:
+          - generic [ref=f1e1679]: ERROR in src/lib/dna/mirroring.ts:641:3
+          - generic [ref=f1e1680]:
+            - text: "TS2484: Export declaration conflicts with exported declaration of 'getUserInfluencePreferences'."
+            - generic [ref=f1e1681]:
+              - text: 639 | saveUserDNA, 640 | getEntityDNA,
+              - generic [ref=f1e1682]: ">"
+              - text: 641 | getUserInfluencePreferences, |
+              - generic [ref=f1e1683]: ^
+              - generic [ref=f1e1684]: ^
+              - generic [ref=f1e1685]: ^
+              - generic [ref=f1e1686]: ^
+              - generic [ref=f1e1687]: ^
+              - generic [ref=f1e1688]: ^
+              - generic [ref=f1e1689]: ^
+              - generic [ref=f1e1690]: ^
+              - generic [ref=f1e1691]: ^
+              - generic [ref=f1e1692]: ^
+              - generic [ref=f1e1693]: ^
+              - generic [ref=f1e1694]: ^
+              - generic [ref=f1e1695]: ^
+              - generic [ref=f1e1696]: ^
+              - generic [ref=f1e1697]: ^
+              - generic [ref=f1e1698]: ^
+              - generic [ref=f1e1699]: ^
+              - generic [ref=f1e1700]: ^
+              - generic [ref=f1e1701]: ^
+              - generic [ref=f1e1702]: ^
+              - generic [ref=f1e1703]: ^
+              - generic [ref=f1e1704]: ^
+              - generic [ref=f1e1705]: ^
+              - generic [ref=f1e1706]: ^
+              - generic [ref=f1e1707]: ^
+              - generic [ref=f1e1708]: ^
+              - generic [ref=f1e1709]: ^
+              - text: "642 | saveUserInfluencePreferences, 643 | computeCompositeDNA 644 | }"
+        - generic [ref=f1e1710]:
+          - generic [ref=f1e1711]: ERROR in src/lib/dna/mirroring.ts:642:3
+          - generic [ref=f1e1712]:
+            - text: "TS2323: Cannot redeclare exported variable 'saveUserInfluencePreferences'."
+            - generic [ref=f1e1713]:
+              - text: 640 | getEntityDNA, 641 | getUserInfluencePreferences,
+              - generic [ref=f1e1714]: ">"
+              - text: 642 | saveUserInfluencePreferences, |
+              - generic [ref=f1e1715]: ^
+              - generic [ref=f1e1716]: ^
+              - generic [ref=f1e1717]: ^
+              - generic [ref=f1e1718]: ^
+              - generic [ref=f1e1719]: ^
+              - generic [ref=f1e1720]: ^
+              - generic [ref=f1e1721]: ^
+              - generic [ref=f1e1722]: ^
+              - generic [ref=f1e1723]: ^
+              - generic [ref=f1e1724]: ^
+              - generic [ref=f1e1725]: ^
+              - generic [ref=f1e1726]: ^
+              - generic [ref=f1e1727]: ^
+              - generic [ref=f1e1728]: ^
+              - generic [ref=f1e1729]: ^
+              - generic [ref=f1e1730]: ^
+              - generic [ref=f1e1731]: ^
+              - generic [ref=f1e1732]: ^
+              - generic [ref=f1e1733]: ^
+              - generic [ref=f1e1734]: ^
+              - generic [ref=f1e1735]: ^
+              - generic [ref=f1e1736]: ^
+              - generic [ref=f1e1737]: ^
+              - generic [ref=f1e1738]: ^
+              - generic [ref=f1e1739]: ^
+              - generic [ref=f1e1740]: ^
+              - generic [ref=f1e1741]: ^
+              - generic [ref=f1e1742]: ^
+              - text: "643 | computeCompositeDNA 644 | } 645 |"
+        - generic [ref=f1e1743]:
+          - generic [ref=f1e1744]: ERROR in src/lib/dna/mirroring.ts:642:3
+          - generic [ref=f1e1745]:
+            - text: "TS2484: Export declaration conflicts with exported declaration of 'saveUserInfluencePreferences'."
+            - generic [ref=f1e1746]:
+              - text: 640 | getEntityDNA, 641 | getUserInfluencePreferences,
+              - generic [ref=f1e1747]: ">"
+              - text: 642 | saveUserInfluencePreferences, |
+              - generic [ref=f1e1748]: ^
+              - generic [ref=f1e1749]: ^
+              - generic [ref=f1e1750]: ^
+              - generic [ref=f1e1751]: ^
+              - generic [ref=f1e1752]: ^
+              - generic [ref=f1e1753]: ^
+              - generic [ref=f1e1754]: ^
+              - generic [ref=f1e1755]: ^
+              - generic [ref=f1e1756]: ^
+              - generic [ref=f1e1757]: ^
+              - generic [ref=f1e1758]: ^
+              - generic [ref=f1e1759]: ^
+              - generic [ref=f1e1760]: ^
+              - generic [ref=f1e1761]: ^
+              - generic [ref=f1e1762]: ^
+              - generic [ref=f1e1763]: ^
+              - generic [ref=f1e1764]: ^
+              - generic [ref=f1e1765]: ^
+              - generic [ref=f1e1766]: ^
+              - generic [ref=f1e1767]: ^
+              - generic [ref=f1e1768]: ^
+              - generic [ref=f1e1769]: ^
+              - generic [ref=f1e1770]: ^
+              - generic [ref=f1e1771]: ^
+              - generic [ref=f1e1772]: ^
+              - generic [ref=f1e1773]: ^
+              - generic [ref=f1e1774]: ^
+              - generic [ref=f1e1775]: ^
+              - text: "643 | computeCompositeDNA 644 | } 645 |"
+        - generic [ref=f1e1776]:
+          - generic [ref=f1e1777]: ERROR in src/lib/passport/processor.ts:65:30
+          - generic [ref=f1e1778]:
+            - text: "TS7016: Could not find a declaration file for module 'uuid'. '/Users/pks.ml/Desktop/93/my-app/node_modules/uuid/dist/index.js' implicitly has an 'any' type. Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`"
+            - generic [ref=f1e1779]:
+              - text: "63 | import { MediaIDDNA } from '@/types/dna' 64 | import mirrorInteractionToDNA from '../dna/mirroring'"
+              - generic [ref=f1e1780]: ">"
+              - text: "65 | import { v4 as uuidv4 } from 'uuid' |"
+              - generic [ref=f1e1781]: ^
+              - generic [ref=f1e1782]: ^
+              - generic [ref=f1e1783]: ^
+              - generic [ref=f1e1784]: ^
+              - generic [ref=f1e1785]: ^
+              - generic [ref=f1e1786]: ^
+              - text: "66 | import { generateMutations, DNAMutation } from '../coliseum/processor-logic' 67 | 68 | // ============================================================================="
+        - generic [ref=f1e1787]:
+          - generic [ref=f1e1788]: ERROR in src/lib/passport/processor.ts:235:34
+          - generic [ref=f1e1789]:
+            - text: "TS2339: Property 'affects_systems' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1790]:
+              - text: 233 | 234 | // Process each affected system
+              - generic [ref=f1e1791]: ">"
+              - text: "235 | const systemPromises = entry.affects_systems.map(async (system) => { |"
+              - generic [ref=f1e1792]: ^
+              - generic [ref=f1e1793]: ^
+              - generic [ref=f1e1794]: ^
+              - generic [ref=f1e1795]: ^
+              - generic [ref=f1e1796]: ^
+              - generic [ref=f1e1797]: ^
+              - generic [ref=f1e1798]: ^
+              - generic [ref=f1e1799]: ^
+              - generic [ref=f1e1800]: ^
+              - generic [ref=f1e1801]: ^
+              - generic [ref=f1e1802]: ^
+              - generic [ref=f1e1803]: ^
+              - generic [ref=f1e1804]: ^
+              - generic [ref=f1e1805]: ^
+              - generic [ref=f1e1806]: ^
+              - text: "236 | try { 237 | switch (system) { 238 | case 'mediaid':"
+        - generic [ref=f1e1807]:
+          - generic [ref=f1e1808]: ERROR in src/lib/passport/processor.ts:235:61
+          - generic [ref=f1e1809]:
+            - text: "TS7006: Parameter 'system' implicitly has an 'any' type."
+            - generic [ref=f1e1810]:
+              - text: 233 | 234 | // Process each affected system
+              - generic [ref=f1e1811]: ">"
+              - text: "235 | const systemPromises = entry.affects_systems.map(async (system) => { |"
+              - generic [ref=f1e1812]: ^
+              - generic [ref=f1e1813]: ^
+              - generic [ref=f1e1814]: ^
+              - generic [ref=f1e1815]: ^
+              - generic [ref=f1e1816]: ^
+              - generic [ref=f1e1817]: ^
+              - text: "236 | try { 237 | switch (system) { 238 | case 'mediaid':"
+        - generic [ref=f1e1818]:
+          - generic [ref=f1e1819]: ERROR in src/lib/passport/processor.ts:317:7
+          - generic [ref=f1e1820]:
+            - text: "TS2322: Type '\"track\" | \"content\" | \"artist\" | \"brand\" | \"event\"' is not assignable to type '\"track\" | \"artist\" | \"brand\" | \"event\"'. Type '\"content\"' is not assignable to type '\"track\" | \"artist\" | \"brand\" | \"event\"'."
+            - generic [ref=f1e1821]:
+              - text: "315 | userId: entry.user_id, 316 | entityId: entry.metadata.trackId || entry.metadata.artistId || entry.metadata.eventId || entry.metadata.targetId,"
+              - generic [ref=f1e1822]: ">"
+              - text: "317 | entityType: mapEntityType(entry.event_type, entry.metadata), |"
+              - generic [ref=f1e1823]: ^
+              - generic [ref=f1e1824]: ^
+              - generic [ref=f1e1825]: ^
+              - generic [ref=f1e1826]: ^
+              - generic [ref=f1e1827]: ^
+              - generic [ref=f1e1828]: ^
+              - generic [ref=f1e1829]: ^
+              - generic [ref=f1e1830]: ^
+              - generic [ref=f1e1831]: ^
+              - generic [ref=f1e1832]: ^
+              - text: "318 | interactionType: mapInteractionType(entry.event_type), 319 | timestamp: new Date(entry.timestamp), // This might need fix if timestamp removed from type 320 | context: {"
+        - generic [ref=f1e1833]:
+          - generic [ref=f1e1834]: ERROR in src/lib/passport/processor.ts:319:33
+          - generic [ref=f1e1835]:
+            - text: "TS2339: Property 'timestamp' does not exist on type 'PassportEntry'."
+            - generic [ref=f1e1836]:
+              - text: "317 | entityType: mapEntityType(entry.event_type, entry.metadata), 318 | interactionType: mapInteractionType(entry.event_type),"
+              - generic [ref=f1e1837]: ">"
+              - text: "319 | timestamp: new Date(entry.timestamp), // This might need fix if timestamp removed from type |"
+              - generic [ref=f1e1838]: ^
+              - generic [ref=f1e1839]: ^
+              - generic [ref=f1e1840]: ^
+              - generic [ref=f1e1841]: ^
+              - generic [ref=f1e1842]: ^
+              - generic [ref=f1e1843]: ^
+              - generic [ref=f1e1844]: ^
+              - generic [ref=f1e1845]: ^
+              - generic [ref=f1e1846]: ^
+              - text: "320 | context: { 321 | // Pass relevant context for adaptive weighting 322 | location: entry.metadata.location,"
+        - generic [ref=f1e1847]:
+          - generic [ref=f1e1848]: ERROR in src/lib/passport/processor.ts:320:7
+          - generic [ref=f1e1849]:
+            - text: "TS2322: Type '{ location: any; device: any; sentiment: any; }' is not assignable to type '\"playlist\" | \"vertical_player\" | \"general\" | \"event\" | \"discovery\"'."
+            - generic [ref=f1e1850]:
+              - text: "318 | interactionType: mapInteractionType(entry.event_type), 319 | timestamp: new Date(entry.timestamp), // This might need fix if timestamp removed from type"
+              - generic [ref=f1e1851]: ">"
+              - text: "320 | context: { |"
+              - generic [ref=f1e1852]: ^
+              - generic [ref=f1e1853]: ^
+              - generic [ref=f1e1854]: ^
+              - generic [ref=f1e1855]: ^
+              - generic [ref=f1e1856]: ^
+              - generic [ref=f1e1857]: ^
+              - generic [ref=f1e1858]: ^
+              - text: "321 | // Pass relevant context for adaptive weighting 322 | location: entry.metadata.location, 323 | device: entry.metadata.device,"
+        - generic [ref=f1e1859]:
+          - generic [ref=f1e1860]: ERROR in src/lib/treasury/gateway.ts:19:30
+          - generic [ref=f1e1861]:
+            - text: "TS7016: Could not find a declaration file for module 'uuid'. '/Users/pks.ml/Desktop/93/my-app/node_modules/uuid/dist/index.js' implicitly has an 'any' type. Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`"
+            - generic [ref=f1e1862]:
+              - text: "17 | import { generateWalletId } from './walletId' 18 | import { logEvent } from '../passport/passportClient'"
+              - generic [ref=f1e1863]: ">"
+              - text: "19 | import { v4 as uuidv4 } from 'uuid' |"
+              - generic [ref=f1e1864]: ^
+              - generic [ref=f1e1865]: ^
+              - generic [ref=f1e1866]: ^
+              - generic [ref=f1e1867]: ^
+              - generic [ref=f1e1868]: ^
+              - generic [ref=f1e1869]: ^
+              - text: 20 | 21 | // ============================================================================= 22 | // TYPES
+        - generic [ref=f1e1870]:
+          - generic [ref=f1e1871]: ERROR in src/lib/treasury/payoutScheduler.ts:328:7
+          - generic [ref=f1e1872]:
+            - text: "TS2322: Type '\"2023-10-16\"' is not assignable to type '\"2025-10-29.clover\"'."
+            - generic [ref=f1e1873]:
+              - text: "326 | // Create Stripe transfer 327 | const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {"
+              - generic [ref=f1e1874]: ">"
+              - text: "328 | apiVersion: '2023-10-16' |"
+              - generic [ref=f1e1875]: ^
+              - generic [ref=f1e1876]: ^
+              - generic [ref=f1e1877]: ^
+              - generic [ref=f1e1878]: ^
+              - generic [ref=f1e1879]: ^
+              - generic [ref=f1e1880]: ^
+              - generic [ref=f1e1881]: ^
+              - generic [ref=f1e1882]: ^
+              - generic [ref=f1e1883]: ^
+              - generic [ref=f1e1884]: ^
+              - text: "329 | }) 330 | 331 | const transfer = await stripe.transfers.create({"
+        - generic [ref=f1e1885]:
+          - generic [ref=f1e1886]: ERROR in src/lib/treasury/webhookHandler.ts:64:5
+          - generic [ref=f1e1887]:
+            - text: "TS2322: Type '\"2023-10-16\"' is not assignable to type '\"2025-10-29.clover\"'."
+            - generic [ref=f1e1888]:
+              - text: "62 | ): Stripe.Event { 63 | const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {"
+              - generic [ref=f1e1889]: ">"
+              - text: "64 | apiVersion: '2023-10-16' |"
+              - generic [ref=f1e1890]: ^
+              - generic [ref=f1e1891]: ^
+              - generic [ref=f1e1892]: ^
+              - generic [ref=f1e1893]: ^
+              - generic [ref=f1e1894]: ^
+              - generic [ref=f1e1895]: ^
+              - generic [ref=f1e1896]: ^
+              - generic [ref=f1e1897]: ^
+              - generic [ref=f1e1898]: ^
+              - generic [ref=f1e1899]: ^
+              - text: "65 | }) 66 | 67 | try {"
+        - generic [ref=f1e1900]:
+          - generic [ref=f1e1901]: ERROR in src/routes/coliseum-dashboard.tsx:13:54
+          - generic [ref=f1e1902]:
+            - text: "TS2614: Module '\"../lib/coliseum/entitlements\"' has no exported member 'DNADomain'. Did you mean to use 'import DNADomain from \"../lib/coliseum/entitlements\"' instead?"
+            - generic [ref=f1e1903]:
+              - text: "11 | import { createClient } from '@supabase/supabase-js'; 12 | import { useNavigate } from 'react-router-dom';"
+              - generic [ref=f1e1904]: ">"
+              - text: "13 | import { useColiseumEntitlement, PLAN_FEATURES, type DNADomain, type ColiseumPlan } from '../lib/coliseum/entitlements'; |"
+              - generic [ref=f1e1905]: ^
+              - generic [ref=f1e1906]: ^
+              - generic [ref=f1e1907]: ^
+              - generic [ref=f1e1908]: ^
+              - generic [ref=f1e1909]: ^
+              - generic [ref=f1e1910]: ^
+              - generic [ref=f1e1911]: ^
+              - generic [ref=f1e1912]: ^
+              - generic [ref=f1e1913]: ^
+              - text: "14 | import type { DomainStrength } from '../lib/coliseum/domainCalculator'; 15 | 16 | // ============================================================================"
+        - generic [ref=f1e1914]:
+          - generic [ref=f1e1915]: ERROR in src/routes/coliseum-dashboard.tsx:825:10
+          - generic [ref=f1e1916]:
+            - text: "TS7053: Element implicitly has an 'any' type because expression of type 'DNADomain' can't be used to index type '{ A: { name: string; description: string; }; T: { name: string; description: string; }; G: { name: string; description: string; }; C: { name: string; description: string; }; }'."
+            - generic [ref=f1e1917]:
+              - text: "823 | }, 824 | };"
+              - generic [ref=f1e1918]: ">"
+              - text: 825 | return info[domain]; |
+              - generic [ref=f1e1919]: ^
+              - generic [ref=f1e1920]: ^
+              - generic [ref=f1e1921]: ^
+              - generic [ref=f1e1922]: ^
+              - generic [ref=f1e1923]: ^
+              - generic [ref=f1e1924]: ^
+              - generic [ref=f1e1925]: ^
+              - generic [ref=f1e1926]: ^
+              - generic [ref=f1e1927]: ^
+              - generic [ref=f1e1928]: ^
+              - generic [ref=f1e1929]: ^
+              - generic [ref=f1e1930]: ^
+              - text: "826 | } 827 | 828 | function getDomainMetricLabel(domain: DNADomain): string {"
+        - generic [ref=f1e1931]:
+          - generic [ref=f1e1932]: ERROR in src/routes/coliseum-dashboard.tsx:835:10
+          - generic [ref=f1e1933]:
+            - text: "TS7053: Element implicitly has an 'any' type because expression of type 'DNADomain' can't be used to index type '{ A: string; T: string; G: string; C: string; }'."
+            - generic [ref=f1e1934]:
+              - text: "833 | C: 'Geographic Reach', 834 | };"
+              - generic [ref=f1e1935]: ">"
+              - text: 835 | return labels[domain]; |
+              - generic [ref=f1e1936]: ^
+              - generic [ref=f1e1937]: ^
+              - generic [ref=f1e1938]: ^
+              - generic [ref=f1e1939]: ^
+              - generic [ref=f1e1940]: ^
+              - generic [ref=f1e1941]: ^
+              - generic [ref=f1e1942]: ^
+              - generic [ref=f1e1943]: ^
+              - generic [ref=f1e1944]: ^
+              - generic [ref=f1e1945]: ^
+              - generic [ref=f1e1946]: ^
+              - generic [ref=f1e1947]: ^
+              - generic [ref=f1e1948]: ^
+              - generic [ref=f1e1949]: ^
+              - text: "836 | } 837 | 838 | function formatDomainMetric(entry: any, domain: DNADomain): string {"
+```

@@ -1,0 +1,75 @@
+.dia-matrix-filters {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.dia-matrix-filters .filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.dia-matrix-filters .filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dia-matrix-filters label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.dia-matrix-filters input,
+.dia-matrix-filters select {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #495057;
+  background: white;
+}
+
+.dia-matrix-filters input:focus,
+.dia-matrix-filters select:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.dia-matrix-filters .daterange-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dia-matrix-filters .daterange-inputs input {
+  flex: 1;
+}
+
+.dia-matrix-filters .daterange-inputs span {
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.dia-matrix-filters .clear-filters-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dia-matrix-filters .clear-filters-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
