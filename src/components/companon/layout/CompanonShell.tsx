@@ -89,7 +89,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
         brand_id: userData.brand_id,
         role: userData.role,
         route: pathname,
-      }, ['mediaid']);
+      }, { affects_systems: ['mediaid'] });
 
     } catch (error) {
       console.error('Failed to load Compañon user:', error);
