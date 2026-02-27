@@ -649,6 +649,8 @@ const HallOfFame: React.FC = () => {
                 </button>
               </div>
 
+              
+
               {/* TiltedCard */}
               <div style={{ height: '280px', width: '100%' }}>
                 <TiltedCard
