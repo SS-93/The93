@@ -295,7 +295,7 @@ export function usePassport(
       const entry = {
         user_id: user.id,
         session_id: logOptions?.session_id || sessionId,
-        device_id: null, // TODO: Add device fingerprinting
+        device_id: undefined, // TODO: Add device fingerprinting
         event_type: eventType,
         event_category: routing.category,
         entity_type: payload.entity_type || null,

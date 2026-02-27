@@ -232,7 +232,7 @@ async function processEntry(entry: PassportEntry): Promise<PassportProcessingRes
     console.log(`[Passport Processor] Processing entry ${entry.id} (${entry.event_type})`)
 
     // Process each affected system
-    const systemPromises = entry.affects_systems.map(async (system) => {
+    const systemPromises = (entry as any).affects_systems.map(async (system: any) => {
       try {
         switch (system) {
           case 'mediaid':
@@ -314,15 +314,11 @@ async function processForMediaID(entry: PassportEntry): Promise<void> {
     const result = await mirrorInteractionToDNA({
       userId: entry.user_id,
       entityId: entry.metadata.trackId || entry.metadata.artistId || entry.metadata.eventId || entry.metadata.targetId,
-      entityType: mapEntityType(entry.event_type, entry.metadata),
+      entityType: mapEntityType(entry.event_type, entry.metadata) as 'track' | 'artist' | 'event' | 'brand',
       interactionType: mapInteractionType(entry.event_type),
-      timestamp: new Date(entry.timestamp), // This might need fix if timestamp removed from type
-      context: {
-        // Pass relevant context for adaptive weighting
-        location: entry.metadata.location,
-        device: entry.metadata.device,
-        sentiment: entry.metadata.sentiment
-      }
+      timestamp: new Date(entry.created_at as string),
+      context: 'general' as const,
+      recencyFactor: 1.0
     })
 
     if (result.success) {

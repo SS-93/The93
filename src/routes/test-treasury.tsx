@@ -515,14 +515,14 @@ export default function TestTreasuryPage() {
                                     });
                                     const data = await res.json();
                                     if (data.success) {
-                                      setResult({ success: true, data, message: data.alreadyConnected ? `${artist.label} already connected` : `✅ Connected ${artist.label} to event` });
+                                      setMessage(data.alreadyConnected ? `${artist.label} already connected` : `✅ Connected ${artist.label} to event`);
                                       // Refresh event to show updated artists
                                       handleConnectEvent();
                                     } else {
-                                      setResult({ success: false, data, message: data.error || 'Failed to connect artist' });
+                                      setMessage(data.error || 'Failed to connect artist');
                                     }
                                   } catch (err: any) {
-                                    setResult({ success: false, data: null, message: err.message });
+                                    setMessage(err.message);
                                   } finally {
                                     setLoading(false);
                                   }

@@ -99,7 +99,7 @@ export function PassportMatrix() {
   // Column definitions
   const columns: ColumnDef<PassportEntry>[] = [
     {
-      key: 'user_email',
+      id: 'user_email',
       label: 'User',
       sortable: true,
       width: '200px',
@@ -113,7 +113,7 @@ export function PassportMatrix() {
       )
     },
     {
-      key: 'event_type',
+      id: 'event_type',
       label: 'Event Type',
       sortable: true,
       width: '220px',
@@ -125,7 +125,7 @@ export function PassportMatrix() {
       )
     },
     {
-      key: 'entity_type',
+      id: 'entity_type',
       label: 'Entity',
       sortable: true,
       width: '150px',
@@ -147,7 +147,7 @@ export function PassportMatrix() {
       )
     },
     {
-      key: 'processed',
+      id: 'processed',
       label: 'Processed',
       sortable: false,
       width: '180px',
@@ -160,7 +160,7 @@ export function PassportMatrix() {
       )
     },
     {
-      key: 'dna_influence',
+      id: 'dna_influence',
       label: 'DNA',
       sortable: false,
       width: '80px',
@@ -175,7 +175,7 @@ export function PassportMatrix() {
       )
     },
     {
-      key: 'created_at',
+      id: 'created_at',
       label: 'Timestamp',
       sortable: true,
       width: '180px',
@@ -190,13 +190,13 @@ export function PassportMatrix() {
   // Filter definitions
   const filters: FilterDef[] = [
     {
-      key: 'search',
+      id: 'search',
       label: 'Search',
       type: 'text',
       placeholder: 'Search user email, event type...'
     },
     {
-      key: 'event_category',
+      id: 'event_category',
       label: 'Category',
       type: 'select',
       options: [
@@ -210,7 +210,7 @@ export function PassportMatrix() {
       ]
     },
     {
-      key: 'processed',
+      id: 'processed',
       label: 'Processing Status',
       type: 'select',
       options: [

@@ -90,6 +90,8 @@
 import { DNADomain, DNACluster } from './dna'
 import { TimeRange } from './treasury'
 
+export type { TimeRange }
+
 // =============================================================================
 // CORE METRIC TYPES
 // =============================================================================

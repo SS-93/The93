@@ -210,7 +210,7 @@ class FFmpegAudioService {
 
       // Read the converted file
       const convertedData = await this.ffmpeg!.readFile(outputFile)
-      const blob = new Blob([convertedData], { type: `audio/${outputFormat}` })
+      const blob = new Blob([convertedData as any], { type: `audio/${outputFormat}` })
 
       // Cleanup
       await this.ffmpeg!.deleteFile('input.audio')
@@ -243,7 +243,7 @@ class FFmpegAudioService {
       ])
 
       const audioData = await this.ffmpeg!.readFile('output.mp3')
-      const blob = new Blob([audioData], { type: 'audio/mp3' })
+      const blob = new Blob([audioData as any], { type: 'audio/mp3' })
 
       // Cleanup
       await this.ffmpeg!.deleteFile('input.video')
@@ -277,7 +277,7 @@ class FFmpegAudioService {
       ])
 
       const normalizedData = await this.ffmpeg!.readFile('normalized.mp3')
-      const blob = new Blob([normalizedData], { type: 'audio/mp3' })
+      const blob = new Blob([normalizedData as any], { type: 'audio/mp3' })
 
       // Cleanup
       await this.ffmpeg!.deleteFile('input.audio')

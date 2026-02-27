@@ -141,7 +141,7 @@ function getCytosineMultiplier(eventType: string): number {
 export function generateMutations(entry: PassportEntry): DNAMutation[] {
     const mutations: DNAMutation[] = [];
     const baseWeight = getEventWeight(entry.event_type);
-    const recencyDecay = calculateRecencyDecay(entry.timestamp || entry.created_at, entry.event_type);
+    const recencyDecay = calculateRecencyDecay(entry.created_at, entry.event_type);
     const metadata = entry.metadata || {};
 
     // Resolve artist ID (either direct or via track/event)
@@ -157,13 +157,13 @@ export function generateMutations(entry: PassportEntry): DNAMutation[] {
                 passport_entry_id: entry.id,
                 user_id: entry.user_id,
                 artist_id: artistId,
-                domain: 'A',
+                domain: 'A' as DNADomain,
                 key: genre,
                 delta,
                 weight: baseWeight,
                 recency_decay: recencyDecay,
                 effective_delta: delta * baseWeight * recencyDecay,
-                occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(),
+                occurred_at: new Date(entry.created_at).toISOString(),
             });
         }
     } else {
@@ -173,13 +173,13 @@ export function generateMutations(entry: PassportEntry): DNAMutation[] {
             passport_entry_id: entry.id,
             user_id: entry.user_id,
             artist_id: artistId,
-            domain: 'A',
+            domain: 'A' as DNADomain,
             key: 'general_engagement',
             delta,
             weight: baseWeight,
             recency_decay: recencyDecay,
             effective_delta: delta * baseWeight * recencyDecay,
-            occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(),
+            occurred_at: new Date(entry.created_at).toISOString(),
         });
     }
 
@@ -189,13 +189,13 @@ export function generateMutations(entry: PassportEntry): DNAMutation[] {
         passport_entry_id: entry.id,
         user_id: entry.user_id,
         artist_id: artistId,
-        domain: 'T',
+        domain: 'T' as DNADomain,
         key: 'engagement',
         delta: tDelta,
         weight: baseWeight,
         recency_decay: recencyDecay,
         effective_delta: tDelta * baseWeight * recencyDecay,
-        occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(),
+        occurred_at: new Date(entry.created_at).toISOString(),
     });
 
     // G-Domain: Economic
@@ -205,13 +205,13 @@ export function generateMutations(entry: PassportEntry): DNAMutation[] {
             passport_entry_id: entry.id,
             user_id: entry.user_id,
             artist_id: artistId,
-            domain: 'G',
+            domain: 'G' as DNADomain,
             key: 'revenue',
             delta: gDelta,
             weight: baseWeight,
             recency_decay: recencyDecay,
             effective_delta: gDelta * baseWeight * recencyDecay,
-            occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(),
+            occurred_at: new Date(entry.created_at).toISOString(),
         });
     }
 
@@ -222,13 +222,13 @@ export function generateMutations(entry: PassportEntry): DNAMutation[] {
             passport_entry_id: entry.id,
             user_id: entry.user_id,
             artist_id: artistId,
-            domain: 'C',
+            domain: 'C' as DNADomain,
             key: `city:${metadata.city}`,
             delta: cDelta,
             weight: baseWeight,
             recency_decay: recencyDecay,
             effective_delta: cDelta * baseWeight * recencyDecay,
-            occurred_at: new Date(entry.timestamp || entry.created_at).toISOString(),
+            occurred_at: new Date(entry.created_at).toISOString(),
         });
     }
 

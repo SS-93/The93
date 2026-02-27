@@ -7,7 +7,7 @@
  * ============================================================================
  */
 
-import type { DNADomain } from './entitlements';
+import type { DNADomain } from './domainCalculator';
 
 // Artist names pool
 const ARTIST_NAMES = [
@@ -306,5 +306,5 @@ export function getDomainInfo(domain: DNADomain) {
     }
   };
 
-  return info[domain];
+  return (info as any)[domain];
 }

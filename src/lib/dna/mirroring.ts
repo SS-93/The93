@@ -184,9 +184,10 @@ export async function mirrorInteractionToDNA(
     const finalWeights = applyUserMultipliers(baseWeights, userPreferences, context.context)
 
     // 5. Calculate decay factor (carbon decay model)
+    const ageDays = (Date.now() - userDNA.lastInteraction.getTime()) / (1000 * 60 * 60 * 24)
     const decayFactor = calculateDecayFactor(
-      userDNA.lastInteraction,
-      userDNA.halfLifeDays
+      ageDays,
+      { half_life_days: userDNA.halfLifeDays, min_retention: 0.1 }
     )
 
     // 6. Calculate learning rate (alpha)
@@ -273,7 +274,7 @@ export async function mirrorInteractionToDNA(
       economicDeltaNorm: 0,
       spatialDeltaNorm: 0,
       compositeDeltaNorm: 0,
-      newDNA: await getUserDNA(context.userId)!,
+      newDNA: (await getUserDNA(context.userId)) as MediaIDDNA,
       processingTimeMs: Date.now() - startTime,
       error: error.message
     }
@@ -633,12 +634,4 @@ function generateMockVector(dimension: number, entityType: string, domain: strin
 // EXPORTS
 // =============================================================================
 
-export {
-  mirrorInteractionToDNA as default,
-  getUserDNA,
-  saveUserDNA,
-  getEntityDNA,
-  getUserInfluencePreferences,
-  saveUserInfluencePreferences,
-  computeCompositeDNA
-}
+export default mirrorInteractionToDNA

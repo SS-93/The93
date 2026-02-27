@@ -37,7 +37,7 @@ interface CompanonShellProps {
 export default function CompanonShell({ children }: CompanonShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const pathname = usePathname();
+  const pathname = location.pathname;
   const supabase = useSupabaseClient();
   const { data: authUser } = useUser();
   const { logEvent } = usePassport();
@@ -84,7 +84,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
       setCurrentBrand(userData.brand);
 
       // Log session start to Passport
-      logEvent('companon.session.started', {
+      logEvent('companon.session.started' as any, {
         user_id: authUser.id,
         brand_id: userData.brand_id,
         role: userData.role,
@@ -147,7 +147,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
 
   useEffect(() => {
     if (companonUser && pathname) {
-      logEvent('companon.navigation', {
+      logEvent('companon.navigation' as any, {
         from: document.referrer || 'direct',
         to: pathname,
         brand_id: companonUser.brand_id,

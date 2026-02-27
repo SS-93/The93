@@ -101,7 +101,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
       setError(null);
 
       // Log query to Passport for audit trail
-      logEvent('companon.dna_query', {
+      logEvent('companon.dna_query' as any, {
         brand_id: brand.id,
         query: query,
         is_detailed: consentGranted,
@@ -166,7 +166,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
     setShowConsentGate(false);
 
     // Log consent grant to Passport
-    logEvent('companon.dna_query.consent_granted', {
+    logEvent('companon.dna_query.consent_granted' as any, {
       brand_id: brand.id,
       query: queryDefinition,
     }, { affects_systems: ['mediaid'] });
@@ -206,7 +206,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
       if (error) throw error;
 
       // Log segment creation to Passport
-      logEvent('companon.audience_segment.created', {
+      logEvent('companon.audience_segment.created' as any, {
         segment_id: data.id,
         brand_id: brand.id,
         estimated_size: preview.estimated_count,

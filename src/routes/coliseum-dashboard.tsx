@@ -10,7 +10,8 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
-import { useColiseumEntitlement, PLAN_FEATURES, type DNADomain, type ColiseumPlan } from '../lib/coliseum/entitlements';
+import { useColiseumEntitlement, PLAN_FEATURES, type ColiseumPlan } from '../lib/coliseum/entitlements';
+import type { DNADomain } from '../lib/coliseum/domainCalculator';
 import type { DomainStrength } from '../lib/coliseum/domainCalculator';
 
 // ============================================================================
@@ -822,7 +823,7 @@ function getDomainInfo(domain: DNADomain) {
       description: 'Touring viability, market penetration, city-to-city mobility',
     },
   };
-  return info[domain];
+  return (info as any)[domain];
 }
 
 function getDomainMetricLabel(domain: DNADomain): string {
@@ -832,7 +833,7 @@ function getDomainMetricLabel(domain: DNADomain): string {
     G: 'Avg Transaction',
     C: 'Geographic Reach',
   };
-  return labels[domain];
+  return (labels as any)[domain];
 }
 
 function formatDomainMetric(entry: any, domain: DNADomain): string {
