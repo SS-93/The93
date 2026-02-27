@@ -89,7 +89,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
         brand_id: userData.brand_id,
         role: userData.role,
         route: pathname,
-      }, ['mediaid']);
+      }, { affects_systems: ['mediaid'] });
 
     } catch (error) {
       console.error('Failed to load Compañon user:', error);
@@ -151,7 +151,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
         from: document.referrer || 'direct',
         to: pathname,
         brand_id: companonUser.brand_id,
-      }, ['coliseum']);
+      }, { affects_systems: ['coliseum'] });
     }
   }, [pathname, companonUser]);
 

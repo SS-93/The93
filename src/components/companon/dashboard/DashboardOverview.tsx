@@ -62,7 +62,7 @@ export default function DashboardOverview({ brand }: DashboardOverviewProps) {
     logEvent('companon.dashboard.viewed' as any, {
       brand_id: brand.id,
       time_range: timeRange,
-    }, ['coliseum']);
+    }, { affects_systems: ['coliseum'] });
 
     // Subscribe to real-time updates
     const subscription = supabase
@@ -111,7 +111,7 @@ export default function DashboardOverview({ brand }: DashboardOverviewProps) {
     logEvent('companon.quick_action' as any, {
       action: 'build_audience',
       brand_id: brand.id,
-    }, ['coliseum']);
+    }, { affects_systems: ['coliseum'] });
     navigate('/companon/dashboard/dna-builder');
   };
 
@@ -119,7 +119,7 @@ export default function DashboardOverview({ brand }: DashboardOverviewProps) {
     logEvent('companon.quick_action' as any, {
       action: 'launch_campaign',
       brand_id: brand.id,
-    }, ['coliseum']);
+    }, { affects_systems: ['coliseum'] });
     navigate('/companon/dashboard/campaigns/new');
   };
 
@@ -127,7 +127,7 @@ export default function DashboardOverview({ brand }: DashboardOverviewProps) {
     logEvent('companon.quick_action' as any, {
       action: 'view_analytics',
       brand_id: brand.id,
-    }, ['coliseum']);
+    }, { affects_systems: ['coliseum'] });
     navigate('/companon/dashboard/analytics');
   };
 

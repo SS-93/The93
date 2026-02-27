@@ -33,6 +33,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePassport } from '@/hooks/usePassport';
+import { useSupabaseClient } from '@/lib/supabaseClient';
 import DNAFilterPanel from './DNAFilterPanel';
 import DNAPreviewPanel from './DNAPreviewPanel';
 import DNAHeatMap from './DNAHeatMap';
@@ -49,8 +51,19 @@ interface DNAQueryBuilderProps {
   brand: CompanonBrand;
 }
 
+// Simple debounce utility
+function debounce<T extends (...args: any[]) => any>(fn: T, ms: number): T {
+  let timer: ReturnType<typeof setTimeout>;
+  return ((...args: any[]) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  }) as T;
+}
+
 export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
   const navigate = useNavigate();
+  const { logEvent } = usePassport();
+  const supabase = useSupabaseClient();
 
   // ============================================================================
   // STATE
@@ -92,7 +105,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
         brand_id: brand.id,
         query: query,
         is_detailed: consentGranted,
-      }, ['mediaid', 'coliseum']);
+      }, { affects_systems: ['mediaid', 'coliseum'] });
 
       // POST to Passport → MediaID DNA API
       const response = await fetch('/api/v1/companon/audiences/preview', {
@@ -156,7 +169,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
     logEvent('companon.dna_query.consent_granted', {
       brand_id: brand.id,
       query: queryDefinition,
-    }, ['mediaid']);
+    }, { affects_systems: ['mediaid'] });
 
     // Re-fetch preview with detailed flag
     await fetchPreview(queryDefinition);
@@ -197,7 +210,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
         segment_id: data.id,
         brand_id: brand.id,
         estimated_size: preview.estimated_count,
-      }, ['mediaid', 'coliseum']);
+      }, { affects_systems: ['mediaid', 'coliseum'] });
 
       setShowSaveModal(false);
 
