@@ -241,7 +241,7 @@ const ArtistScorecardEvaluation: React.FC<ArtistScorecardProps> = ({
               onClick={() => !readonly && updateMetric(metric, star)}
               disabled={readonly}
               className={`text-xl transition-colors ${
-                star <= currentValue
+                star <= (currentValue as number)
                   ? 'text-yellow-400'
                   : 'text-gray-600 hover:text-gray-400'
               } ${readonly ? 'cursor-default' : 'cursor-pointer'}`}

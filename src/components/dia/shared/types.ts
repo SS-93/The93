@@ -39,6 +39,7 @@ export interface MatrixStats {
   value: string | number
   trend?: 'up' | 'down' | 'neutral'
   icon?: string
+  color?: string
 }
 
 export interface DIAMatrixProps<T> {

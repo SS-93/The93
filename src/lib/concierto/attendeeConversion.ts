@@ -173,8 +173,8 @@ export async function linkAttendeeToUser(
       eventId,
       attendeeType,
       attendeeId,
-      originalEmail: updateResult.data?.email || '',
-      originalName: updateResult.data?.name || updateResult.data?.artist_name || '',
+      originalEmail: updateResult?.data?.email || '',
+      originalName: updateResult?.data?.name || updateResult?.data?.artist_name || '',
       convertedUserId: userId,
       conversionSource
     });

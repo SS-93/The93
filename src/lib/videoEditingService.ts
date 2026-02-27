@@ -154,7 +154,7 @@ class VideoEditingService {
       
       const data = await ffmpeg.readFile(outputName)
       const buffer = data instanceof Uint8Array ? data.buffer : data
-      return new Blob([buffer], { type: 'video/mp4' })
+      return new Blob([buffer as any], { type: 'video/mp4' })
     } catch (error) {
       console.error('Filter application failed:', error)
       throw error
@@ -247,7 +247,7 @@ class VideoEditingService {
       
       const data = await ffmpeg.readFile('output.mp4')
       const buffer = data instanceof Uint8Array ? data.buffer : data
-      return new Blob([buffer], { type: 'video/mp4' })
+      return new Blob([buffer as any], { type: 'video/mp4' })
     } catch (error) {
       console.error('Video rendering failed:', error)
       throw error

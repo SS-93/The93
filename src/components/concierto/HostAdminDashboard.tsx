@@ -547,7 +547,7 @@ const HostAdminDashboard: React.FC = () => {
       {/* Edit Event Modal */}
       {editingEvent && (
         <EventDetailsEditor
-          event={editingEvent}
+          event={editingEvent as any}
           onSave={(updatedEvent) => {
             setEvents(prev => prev.map(e => e.id === updatedEvent.id ? {
               ...e,

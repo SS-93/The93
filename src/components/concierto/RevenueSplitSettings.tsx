@@ -562,7 +562,8 @@ function PartnerModal({ onSave, onClose }: PartnerModalProps) {
     partner_name: '',
     recipient_type: 'other' as ProfitSharePartner['recipient_type'],
     recipient_email: '',
-    split_percent: 0
+    split_percent: 0,
+    is_active: true
   });
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -8,7 +8,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import type { PassportEvent } from '../passport/events';
+import type { PassportEntry as PassportEvent } from '@/types/passport';
 
 // ============================================================================
 // TYPES
@@ -264,7 +264,7 @@ export class DomainStrengthCalculator {
   private generateMutations(event: PassportEvent): DNAMutation[] {
     const mutations: DNAMutation[] = [];
     const baseWeight = getEventWeight(event.event_type);
-    const recencyDecay = calculateRecencyDecay(new Date(event.timestamp), event.event_type);
+    const recencyDecay = calculateRecencyDecay(new Date(event.created_at as string), event.event_type);
     const metadata = event.metadata as any || {};
 
     // A-Domain: Cultural mutations (genre, interests)
@@ -449,7 +449,7 @@ export class DomainStrengthCalculator {
     mutations: DNAMutation[]
   ): Promise<ThymineMetadata> {
     // Fetch unique fans
-    const fanIds = [...new Set(events.map((e) => e.user_id))];
+    const fanIds = Array.from(new Set(events.map((e) => e.user_id)));
     const totalFans = fanIds.length;
 
     // Calculate repeat interactions
@@ -528,7 +528,7 @@ export class DomainStrengthCalculator {
     const revenue_concentration = 0.5; // Would need per-fan revenue distribution
 
     // LTV per fan (placeholder - would need predictive model)
-    const uniqueFans = [...new Set(events.map((e) => e.user_id))].length;
+    const uniqueFans = Array.from(new Set(events.map((e) => e.user_id))).length;
     const lifetime_value_per_fan = uniqueFans > 0 ? total_revenue_cents / uniqueFans / 100 : 0;
 
     // Monetization efficiency (revenue / engagement)

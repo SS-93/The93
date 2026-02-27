@@ -94,7 +94,7 @@ export function applyDecay(
  * @param config - Decay configuration
  * @returns Decay factor (0-1)
  */
-function calculateDecayFactor(
+export function calculateDecayFactor(
   ageDays: number,
   config: DNADecayConfig
 ): number {

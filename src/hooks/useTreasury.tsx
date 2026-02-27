@@ -157,7 +157,7 @@ export function useTreasury(
         auto_payout_threshold_cents: 10000,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      } as TreasuryAccount)
+      } as unknown as TreasuryAccount)
 
     } catch (err) {
       console.error('[useTreasury] Error fetching account:', err)
