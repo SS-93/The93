@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   WalletIcon,
   TicketIcon,
   CreditCardIcon,
@@ -50,6 +50,10 @@ export default function WalletPage() {
   const [filter, setFilter] = useState<'upcoming' | 'past' | 'all'>('upcoming');
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+
+  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
   // Fetch wallet data
   useEffect(() => {
@@ -104,19 +108,55 @@ export default function WalletPage() {
 
       setTickets(transformedTickets);
 
-      // Fetch wallet balance
-      const { data: balanceData } = await supabase
-        .from('wallet_balances')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Fetch wallet balance from live ledger via backend API
+      try {
+        const statusRes = await fetch(`${API_URL}/api/treasury/user-status/${user.id}`);
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          setBalance({
+            availableBalanceCents: statusData.balance,
+            pendingBalanceCents: 0, // Pending payouts - future feature
+            totalBalanceCents: statusData.balance
+          });
+        }
+      } catch (apiErr) {
+        console.warn('Could not fetch live balance from API, falling back to local calculation');
+        // Fallback: calculate balance directly from ledger_entries
+        const { data: ledgerData } = await supabase
+          .from('ledger_entries')
+          .select('amount_cents, type')
+          .eq('user_id', user.id);
 
-      if (balanceData) {
-        setBalance({
-          availableBalanceCents: balanceData.available_balance_cents,
-          pendingBalanceCents: balanceData.pending_balance_cents,
-          totalBalanceCents: balanceData.total_balance_cents
-        });
+        if (ledgerData) {
+          let bal = 0;
+          for (const entry of ledgerData) {
+            if (entry.type === 'credit') bal += entry.amount_cents;
+            else if (entry.type === 'debit') bal -= entry.amount_cents;
+          }
+          setBalance({
+            availableBalanceCents: bal,
+            pendingBalanceCents: 0,
+            totalBalanceCents: bal
+          });
+        }
+      }
+
+      // Fetch recent transactions from ledger
+      try {
+        const logsRes = await fetch(`${API_URL}/api/treasury/logs/${user.id}?limit=10`);
+        if (logsRes.ok) {
+          const logsData = await logsRes.json();
+          setRecentTransactions(logsData.ledgerEntries || []);
+        }
+      } catch (logErr) {
+        // Fallback: fetch directly
+        const { data: txns } = await supabase
+          .from('ledger_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        setRecentTransactions(txns || []);
       }
 
       // Calculate stats
@@ -135,6 +175,7 @@ export default function WalletPage() {
     }
   };
 
+
   const formatCents = (cents: number) => {
     return (cents / 100).toFixed(2);
   };
@@ -142,7 +183,7 @@ export default function WalletPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -160,11 +201,11 @@ export default function WalletPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          {/* Coming Soon Badge */}
+          {/* Live Balance Badge */}
           <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-              <ClockIcon className="w-3 h-3" />
-              Coming Soon
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-300 border border-green-500/30">
+              <CheckCircleIcon className="w-3 h-3" />
+              Live
             </span>
           </div>
 
@@ -183,11 +224,11 @@ export default function WalletPage() {
             <CreditCardIcon className="w-12 h-12 text-purple-400" />
           </div>
 
-          {/* Pending Features */}
+          {/* Actions */}
           <div className="grid grid-cols-2 gap-4 mb-4">
             <button
-              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 text-white/40 cursor-not-allowed"
-              disabled
+              onClick={() => window.location.href = '/test-treasury'}
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-all border border-green-500/20"
             >
               <PlusIcon className="w-5 h-5" />
               <span className="font-medium">Add Funds</span>
@@ -202,7 +243,7 @@ export default function WalletPage() {
           </div>
 
           <p className="text-xs text-gray-500 text-center">
-            💡 Add funds to your wallet and start collecting exclusive creative NFTs
+            💡 Balance calculated from Treasury ledger entries in real-time
           </p>
         </motion.div>
 
@@ -261,11 +302,10 @@ export default function WalletPage() {
             <button
               key={tab}
               onClick={() => setFilter(tab)}
-              className={`px-6 py-3 rounded-xl font-medium transition-all ${
-                filter === tab
-                  ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
-                  : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
-              }`}
+              className={`px-6 py-3 rounded-xl font-medium transition-all ${filter === tab
+                ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/50'
+                : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
+                }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -288,8 +328,8 @@ export default function WalletPage() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <TicketCard 
-                    ticket={ticket} 
+                  <TicketCard
+                    ticket={ticket}
                     onClick={() => setSelectedTicket(ticket)}
                   />
                 </motion.div>
@@ -305,11 +345,11 @@ export default function WalletPage() {
             <TicketIcon className="w-20 h-20 mx-auto text-gray-600 mb-6" />
             <h3 className="text-2xl font-bold text-white mb-2">No tickets yet</h3>
             <p className="text-gray-400 text-lg mb-6">
-              {filter === 'upcoming' 
-                ? 'Purchase tickets to upcoming events to see them here' 
+              {filter === 'upcoming'
+                ? 'Purchase tickets to upcoming events to see them here'
                 : filter === 'past'
-                ? 'No past events found'
-                : 'Your ticket wallet is empty'}
+                  ? 'No past events found'
+                  : 'Your ticket wallet is empty'}
             </p>
             <button
               onClick={() => window.location.href = '/events'}
@@ -317,6 +357,68 @@ export default function WalletPage() {
             >
               Browse Events
             </button>
+          </motion.div>
+        )}
+
+        {/* Transaction History */}
+        {recentTransactions.length > 0 && (
+          <motion.div
+            className="mt-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <CreditCardIcon className="w-5 h-5 text-purple-400" />
+                Transaction History
+              </h3>
+              <button
+                onClick={fetchWalletData}
+                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+              >
+                Refresh
+              </button>
+            </div>
+            <div className="space-y-2">
+              {recentTransactions.map((tx: any, i: number) => (
+                <motion.div
+                  key={tx.id || i}
+                  className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-green-500/20' : 'bg-red-500/20'
+                      }`}>
+                      <span className="text-sm">{tx.type === 'credit' ? '↓' : '↑'}</span>
+                    </div>
+                    <div>
+                      <p className="text-white text-sm font-medium">
+                        {tx.description || tx.event_source || 'Transaction'}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        {new Date(tx.created_at).toLocaleDateString('en-US', {
+                          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <span className={`font-mono font-semibold ${tx.type === 'credit' ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                    {tx.type === 'credit' ? '+' : '-'}${formatCents(tx.amount_cents)}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <a
+                href="/test-treasury"
+                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+              >
+                View all in Treasury Console →
+              </a>
+            </div>
           </motion.div>
         )}
 
@@ -330,8 +432,8 @@ export default function WalletPage() {
           <SparklesIcon className="w-16 h-16 mx-auto text-purple-400 mb-4" />
           <h3 className="text-2xl font-bold text-white mb-2">Creative NFTs</h3>
           <p className="text-gray-400 mb-4 max-w-2xl mx-auto">
-            Soon you'll be able to mint, collect, and trade exclusive digital collectibles 
-            from your favorite artists. Music stems, behind-the-scenes footage, limited edition 
+            Soon you'll be able to mint, collect, and trade exclusive digital collectibles
+            from your favorite artists. Music stems, behind-the-scenes footage, limited edition
             artwork, and more - all hosted in your Passport Wallet.
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/20 text-purple-300 text-sm">

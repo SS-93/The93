@@ -30,6 +30,18 @@ import LockerDemo from './locker-demo'
 // Companon routes
 import CompanonRoute from './companon'
 
+// Coliseum route
+import ColiseumDashboard from './coliseum-dashboard'
+
+// Denver Spotlight routes
+import SpotlightHome from '../components/dnvrspotlight/SpotlightHome'
+import VotingPage from '../components/dnvrspotlight/VotingPage'
+import HallOfFame from '../components/dnvrspotlight/HallOfFame'
+import DNVRSpotlightDashboard from './dnvr-spotlight-dashboard'
+
+// Test components
+import PassportTest from '../components/PassportTest'
+
 // Unauthorized route component
 const UnauthorizedRoute = () => (
   <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -52,6 +64,11 @@ export const router = createBrowserRouter([
   {
     path: '/test',
     element: <TestRoute />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/test-passport',
+    element: <PassportTest />,
     errorElement: <ErrorBoundary />
   },
   {
@@ -121,6 +138,17 @@ export const router = createBrowserRouter([
     element: <CompanonRoute />,
     errorElement: <ErrorBoundary />
   },
+  // Coliseum Analytics Route
+  {
+    path: '/coliseum',
+    element: <ColiseumDashboard />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/coliseum-dashboard',
+    element: <ColiseumDashboard />,
+    errorElement: <ErrorBoundary />
+  },
   // Protected Dashboard Routes
   {
     path: '/dashboard/fan',
@@ -147,5 +175,26 @@ export const router = createBrowserRouter([
     path: '/unauthorized',
     element: <UnauthorizedRoute />,
     errorElement: <ErrorBoundary />
-  }
+  },
+  // Denver Spotlight Routes
+  {
+    path: '/DNVRSpotlight',
+    element: <SpotlightHome />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/DNVRSpotlight/vote',
+    element: <VotingPage />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/DNVRSpotlight/dashboard',
+    element: <DNVRSpotlightDashboard />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/DNVRSpotlight/HallofFame',
+    element: <HallOfFame />,
+    errorElement: <ErrorBoundary />
+  },
 ]) 

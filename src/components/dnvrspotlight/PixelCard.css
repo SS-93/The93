@@ -1,0 +1,140 @@
+.pixel-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pixel-card {
+  height: 400px;
+  width: 300px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  border: 1px solid #27272a;
+  border-radius: 25px;
+  isolation: isolate;
+  transition: border-color 200ms cubic-bezier(0.5, 1, 0.89, 1);
+  user-select: none;
+}
+
+.pixel-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, #09090b, transparent 85%);
+  opacity: 0;
+  transition: opacity 800ms cubic-bezier(0.5, 1, 0.89, 1);
+}
+
+.pixel-card:hover::before,
+.pixel-card:focus-within::before {
+  opacity: 1;
+}
+
+/* ── Button variants ──────────────────────────────────── */
+
+/* Large CTA button — "Begin Voting" (infinity edge) */
+.pixel-card.pixel-btn-lg {
+  width: 100%;
+  height: 80px;
+  aspect-ratio: unset;
+  border-radius: 20px;
+  border-top: 1px solid rgba(194, 24, 91, 0.32);
+  border-bottom: 1px solid rgba(194, 24, 91, 0.32);
+  border-left: none;
+  border-right: none;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+.pixel-card.pixel-btn-lg:hover {
+  border-top-color: rgba(194, 24, 91, 0.55);
+  border-bottom-color: rgba(194, 24, 91, 0.55);
+}
+
+/* Medium CTA button — "Hall of Fame" (infinity edge) */
+.pixel-card.pixel-btn-md {
+  width: 100%;
+  height: 80px;
+  aspect-ratio: unset;
+  border-radius: 20px;
+  border-top: 1px solid rgba(201, 204, 214, 0.15);
+  border-bottom: 1px solid rgba(201, 204, 214, 0.15);
+  border-left: none;
+  border-right: none;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+.pixel-card.pixel-btn-md:hover {
+  border-top-color: rgba(224, 242, 254, 0.28);
+  border-bottom-color: rgba(224, 242, 254, 0.28);
+}
+
+/* Counter card — homepage hero stat display */
+.pixel-card.pixel-counter-card {
+  width: auto;
+  height: auto;
+  aspect-ratio: unset;
+  border-radius: 20px;
+  border-color: rgba(229, 231, 235, 0.10);
+  padding: 18px 28px;
+}
+
+.pixel-card.pixel-counter-card:hover {
+  border-color: rgba(194, 24, 91, 0.25);
+}
+
+/* Nominee card overlay — fills parent, canvas floats absolutely over content */
+.pixel-card.pixel-nominee {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: unset;
+  border: none;
+  border-radius: 20px;
+  background: transparent;
+}
+
+.pixel-card.pixel-nominee::before {
+  display: none;
+}
+
+.pixel-card.pixel-nominee .pixel-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Buttons-only pixel overlay — wraps Cast Vote + View Card */
+.pixel-card.pixel-nominee-btn {
+  width: 100%;
+  height: auto;
+  aspect-ratio: unset;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+}
+
+.pixel-card.pixel-nominee-btn::before {
+  display: none;
+}
+
+.pixel-card.pixel-nominee-btn .pixel-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}

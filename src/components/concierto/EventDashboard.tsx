@@ -6,6 +6,7 @@ import ArtistPhotoUploader from './ArtistPhotoUploader'
 import EventBannerUploader from './EventBannerUploader'
 import EventVideoPlayer from './EventVideoPlayer'
 import EventDetailsEditor from './EventDetailsEditor'
+import RevenueSplitSettings from './RevenueSplitSettings'
 
 interface EventDetails {
   id: string
@@ -18,6 +19,7 @@ interface EventDetails {
   max_votes_per_participant: number
   mediaid_integration_enabled: boolean
   privacy_mode: string
+  host_user_id: string
   cover_image_url?: string
   video_url?: string
   video_thumbnail_url?: string
@@ -76,7 +78,7 @@ const EventDashboard: React.FC = () => {
   const [artists, setArtists] = useState<Artist[]>([])
   const [audienceMembers, setAudienceMembers] = useState<AudienceMember[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'artists' | 'audience' | 'media' | 'share'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'artists' | 'audience' | 'media' | 'revenue' | 'share'>('overview')
   const [showAddArtist, setShowAddArtist] = useState(false)
   const [isAddingArtist, setIsAddingArtist] = useState(false)
   const [newArtist, setNewArtist] = useState({
@@ -623,7 +625,7 @@ The Event Team
         {/* Navigation Tabs */}
         <div className="border-b border-gray-800 mb-8">
           <nav className="flex space-x-8">
-            {(['overview', 'analytics', 'artists', 'audience', 'media', 'share'] as const).map(tab => (
+            {(['overview', 'analytics', 'artists', 'audience', 'media', 'revenue', 'share'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1329,6 +1331,15 @@ The Event Team
                 <li>• Your media will appear on the public event page and voting interface</li>
               </ul>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'revenue' && event && (
+          <div className="max-w-5xl mx-auto">
+            <RevenueSplitSettings
+              eventId={event.id}
+              eventHostId={event.host_user_id || ''}
+            />
           </div>
         )}
 

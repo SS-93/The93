@@ -1,4 +1,20 @@
 /**
+ * ⚠️ DEPRECATED HOOK - DO NOT USE IN NEW CODE
+ *
+ * This hook references legacy tables that were never created:
+ * - coliseum_metrics (replaced by passport_entries → coliseum_dna_mutations)
+ * - coliseum_leaderboards (replaced by 15 materialized views)
+ *
+ * For leaderboard queries, use:
+ * - /src/hooks/useColiseumLeaderboard.ts
+ *
+ * For audio tracking, use:
+ * - Passport logging → Edge Function processor
+ *
+ * Last updated: February 1, 2026
+ */
+
+/**
  * =============================================================================
  * useColiseum CUSTOM HOOK
  * =============================================================================

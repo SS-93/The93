@@ -28,14 +28,16 @@ export async function logEvent(
     await supabase.from('passport_entries').insert({
       user_id: user?.id,
       event_type: eventType,
-      event_data: data,
-      system_routing: systemRouting,
-      session_id: getSessionId(),
-      timestamp: new Date().toISOString(),
+      event_category: getEventCategory(eventType), // Helper needed or hardcode?
+      // event_data removed, using metadata
       metadata: {
+        ...data,
         source: 'web_app',
         version: '1.0.0'
-      }
+      },
+      system_routing: systemRouting, // Wait, does DB have system_routing?
+      session_id: getSessionId()
+      // timestamp removed, using default created_at
     })
 
     console.log('[Passport] Logged event:', eventType)
@@ -53,27 +55,27 @@ export async function logEvent(
  */
 function getSystemRouting(eventType: string): string[] {
   const routes: string[] = []
-  
+
   // Treasury events
   if (eventType.startsWith('treasury.')) {
     routes.push('treasury', 'coliseum')
   }
-  
+
   // Concierto events
   if (eventType.startsWith('concierto.')) {
     routes.push('concierto', 'coliseum')
   }
-  
+
   // CALS events
   if (eventType.startsWith('cals.')) {
     routes.push('cals', 'treasury', 'coliseum')
   }
-  
+
   // MediaID events
   if (eventType.startsWith('mediaid.')) {
     routes.push('mediaid_dna')
   }
-  
+
   return routes
 }
 
@@ -86,14 +88,14 @@ function getSessionId(): string {
   if (typeof window === 'undefined') {
     return 'server'
   }
-  
+
   let sessionId = sessionStorage.getItem('passport_session_id')
-  
+
   if (!sessionId) {
     sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     sessionStorage.setItem('passport_session_id', sessionId)
   }
-  
+
   return sessionId
 }
 
@@ -113,5 +115,27 @@ export async function logEvents(
 export default {
   logEvent,
   logEvents
+}
+
+/**
+ * Determine event category from type
+ * 
+ * @param eventType - Event type (e.g. 'player.track_played')
+ * @returns Event category
+ */
+function getEventCategory(eventType: string): string {
+  const prefix = eventType.split('.')[0]
+
+  switch (prefix) {
+    case 'mediaid': return 'trinity'
+    case 'treasury': return 'transaction'
+    case 'coliseum': return 'system' // or interaction?
+    case 'player': return 'interaction'
+    case 'concierto': return 'interaction'
+    case 'social': return 'social'
+    case 'access': return 'access'
+    case 'system': return 'system'
+    default: return 'interaction'
+  }
 }
 

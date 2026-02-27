@@ -22,10 +22,8 @@
  * - Bilingual support (EN/ES)
  */
 
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSupabaseClient, useUser } from '@/lib/supabaseClient';
 import { usePassport } from '@/hooks/usePassport';
 import CompanonHeader from './CompanonHeader';
@@ -37,7 +35,8 @@ interface CompanonShellProps {
 }
 
 export default function CompanonShell({ children }: CompanonShellProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
+  const location = useLocation();
   const pathname = usePathname();
   const supabase = useSupabaseClient();
   const { data: authUser } = useUser();
@@ -60,7 +59,7 @@ export default function CompanonShell({ children }: CompanonShellProps) {
   useEffect(() => {
     if (!authUser) {
       // Redirect to login if not authenticated
-      router.push('/auth/login?redirect=/companon/dashboard');
+      navigate('/auth/login?redirect=/companon/dashboard');
       return;
     }
 

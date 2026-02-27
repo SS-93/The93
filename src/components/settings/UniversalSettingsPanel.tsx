@@ -5,6 +5,7 @@ import HostAccessRequest from './HostAccessRequest'
 import MediaIDSettings from './MediaIDSettings'
 import ProfileSettings from './ProfileSettings'
 import NotificationSettings from './NotificationSettings'
+import BadgeManagementSettings from './BadgeManagementSettings'
 import { supabase } from '../../lib/supabaseClient'
 
 interface SettingsTab {
@@ -55,6 +56,16 @@ const UniversalSettingsPanel: React.FC = () => {
         </svg>
       ),
       component: ProfileSettings
+    },
+    {
+      id: 'badges',
+      name: 'Badge Management',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      ),
+      component: BadgeManagementSettings
     },
     {
       id: 'host-access',
@@ -119,8 +130,8 @@ const UniversalSettingsPanel: React.FC = () => {
               <h1 className="text-2xl font-bold text-white">Settings</h1>
               <p className="text-gray-400 mt-1">Manage your account, privacy, and preferences</p>
             </div>
-            <a 
-              href="/dashboard" 
+            <a
+              href="/dashboard"
               className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -141,11 +152,10 @@ const UniversalSettingsPanel: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-accent-yellow text-black font-medium'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                  }`}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all ${activeTab === tab.id
+                    ? 'bg-accent-yellow text-black font-medium'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                    }`}
                 >
                   {tab.icon}
                   <span>{tab.name}</span>
@@ -168,12 +178,16 @@ const UniversalSettingsPanel: React.FC = () => {
                   <p className="text-sm font-medium text-white truncate">
                     {userProfile?.display_name || 'User'}
                   </p>
-                  <p className="text-xs text-gray-400 capitalize">
-                    {userProfile?.role || 'fan'}
-                  </p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {(userProfile?.all_badges?.length > 0 ? userProfile.all_badges : [userProfile?.role || 'fan']).map((badge: string) => (
+                      <span key={badge} className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-700 text-gray-300 capitalize">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
-              
+
               {hasHostPrivileges && (
                 <div className="mt-3 pt-3 border-t border-gray-700">
                   <div className="flex items-center space-x-2 text-xs">
@@ -190,7 +204,7 @@ const UniversalSettingsPanel: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <div className="glass border border-gray-700 rounded-xl p-6">
-              <ActiveComponent 
+              <ActiveComponent
                 user={user}
                 profile={userProfile}
                 hostPrivileges={hostPrivileges}

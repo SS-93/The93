@@ -62,7 +62,7 @@ interface UseTreasuryReturn {
   dashboardData: TreasuryDashboardData | null
   loading: boolean
   error: Error | null
-  
+
   // Operations
   refreshAccount: () => Promise<void>
   fetchTransactions: (limit?: number, timeRange?: TimeRange) => Promise<TreasuryTransaction[]>
@@ -97,16 +97,16 @@ export function useTreasury(
   const [dashboardData, setDashboardData] = useState<TreasuryDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-  
+
   // Options with defaults
   const autoFetch = options?.autoFetch !== false
   const realtime = options?.realtime === true
   const shouldFetchTransactions = options?.fetchTransactions === true
-  
+
   // =============================================================================
   // FETCH ACCOUNT
   // =============================================================================
-  
+
   /**
    * Fetch user's Treasury account
    */
@@ -114,44 +114,51 @@ export function useTreasury(
     try {
       setLoading(true)
       setError(null)
-      
+
       console.log(`[useTreasury] Fetching account for user ${id}`)
-      
-      const { data, error: fetchError } = await supabase
-        .from('treasury_accounts')
-        .select('*')
+
+      // Calculate balance from ledger_entries (the actual source of truth)
+      const { data: ledgerData, error: ledgerError } = await supabase
+        .from('ledger_entries')
+        .select('amount_cents, type, event_source')
         .eq('user_id', id)
-        .single()
-      
-      if (fetchError) {
-        if (fetchError.code === 'PGRST116') {
-          // No account found - create one
-          console.log('[useTreasury] Creating new Treasury account')
-          const { data: newAccount, error: createError } = await supabase
-            .from('treasury_accounts')
-            .insert({
-              user_id: id,
-              balance_cents: 0,
-              pending_cents: 0,
-              lifetime_earned_cents: 0,
-              lifetime_withdrawn_cents: 0,
-              auto_payout_enabled: false,
-              auto_payout_threshold_cents: 10000, // $100
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            })
-            .select()
-            .single()
-          
-          if (createError) throw createError
-          setAccount(newAccount as TreasuryAccount)
-        } else {
-          throw fetchError
+
+      if (ledgerError) throw ledgerError
+
+      let balance = 0
+      let lifetimeEarned = 0
+      let lifetimeWithdrawn = 0
+      let pending = 0
+
+      if (ledgerData) {
+        for (const entry of ledgerData) {
+          if (entry.type === 'credit') {
+            balance += entry.amount_cents
+            lifetimeEarned += entry.amount_cents
+          } else if (entry.type === 'debit') {
+            balance -= entry.amount_cents
+            if (entry.event_source === 'payout') {
+              lifetimeWithdrawn += entry.amount_cents
+            }
+          }
         }
-      } else {
-        console.log(`[useTreasury] Account fetched: $${(data.balance_cents / 100).toFixed(2)} balance`)
-        setAccount(data as TreasuryAccount)
       }
+
+      console.log(`[useTreasury] Balance computed from ledger: $${(balance / 100).toFixed(2)}`)
+
+      // Build a TreasuryAccount-compatible object from ledger data
+      setAccount({
+        user_id: id,
+        balance_cents: balance,
+        pending_cents: pending,
+        lifetime_earned_cents: lifetimeEarned,
+        lifetime_withdrawn_cents: lifetimeWithdrawn,
+        auto_payout_enabled: false,
+        auto_payout_threshold_cents: 10000,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      } as TreasuryAccount)
+
     } catch (err) {
       console.error('[useTreasury] Error fetching account:', err)
       setError(err as Error)
@@ -159,7 +166,8 @@ export function useTreasury(
       setLoading(false)
     }
   }, [])
-  
+
+
   /**
    * Refresh account (public API)
    */
@@ -169,11 +177,11 @@ export function useTreasury(
     }
     await fetchAccount(userId)
   }, [userId, fetchAccount])
-  
+
   // =============================================================================
   // FETCH TRANSACTIONS
   // =============================================================================
-  
+
   /**
    * Fetch user's transaction history
    */
@@ -184,30 +192,30 @@ export function useTreasury(
     if (!userId) {
       throw new Error('User ID required to fetch transactions')
     }
-    
+
     try {
       console.log(`[useTreasury] Fetching transactions (limit: ${limit})`)
-      
+
       let query = supabase
         .from('treasury_transactions')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(limit)
-      
+
       // Apply time range filter
       if (timeRange && timeRange !== 'all') {
         const days = parseInt(timeRange.replace('d', ''))
         const startDate = new Date()
         startDate.setDate(startDate.getDate() - days)
-        
+
         query = query.gte('created_at', startDate.toISOString())
       }
-      
+
       const { data, error: fetchError } = await query
-      
+
       if (fetchError) throw fetchError
-      
+
       console.log(`[useTreasury] Fetched ${data?.length || 0} transactions`)
       const txns = (data as TreasuryTransaction[]) || []
       setTransactions(txns)
@@ -217,11 +225,11 @@ export function useTreasury(
       throw err
     }
   }, [userId])
-  
+
   // =============================================================================
   // REQUEST PAYOUT
   // =============================================================================
-  
+
   /**
    * Request a payout/withdrawal
    */
@@ -231,18 +239,18 @@ export function useTreasury(
     if (!userId) {
       throw new Error('User ID required to request payout')
     }
-    
+
     if (amountCents <= 0) {
       throw new Error('Payout amount must be positive')
     }
-    
+
     if (account && amountCents > account.balance_cents) {
       throw new Error('Insufficient balance for payout')
     }
-    
+
     try {
       console.log(`[useTreasury] Requesting payout: $${(amountCents / 100).toFixed(2)}`)
-      
+
       // Create payout request
       const { data, error: requestError } = await supabase
         .from('treasury_payout_requests')
@@ -254,25 +262,25 @@ export function useTreasury(
         })
         .select()
         .single()
-      
+
       if (requestError) throw requestError
-      
+
       console.log('[useTreasury] Payout requested successfully')
-      
+
       // Refresh account to update balance
       await refreshAccount()
-      
+
       return data as PayoutRequest
     } catch (err) {
       console.error('[useTreasury] Error requesting payout:', err)
       throw err
     }
   }, [userId, account, refreshAccount])
-  
+
   // =============================================================================
   // FETCH DASHBOARD DATA
   // =============================================================================
-  
+
   /**
    * Fetch comprehensive dashboard data
    */
@@ -282,19 +290,19 @@ export function useTreasury(
     if (!userId) {
       throw new Error('User ID required to fetch dashboard data')
     }
-    
+
     try {
       console.log(`[useTreasury] Fetching dashboard data (${timeRange})`)
-      
+
       // Fetch account
       await refreshAccount()
-      
+
       // Fetch transactions
       const txns = await fetchTransactions(100, timeRange)
-      
+
       // Calculate MRR (placeholder)
       const mrr_cents = 0 // TODO: Implement MRR calculation
-      
+
       // Fetch attributions (CALS revenue)
       const { data: attributions } = await supabase
         .from('cals_attribution_ledger')
@@ -302,13 +310,13 @@ export function useTreasury(
         .eq('beneficiary_id', userId)
         .order('created_at', { ascending: false })
         .limit(50)
-      
+
       // Revenue breakdown
       const revenueBySource = txns.reduce((acc, txn) => {
         acc[txn.transaction_type] = (acc[txn.transaction_type] || 0) + txn.amount_cents
         return acc
       }, {} as Record<string, number>)
-      
+
       const data: TreasuryDashboardData = {
         balance_cents: account?.balance_cents || 0,
         pending_cents: account?.pending_cents || 0,
@@ -320,7 +328,7 @@ export function useTreasury(
         transactions: txns,
         revenue_by_source: revenueBySource
       }
-      
+
       console.log('[useTreasury] Dashboard data fetched')
       setDashboardData(data)
       return data
@@ -329,32 +337,32 @@ export function useTreasury(
       throw err
     }
   }, [userId, account, refreshAccount, fetchTransactions])
-  
+
   // =============================================================================
   // EFFECTS
   // =============================================================================
-  
+
   /**
    * Auto-fetch account on mount or userId change
    */
   useEffect(() => {
     if (userId && autoFetch) {
       fetchAccount(userId)
-      
+
       if (shouldFetchTransactions) {
         fetchTransactions(50)
       }
     }
   }, [userId, autoFetch, shouldFetchTransactions, fetchAccount, fetchTransactions])
-  
+
   /**
    * Subscribe to real-time transaction updates
    */
   useEffect(() => {
     if (!userId || !realtime) return
-    
+
     console.log(`[useTreasury] Subscribing to real-time updates for user ${userId}`)
-    
+
     // Subscribe to treasury_accounts changes
     const accountSubscription = supabase
       .channel(`treasury_accounts:${userId}`)
@@ -368,14 +376,14 @@ export function useTreasury(
         },
         (payload) => {
           console.log('[useTreasury] Real-time account update received')
-          
+
           if (payload.eventType === 'UPDATE') {
             setAccount(payload.new as TreasuryAccount)
           }
         }
       )
       .subscribe()
-    
+
     // Subscribe to treasury_transactions changes
     const transactionSubscription = supabase
       .channel(`treasury_transactions:${userId}`)
@@ -389,27 +397,27 @@ export function useTreasury(
         },
         (payload) => {
           console.log('[useTreasury] New transaction received')
-          
+
           // Prepend new transaction
           setTransactions(prev => [payload.new as TreasuryTransaction, ...prev])
-          
+
           // Refresh account for updated balance
           refreshAccount()
         }
       )
       .subscribe()
-    
+
     return () => {
       console.log('[useTreasury] Unsubscribing from real-time updates')
       accountSubscription.unsubscribe()
       transactionSubscription.unsubscribe()
     }
   }, [userId, realtime, refreshAccount])
-  
+
   // =============================================================================
   // RETURN
   // =============================================================================
-  
+
   return {
     account,
     transactions,
@@ -435,7 +443,7 @@ export function useBalance(userId?: string): {
   loading: boolean
 } {
   const { account, loading } = useTreasury(userId)
-  
+
   return {
     balance: account?.balance_cents || 0,
     loading
@@ -451,7 +459,7 @@ export function useCanPayout(userId?: string, minAmount: number = 1000): {
   loading: boolean
 } {
   const { account, loading } = useTreasury(userId)
-  
+
   return {
     canPayout: (account?.balance_cents || 0) >= minAmount,
     balance: account?.balance_cents || 0,

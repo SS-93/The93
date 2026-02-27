@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import EventBannerUploader from './EventBannerUploader'
+import TicketTierConfig, { TicketTier } from './TicketTierConfig'
 
 interface EventDetails {
   id: string
@@ -18,6 +19,10 @@ interface EventDetails {
     applyToBackground: boolean
     overlayOpacity: number
   }
+  ticketing_enabled?: boolean
+  ticket_tiers?: TicketTier[]
+  ticket_sales_start?: string
+  ticket_sales_end?: string
 }
 
 interface EventDetailsEditorProps {
@@ -45,7 +50,17 @@ const EventDetailsEditor: React.FC<EventDetailsEditorProps> = ({
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'basic' | 'media'>('basic')
+  const [activeTab, setActiveTab] = useState<'basic' | 'media' | 'ticketing'>('basic')
+  
+  // Ticketing state
+  const [ticketingEnabled, setTicketingEnabled] = useState(event.ticketing_enabled || false)
+  const [ticketTiers, setTicketTiers] = useState<TicketTier[]>(event.ticket_tiers || [])
+  const [ticketSalesStart, setTicketSalesStart] = useState(
+    event.ticket_sales_start ? event.ticket_sales_start.split('T')[0] : ''
+  )
+  const [ticketSalesEnd, setTicketSalesEnd] = useState(
+    event.ticket_sales_end ? event.ticket_sales_end.split('T')[0] : ''
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,26 +73,81 @@ const EventDetailsEditor: React.FC<EventDetailsEditorProps> = ({
     setError(null)
 
     try {
+      // Prepare base update data (always present fields)
+      const updateData: any = {
+        title: formData.title.trim(),
+        description: formData.description,
+        start_date: new Date(formData.start_date).toISOString(),
+        end_date: new Date(formData.end_date).toISOString(),
+        location: formData.location || null,
+        max_votes_per_participant: formData.max_votes_per_participant,
+        privacy_mode: formData.privacy_mode,
+        updated_at: new Date().toISOString()
+      }
+
+      // Only include media fields if they exist in the event object (meaning column exists)
+      if ('cover_image_url' in event) {
+        updateData.cover_image_url = formData.cover_image_url || null
+      }
+      if ('video_url' in event) {
+        updateData.video_url = formData.video_url || null
+      }
+      if ('banner_settings' in event) {
+        updateData.banner_settings = formData.banner_settings
+      }
+
+      // Prepare ticketing data
+      const ticketingData: any = {
+        ticketing_enabled: ticketingEnabled,
+        ticket_tiers: ticketTiers.length > 0 ? ticketTiers : null,
+        ticket_sales_start: ticketSalesStart ? new Date(ticketSalesStart).toISOString() : null,
+        ticket_sales_end: ticketSalesEnd ? new Date(ticketSalesEnd).toISOString() : null
+      }
+
+      // If ticketing is disabled, clear ticket tiers
+      if (!ticketingEnabled) {
+        ticketingData.ticket_tiers = null
+      }
+
+      // Only include ticketing fields if they exist in the event object
+      if ('ticketing_enabled' in event || ticketingEnabled) {
+        Object.assign(updateData, ticketingData)
+      }
+
       const { data, error: updateError } = await supabase
         .from('events')
-        .update({
-          title: formData.title.trim(),
-          description: formData.description,
-          start_date: new Date(formData.start_date).toISOString(),
-          end_date: new Date(formData.end_date).toISOString(),
-          location: formData.location || null,
-          max_votes_per_participant: formData.max_votes_per_participant,
-          privacy_mode: formData.privacy_mode,
-          cover_image_url: formData.cover_image_url || null,
-          video_url: formData.video_url || null,
-          banner_settings: formData.banner_settings,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', event.id)
         .select()
         .single()
 
-      if (updateError) throw updateError
+      if (updateError) {
+        // If error is about missing column, try again without media fields
+        if (updateError.message?.includes('column') && updateError.message?.includes('schema cache')) {
+          console.warn('Missing column detected, retrying without media fields:', updateError.message)
+          
+          // Remove media fields and retry
+          const retryData = { ...updateData }
+          delete retryData.cover_image_url
+          delete retryData.video_url
+          delete retryData.video_thumbnail_url
+          delete retryData.banner_settings
+          
+          const { data: retryDataResult, error: retryError } = await supabase
+            .from('events')
+            .update(retryData)
+            .eq('id', event.id)
+            .select()
+            .single()
+          
+          if (retryError) throw retryError
+          if (retryDataResult) {
+            onSave(retryDataResult)
+            return
+          }
+        }
+        throw updateError
+      }
 
       if (data) {
         onSave(data)
@@ -129,6 +199,16 @@ const EventDetailsEditor: React.FC<EventDetailsEditorProps> = ({
               }`}
             >
               📸 Media
+            </button>
+            <button
+              onClick={() => setActiveTab('ticketing')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === 'ticketing'
+                  ? 'bg-accent-yellow text-black'
+                  : 'bg-gray-800 hover:bg-gray-700'
+              }`}
+            >
+              🎫 Ticketing
             </button>
           </div>
         </div>
@@ -286,6 +366,63 @@ const EventDetailsEditor: React.FC<EventDetailsEditorProps> = ({
                     <li>• Use "Apply to Background" to show your banner behind event content</li>
                     <li>• Videos should be under 50MB for optimal loading</li>
                     <li>• Your media will appear on the public event page and voting interface</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Ticketing Tab */}
+            {activeTab === 'ticketing' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Ticket Configuration</h3>
+                  
+                  {/* Ticket Sales Dates */}
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <label htmlFor="ticket_sales_start" className="block text-sm font-medium mb-2">
+                        Sales Start Date
+                      </label>
+                      <input
+                        type="date"
+                        id="ticket_sales_start"
+                        value={ticketSalesStart}
+                        onChange={(e) => setTicketSalesStart(e.target.value)}
+                        className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg focus:border-accent-yellow focus:outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="ticket_sales_end" className="block text-sm font-medium mb-2">
+                        Sales End Date
+                      </label>
+                      <input
+                        type="date"
+                        id="ticket_sales_end"
+                        value={ticketSalesEnd}
+                        onChange={(e) => setTicketSalesEnd(e.target.value)}
+                        className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg focus:border-accent-yellow focus:outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Ticket Tier Configuration */}
+                  <TicketTierConfig
+                    ticketingEnabled={ticketingEnabled}
+                    onTicketingToggle={setTicketingEnabled}
+                    tiers={ticketTiers}
+                    onTiersChange={setTicketTiers}
+                    hideToggle={false}
+                  />
+                </div>
+
+                {/* Ticketing Tips */}
+                <div className="p-4 bg-green-900/20 border border-green-700/50 rounded-lg">
+                  <h4 className="font-medium text-green-300 mb-2">💡 Ticketing Tips</h4>
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>• Set sales dates to control when tickets are available</li>
+                    <li>• Create multiple tiers (General, VIP, Backstage) to maximize revenue</li>
+                    <li>• Add perks to higher tiers to incentivize upgrades</li>
+                    <li>• Review your revenue split settings in the Revenue tab</li>
                   </ul>
                 </div>
               </div>

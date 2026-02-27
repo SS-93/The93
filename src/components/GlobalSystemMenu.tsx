@@ -37,6 +37,7 @@ const GlobalSystemMenu: React.FC<GlobalSystemMenuProps> = ({ isOpen, onClose }) 
 
   // Menu sections
   const quickActions = [
+    { label: 'Coliseum', icon: '🏛️', path: '/coliseum', color: 'from-purple-600 to-indigo-700' },
     { label: 'Passport', icon: '🧬', path: '/passport', color: 'from-cyan-500 to-blue-600', requiresAuth: true },
     { label: 'Discover', icon: '🔍', path: '/discover', color: 'from-purple-500 to-blue-500' },
     { label: 'Events', icon: '🎪', path: '/events', color: 'from-orange-500 to-red-500' },

@@ -55,7 +55,7 @@ const WelcomePage: React.FC = () => {
                   Where artists monetize creativity through authentic fan connections
                 </p>
                 <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                  Join the platform where daily drops, subscription tiers, and privacy-first brand collaborations 
+                  Join the platform where daily drops, subscription tiers, and privacy-first brand collaborations
                   create sustainable revenue for independent artists.
                 </p>
               </div>
@@ -103,9 +103,9 @@ const WelcomePage: React.FC = () => {
                     onClick={() => setActiveForm('signup')}
                     className="w-full bg-accent-yellow text-black font-bold py-4 rounded-xl hover:bg-accent-yellow/90 transition-colors"
                   >
-                    Create Fan Account
+                    Create Your Account
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveForm('signin')}
                     className="w-full bg-gray-800 text-white font-bold py-4 rounded-xl hover:bg-gray-700 transition-colors border border-gray-600"
@@ -114,18 +114,10 @@ const WelcomePage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="mt-6 text-center">
-                  <p className="text-gray-500 text-sm mb-3">
-                    Looking for a different experience?
+                <div className="mt-4 text-center">
+                  <p className="text-gray-500 text-xs">
+                    One account. Multiple badges. Unlimited possibilities.
                   </p>
-                  <div className="flex justify-center gap-4">
-                    <a href="/artist/login" className="text-green-400 hover:underline text-sm font-medium">
-                      🎤 Artist Portal
-                    </a>
-                    <a href="/brand/login" className="text-blue-400 hover:underline text-sm font-medium">
-                      🏢 Brand Portal
-                    </a>
-                  </div>
                 </div>
               </div>
             </motion.div>
@@ -136,14 +128,14 @@ const WelcomePage: React.FC = () => {
               className="w-full max-w-md"
             >
               {activeForm === 'signup' && (
-                <SignUpForm 
+                <SignUpForm
                   onSuccess={handleSignUpSuccess}
                   onBack={() => setActiveForm(null)}
                 />
               )}
-              
+
               {activeForm === 'signin' && (
-                <SignInForm 
+                <SignInForm
                   onSuccess={(user) => {
                     const userRole = user?.user_metadata?.role || 'fan'
                     window.location.href = `/dashboard/${userRole}`

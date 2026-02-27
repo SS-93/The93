@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Dark-first theme matching project design system */
+    --background: 0 0% 0%;            /* #000000 */
+    --foreground: 0 0% 100%;          /* #FFFFFF */
+    --card: 0 0% 7%;                  /* #111111 */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 47 100% 50%;           /* #FFC600 brand yellow */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;            /* #1A1A1A */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 240 4% 46%;   /* zinc-500 #71717A */
+    --accent: 47 100% 50%;            /* #FFC600 brand yellow */
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;               /* #333333 */
+    --input: 0 0% 10%;
+    --ring: 47 100% 50%;              /* #FFC600 */
+    --radius: 0.5rem;
+  }
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* Enhanced base styles */

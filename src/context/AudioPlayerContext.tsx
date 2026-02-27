@@ -5,6 +5,7 @@ import React, { createContext, useContext, useReducer, useRef, useEffect } from 
 import { listeningHistoryService, trackPlay } from '../lib/listeningHistory'
 import { useAuth } from '../hooks/useAuth'
 import { usePassport } from '../hooks/usePassport'
+import { getPlatformMetadata } from '../utils/platformDetection'
 
 // Types for the audio player
 export interface Track {
@@ -330,28 +331,38 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.log('⚠️ [Session] No user authenticated - skipping session')
     }
 
-    // Log to Passport
+    // Log to Passport (using canonical event schema)
     if (user) {
       console.log('📋 [Passport] Logging player.track_played event...')
+      
+      // Get platform metadata for cross-platform tracking
+      const platformMeta = getPlatformMetadata()
+      
       const passportPayload = {
-        entity_type: 'track',
-        entity_id: track.id,
-        trackTitle: track.title,
+        type: 'player.track_played' as const,
+        userId: user.id,
+        trackId: track.id,
         artistId: track.artistId,
+        durationSeconds: track.duration,
+        at: new Date().toISOString(),
+        // Additional metadata
+        trackTitle: track.title,
         artistName: track.artist,
-        duration: track.duration,
-        source: 'global_player',
+        source: platformMeta.source, // ✅ Cross-platform: 'web' | 'ios' | 'android'
+        platform: platformMeta, // ✅ Full platform metadata
         audioUrl: track.audioUrl,
         features: track.audioFeatures,
         moodTags: track.moodTags?.tags
       }
       console.log('📋 [Passport] Payload:', passportPayload)
+      console.log('🌐 [Platform] Detected:', platformMeta.source, platformMeta.deviceType)
 
       logEvent('player.track_played', passportPayload)
 
       console.log('✅ [Passport] Event logged: player.track_played')
       console.log('📊 [Passport] Track:', track.title)
       console.log('📊 [Passport] User:', user.email)
+      console.log('🌐 [Platform] Source:', platformMeta.source)
     } else {
       console.log('⚠️ [Passport] No user authenticated - skipping passport log')
     }

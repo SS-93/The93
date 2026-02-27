@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import ArtistPhotoUploader from './ArtistPhotoUploader'
+import { syncAttendeeFromRegistration } from '../../lib/concierto/attendeeConversion'
 
 interface ArtistProspect {
   id: string
@@ -13,6 +14,8 @@ interface ArtistProspect {
   event_id: string
   registration_token: string
   host_notes?: string
+  migrated_to_user_id?: string | null
+  profile_image_url?: string | null
 }
 
 interface EventInfo {
@@ -40,6 +43,26 @@ const ArtistRegistration: React.FC = () => {
   })
   const [isRegistered, setIsRegistered] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [isLinked, setIsLinked] = useState(false)
+  const [linking, setLinking] = useState(false)
+  const [linkMessage, setLinkMessage] = useState<string | null>(null)
+
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'
+
+  // Check auth state
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setCurrentUser(user)
+    }
+    checkAuth()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user || null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     if (registrationToken) {
@@ -88,11 +111,63 @@ const ArtistRegistration: React.FC = () => {
       // Check if already registered/confirmed
       setIsRegistered(artistData.contact_status === 'confirmed')
 
+      // Check if account is already linked
+      if (artistData.migrated_to_user_id) {
+        setIsLinked(true)
+      }
+
     } catch (error) {
       console.error('Error loading artist data:', error)
       setError('Failed to load registration information')
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Link Account — sets migrated_to_user_id on the artist prospect
+  const handleLinkAccount = async () => {
+    if (!currentUser || !artist) return
+
+    setLinking(true)
+    setLinkMessage(null)
+    try {
+      // Update the prospect row with the logged-in user's ID
+      const { error: updateError } = await supabase
+        .from('event_artist_prospects')
+        .update({
+          migrated_to_user_id: currentUser.id,
+          contact_status: 'confirmed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', artist.id)
+
+      if (updateError) throw updateError
+
+      // Also connect via backend for passport logging
+      try {
+        await fetch(`${API_URL}/api/treasury/connect-artist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId: artist.event_id,
+            artistUserId: currentUser.id,
+            artistName: formData.name || artist.artist_name
+          })
+        })
+      } catch (apiErr) {
+        // Non-critical — the direct update above is the important one
+        console.warn('Backend connect-artist call failed (non-critical):', apiErr)
+      }
+
+      setIsLinked(true)
+      setLinkMessage('✅ Account linked! Revenue splits will now flow to your wallet.')
+      console.log('✅ Artist account linked:', currentUser.id)
+
+    } catch (err: any) {
+      console.error('Error linking account:', err)
+      setLinkMessage(`❌ Failed to link: ${err.message}`)
+    } finally {
+      setLinking(false)
     }
   }
 
@@ -121,6 +196,27 @@ const ArtistRegistration: React.FC = () => {
 
       setIsRegistered(true)
       setArtist(prev => prev ? { ...prev, contact_status: 'confirmed' } : null)
+
+      // Sync to conversion pipeline
+      if (formData.email && artist) {
+        try {
+          await syncAttendeeFromRegistration(
+            artist.event_id,
+            'artist',
+            {
+              id: artist.id,
+              email: formData.email,
+              name: formData.name,
+              phone: null
+            },
+            'registration_form'
+          )
+          console.log('✅ Artist synced to conversion pipeline')
+        } catch (conversionError) {
+          console.warn('⚠️ Conversion sync failed (non-critical):', conversionError)
+          // Don't fail registration if conversion sync fails
+        }
+      }
 
     } catch (error) {
       console.error('Error updating artist registration:', error)
@@ -196,6 +292,56 @@ const ArtistRegistration: React.FC = () => {
               {formData.instagram && <p><strong>Instagram:</strong> {formData.instagram}</p>}
               {formData.bio && <p><strong>Bio:</strong> {formData.bio}</p>}
             </div>
+          </div>
+
+          {/* Link Account Section */}
+          <div className={`border rounded-lg p-4 mb-6 ${isLinked
+              ? 'bg-green-900/20 border-green-700/50'
+              : 'bg-purple-900/20 border-purple-700/50'
+            }`}>
+            <h3 className="font-medium mb-2 flex items-center gap-2">
+              {isLinked ? '✅ Account Linked' : '🔗 Link Your Buckets Account'}
+            </h3>
+            {isLinked ? (
+              <p className="text-sm text-green-400">
+                Your Buckets account is connected. Revenue splits from this event will flow directly to your wallet.
+              </p>
+            ) : currentUser ? (
+              <div>
+                <p className="text-sm text-gray-400 mb-3">
+                  Link your Buckets account to receive revenue splits from ticket sales directly in your wallet.
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="text-xs text-gray-500">
+                    Signed in as <span className="text-purple-400 font-mono">{currentUser.email}</span>
+                  </div>
+                  <button
+                    onClick={handleLinkAccount}
+                    disabled={linking}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors text-sm disabled:opacity-50"
+                  >
+                    {linking ? 'Linking...' : '🔗 Link Account'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm text-gray-400 mb-3">
+                  Sign in to your Buckets account to receive revenue splits from this event.
+                </p>
+                <button
+                  onClick={() => navigate('/login?redirect=' + encodeURIComponent(window.location.pathname))}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors text-sm"
+                >
+                  🔐 Sign In to Link
+                </button>
+              </div>
+            )}
+            {linkMessage && (
+              <p className={`text-sm mt-2 ${linkMessage.startsWith('✅') ? 'text-green-400' : 'text-red-400'}`}>
+                {linkMessage}
+              </p>
+            )}
           </div>
 
           <div className="space-y-3">
@@ -319,6 +465,58 @@ const ArtistRegistration: React.FC = () => {
             </div>
           </div>
 
+          {/* Link Account Section (on form) */}
+          <div className={`border rounded-lg p-6 ${isLinked
+              ? 'bg-green-900/20 border-green-700/50'
+              : 'bg-purple-900/20 border-purple-700/50'
+            }`}>
+            <h3 className="font-medium mb-3 flex items-center gap-2">
+              {isLinked ? '✅ Account Linked' : '🔗 Link Your Buckets Account'}
+            </h3>
+            {isLinked ? (
+              <p className="text-sm text-green-400">
+                Your Buckets account is connected. You'll receive revenue splits from ticket sales in your wallet.
+              </p>
+            ) : currentUser ? (
+              <div>
+                <p className="text-sm text-gray-400 mb-3">
+                  Connect your Buckets account to receive event revenue splits directly in your wallet.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    Signed in as <span className="text-purple-400 font-mono">{currentUser.email}</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleLinkAccount}
+                    disabled={linking}
+                    className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors text-sm disabled:opacity-50"
+                  >
+                    {linking ? 'Linking...' : '🔗 Link Account'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm text-gray-400 mb-3">
+                  Have a Buckets account? Sign in to link it and receive event revenue directly.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/login?redirect=' + encodeURIComponent(window.location.pathname))}
+                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors text-sm"
+                >
+                  🔐 Sign In to Link
+                </button>
+              </div>
+            )}
+            {linkMessage && (
+              <p className={`text-sm mt-2 ${linkMessage.startsWith('✅') ? 'text-green-400' : 'text-red-400'}`}>
+                {linkMessage}
+              </p>
+            )}
+          </div>
+
           <div className="flex space-x-4">
             <button
               type="button"
@@ -330,11 +528,10 @@ const ArtistRegistration: React.FC = () => {
             <button
               type="submit"
               disabled={!formData.name.trim() || saving}
-              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 ${
-                !formData.name.trim() || saving
+              className={`flex-1 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2 ${!formData.name.trim() || saving
                   ? 'bg-gray-600 cursor-not-allowed text-gray-400'
                   : 'bg-accent-yellow text-black hover:bg-accent-yellow/90'
-              }`}
+                }`}
             >
               {saving && (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>

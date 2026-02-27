@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import TicketTierConfig from './TicketTierConfig'
 
 interface EventFormData {
   title: string
@@ -14,6 +15,10 @@ interface EventFormData {
   endTime: string
   maxVotesPerParticipant: number
   allowMultipleVotes: boolean
+  ticketingEnabled: boolean
+  ticketTiers: any[]
+  ticketSalesStart: string
+  ticketSalesEnd: string
 }
 
 interface CalendarProps {
@@ -298,7 +303,11 @@ const EventCreator: React.FC = () => {
     endDate: '',
     endTime: '17:00',
     maxVotesPerParticipant: 5,
-    allowMultipleVotes: false
+    allowMultipleVotes: false,
+    ticketingEnabled: false,
+    ticketTiers: [],
+    ticketSalesStart: '',
+    ticketSalesEnd: ''
   })
 
   const updateFormData = (updates: Partial<EventFormData>) => {
@@ -342,7 +351,11 @@ const EventCreator: React.FC = () => {
         host_user_id: user.id,
         status: 'draft', // Create events as draft, publish them via dashboard
         mediaid_integration_enabled: true,
-        privacy_mode: 'balanced'
+        privacy_mode: 'balanced',
+        ticketing_enabled: formData.ticketingEnabled,
+        ticket_tiers: formData.ticketTiers,
+        ticket_sales_start: formData.ticketSalesStart || null,
+        ticket_sales_end: formData.ticketSalesEnd || null
       }
 
       const { data: event, error } = await supabase
@@ -514,37 +527,92 @@ const EventCreator: React.FC = () => {
 
           {currentStep === 2 && (
             <>
-              <h2 className="text-2xl font-bold mb-6">Voting Rules</h2>
+              <h2 className="text-2xl font-bold mb-6">Voting Rules & Ticketing</h2>
 
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Votes Per Participant</label>
-                  <select
-                    value={formData.maxVotesPerParticipant}
-                    onChange={(e) => updateFormData({ maxVotesPerParticipant: parseInt(e.target.value) })}
-                    className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg focus:border-accent-yellow focus:outline-none"
-                  >
-                    {[1, 3, 5, 10].map(num => (
-                      <option key={num} value={num}>{num} votes per person</option>
-                    ))}
-                  </select>
+              <div className="space-y-8">
+                {/* Voting Rules Section */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-bold text-gray-300">Voting Configuration</h3>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Votes Per Participant</label>
+                    <select
+                      value={formData.maxVotesPerParticipant}
+                      onChange={(e) => updateFormData({ maxVotesPerParticipant: parseInt(e.target.value) })}
+                      className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg focus:border-accent-yellow focus:outline-none"
+                    >
+                      {[1, 3, 5, 10].map(num => (
+                        <option key={num} value={num}>{num} votes per person</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={formData.allowMultipleVotes}
+                        onChange={(e) => updateFormData({ allowMultipleVotes: e.target.checked })}
+                        className="w-5 h-5 bg-black border border-gray-700 rounded focus:border-accent-yellow"
+                      />
+                      <div>
+                        <div className="font-medium">Allow Multiple Votes Per Artist</div>
+                        <div className="text-sm text-gray-400">
+                          Let participants vote multiple times for the same artist
+                        </div>
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      checked={formData.allowMultipleVotes}
-                      onChange={(e) => updateFormData({ allowMultipleVotes: e.target.checked })}
-                      className="w-5 h-5 bg-black border border-gray-700 rounded focus:border-accent-yellow"
-                    />
+                {/* Divider */}
+                <div className="border-t border-gray-700"></div>
+
+                {/* Ticketing Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium">Allow Multiple Votes Per Artist</div>
-                      <div className="text-sm text-gray-400">
-                        Let participants vote multiple times for the same artist
-                      </div>
+                      <h3 className="text-lg font-bold text-gray-300">Ticket Sales</h3>
+                      <p className="text-sm text-gray-400 mt-1">
+                        Enable ticket sales and configure pricing tiers for your event
+                      </p>
                     </div>
-                  </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <span className="text-sm font-medium">Enable Ticketing</span>
+                      <input
+                        type="checkbox"
+                        checked={formData.ticketingEnabled}
+                        onChange={(e) => updateFormData({ ticketingEnabled: e.target.checked })}
+                        className="w-6 h-6 bg-black border border-gray-700 rounded focus:border-accent-yellow"
+                      />
+                    </label>
+                  </div>
+
+                  {formData.ticketingEnabled && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-4"
+                    >
+                      <TicketTierConfig
+                        ticketingEnabled={formData.ticketingEnabled}
+                        onTicketingToggle={(enabled) => updateFormData({ ticketingEnabled: enabled })}
+                        tiers={formData.ticketTiers}
+                        onTiersChange={(tiers) => updateFormData({ ticketTiers: tiers })}
+                        hideToggle={true}
+                      />
+                    </motion.div>
+                  )}
+
+                  {!formData.ticketingEnabled && (
+                    <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg text-center text-gray-500">
+                      <p className="text-sm">Ticketing disabled. Enable above to configure ticket tiers.</p>
+                      <p className="text-xs mt-1 text-gray-600">
+                        💡 Tip: You can configure revenue splits later in the Event Dashboard
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </>

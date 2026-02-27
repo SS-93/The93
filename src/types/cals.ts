@@ -52,7 +52,7 @@
  */
 
 // =============================================================================
- * THREAD TYPES
+// THREAD TYPES
 // =============================================================================
 
 /**
@@ -68,28 +68,28 @@
  */
 export interface CALSThread {
   id: string
-  
+
   // Participants
   member_ids: string[]         // User IDs in thread
   is_group: boolean            // True if >2 members
-  
+
   // Thread metadata
   thread_name?: string         // Optional custom name
   last_activity_ts: Date       // Last link shared or opened
   unread_count?: Record<string, number>  // Per-member unread count
-  
+
   // Privacy
   visibility: 'private' | 'friends' | 'public'
-  
+
   // Statistics
   total_links_shared: number
   total_links_opened: number
   total_attributed_revenue_cents: number
-  
+
   // Status
   is_active: boolean
   is_archived: boolean
-  
+
   // Metadata
   created_at: Date
   updated_at: Date
@@ -105,29 +105,29 @@ export interface CALSThread {
 export interface CALSThreadItem {
   id: string
   thread_id: string
-  
+
   // Item type
   type: 'link' | 'note' | 'system'
-  
+
   // For link type
   link_id?: string
   link_data?: CALSLinkData
-  
+
   // For note type (optional text annotations)
   text?: string
-  
+
   // Sender
   sender_id: string
   sender_name?: string         // Cached for display
-  
+
   // Engagement
   view_count: number
   open_count: number           // How many times link was opened
   conversion_count: number     // How many conversions from this link
-  
+
   // Attribution revenue
   attributed_revenue_cents: number
-  
+
   // Metadata
   metadata?: Record<string, any>
   created_at: Date
@@ -150,36 +150,36 @@ export interface CALSLinkData {
   canonical_id: string         // ID of the entity (track, event, etc.)
   url: string                  // Original URL
   short_url?: string           // bkt.to/xyz shortlink
-  
+
   // Display metadata
   title: string
   description?: string
   image_url?: string
   thumbnail_url?: string
-  
+
   // Content-specific data
   content_metadata?: {
     // For tracks
     artist_name?: string
     duration?: number
     genre?: string
-    
+
     // For events
     event_date?: Date
     location?: string
     ticket_price_cents?: number
-    
+
     // For artists
     follower_count?: number
     monthly_listeners?: number
   }
-  
+
   // Attribution tracking
   utm_campaign?: string
   utm_source?: string
   utm_medium?: string
   source_app?: string          // Where link was shared from
-  
+
   // DNA context (for personalization)
   dna_match_score?: number     // Match between sharer and recipient
 }
@@ -218,33 +218,33 @@ export type CALSLinkType =
 export interface LinkOpenEvent {
   id: string
   link_id: string              // Reference to CALSThreadItem
-  
+
   // Parties involved
   sender_user_id?: string      // User who shared (if known)
   receiver_user_id?: string    // User who opened (if authenticated)
   receiver_device_id?: string  // Device ID (if not authenticated)
-  
+
   // Context
   source_app?: 'ios' | 'android' | 'web' | 'unknown'
   opened_from?: string         // "iMessage", "WhatsApp", "Instagram", etc.
-  
+
   // Attribution tracking
   utm_campaign?: string
   utm_source?: string
   utm_medium?: string
-  
+
   // Deep link data
   deep_link_params?: Record<string, string>
-  
+
   // Session tracking
   session_id?: string
   is_first_open: boolean       // First time this person opened this link
-  
+
   // Outcome tracking
   resulted_in_conversion: boolean
   conversion_type?: 'subscription' | 'ticket_purchase' | 'track_purchase'
   conversion_value_cents?: number
-  
+
   // Metadata
   timestamp: Date
 }
@@ -258,28 +258,28 @@ export interface LinkOpenEvent {
  */
 export interface LinkShareEvent {
   id: string
-  
+
   // What was shared
   link_type: CALSLinkType
   entity_id: string
-  
+
   // Who shared
   sharer_user_id: string
-  
+
   // How it was shared
   share_method: 'native_sheet' | 'copy_link' | 'direct_message'
   target_app?: string          // "iMessage", "WhatsApp", etc. (if known)
-  
+
   // Generated link
   short_url: string
   full_url: string
-  
+
   // Attribution setup
   utm_campaign: string
-  
+
   // DNA context (for later analysis of share effectiveness)
   sharer_dna_snapshot?: number[]  // Snapshot of sharer's DNA at share time
-  
+
   // Metadata
   metadata?: Record<string, any>
   timestamp: Date
@@ -302,21 +302,21 @@ export interface LinkShareEvent {
  */
 export interface CALSConsentScope {
   user_id: string
-  
+
   // Core CALS features
   cals_basic: boolean          // Allow basic link tracking
   cals_threads: boolean        // Allow thread creation
   cals_attribution: boolean    // Allow attribution revenue
-  
+
   // Optional features
   cals_brand: boolean          // Allow brand drops in threads (Locker integration)
   cals_analytics: boolean      // Allow anonymized analytics
   cals_recommendations: boolean // Allow DNA-based share recommendations
-  
+
   // Data sharing
   allow_dna_matching: boolean  // Use DNA for personalization
   allow_device_tracking: boolean
-  
+
   // Metadata
   granted_at: Date
   updated_at: Date
@@ -340,20 +340,20 @@ export interface ShareRecommendation {
   user_id: string
   user_name: string
   user_avatar_url?: string
-  
+
   // Recommendation reasoning
   recommendation_score: number  // 0-1
   recommendation_reason: string // "Strong music taste match"
-  
+
   // DNA matching
   dna_match_score: number
   matching_domains: string[]    // ["cultural", "spatial"]
-  
+
   // Historical context
   previous_shares_count: number
   previous_opens_count: number
   previous_conversions_count: number
-  
+
   // Estimated outcomes
   estimated_open_probability: number
   estimated_conversion_probability: number
@@ -375,15 +375,15 @@ export interface DeepLinkConfig {
   // URL patterns
   domain: string               // "buckets.media" or "bkt.to"
   path_pattern: string         // "/track/:id", "/event/:id"
-  
+
   // Handling
   handler: 'native' | 'web' | 'fallback'
   fallback_url?: string        // Web URL if app not installed
-  
+
   // Parameters
   required_params: string[]
   optional_params: string[]
-  
+
   // Analytics
   track_opens: boolean
   create_thread: boolean       // Auto-create CALS thread
@@ -399,16 +399,16 @@ export interface DeepLinkPayload {
   // Link identification
   link_type: CALSLinkType
   entity_id: string
-  
+
   // Attribution
   sender_id?: string
   campaign_id?: string
   utm_params: Record<string, string>
-  
+
   // Navigation target
   route: string
   params: Record<string, string>
-  
+
   // Metadata
   timestamp: Date
 }
@@ -427,26 +427,26 @@ export interface DeepLinkPayload {
 export interface Shortlink {
   id: string
   short_code: string           // "xyz" in "bkt.to/xyz"
-  
+
   // Target
   long_url: string
   link_type: CALSLinkType
   entity_id: string
-  
+
   // Creator
   created_by: string
-  
+
   // Analytics
   open_count: number
   unique_opens: number
-  
+
   // Attribution
   campaign_id?: string
-  
+
   // Lifecycle
   expires_at?: Date
   is_active: boolean
-  
+
   // Metadata
   created_at: Date
 }
@@ -467,7 +467,7 @@ export interface Shortlink {
 export interface ThreadLockerDrop {
   id: string
   thread_id: string
-  
+
   // Drop content
   drop_type: 'offer' | 'content' | 'reward' | 'ticket'
   drop_data: {
@@ -477,23 +477,23 @@ export interface ThreadLockerDrop {
     value_cents?: number
     expires_at?: Date
   }
-  
+
   // Brand/source
   brand_id?: string
   brand_name?: string
-  
+
   // Targeting (DNA-based)
   target_dna_profile?: number[]
   min_dna_match?: number
-  
+
   // Engagement
   view_count: number
   claim_count: number
-  
+
   // Status
   is_active: boolean
   is_claimed: boolean
-  
+
   // Metadata
   created_at: Date
 }
@@ -511,26 +511,26 @@ export interface ThreadLockerDrop {
 export interface CALSAnalyticsSummary {
   user_id: string
   time_range: '7d' | '30d' | '90d' | 'all'
-  
+
   // Sharing activity
   links_shared: number
   unique_recipients: number
-  
+
   // Engagement
   links_opened: number
   open_rate: number            // Opens / Shares
   unique_openers: number
-  
+
   // Conversion
   conversions: number
   conversion_rate: number      // Conversions / Opens
   conversion_types: Record<string, number>
-  
+
   // Revenue
   total_attributed_revenue_cents: number
   pending_revenue_cents: number
   settled_revenue_cents: number
-  
+
   // Top performers
   top_shared_content: Array<{
     link_type: CALSLinkType
@@ -540,7 +540,7 @@ export interface CALSAnalyticsSummary {
     open_rate: number
     revenue_cents: number
   }>
-  
+
   generated_at: Date
 }
 

@@ -28,6 +28,27 @@ import CompanonLanding from './CompanonLanding';
 import CompanonShell from './layout/CompanonShell';
 import DashboardOverview from './dashboard/DashboardOverview';
 import DNAQueryBuilder from './dna/DNAQueryBuilder';
+import type { CompanonBrand } from '../../types/companon';
+
+// Default brand for demo/testing purposes
+const DEFAULT_BRAND: CompanonBrand = {
+  id: '',
+  name: 'Default Brand',
+  settings: {
+    primary_color: '#7C3AED',
+    language: 'en' as const,
+    timezone: 'America/New_York',
+    notification_preferences: {
+      campaign_launched: true,
+      fraud_alerts: true,
+      weekly_reports: true,
+      budget_warnings: true
+    }
+  },
+  subscription_tier: 'starter' as const,
+  created_at: new Date(),
+  updated_at: new Date()
+};
 // Import other components as they're built
 // import CampaignList from './campaigns/CampaignList';
 // import CampaignWizard from './campaigns/CampaignWizard';
@@ -50,10 +71,10 @@ const CompanonRoutes: React.FC = () => {
           <CompanonShell>
             <Routes>
               {/* Dashboard Home */}
-              <Route path="/" element={<DashboardOverview />} />
-              
+              <Route path="/" element={<DashboardOverview brand={DEFAULT_BRAND} />} />
+
               {/* DNA Query Builder */}
-              <Route path="/dna-builder" element={<DNAQueryBuilder />} />
+              <Route path="/dna-builder" element={<DNAQueryBuilder brand={DEFAULT_BRAND} />} />
               
               {/* Campaigns */}
               <Route path="/campaigns" element={<ComingSoon feature="Campaign List" />} />

@@ -23,10 +23,8 @@
  * - System health indicator in header
  */
 
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseClient } from '@/lib/supabaseClient';
 import { usePassport } from '@/hooks/usePassport';
 import { useColiseum } from '@/hooks/useColiseum';
@@ -40,10 +38,10 @@ interface DashboardOverviewProps {
 }
 
 export default function DashboardOverview({ brand }: DashboardOverviewProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const supabase = useSupabaseClient();
   const { logEvent } = usePassport();
-  const { fetchMetrics } = useColiseum();
+  useColiseum();
 
   // ============================================================================
   // STATE
@@ -61,7 +59,7 @@ export default function DashboardOverview({ brand }: DashboardOverviewProps) {
     loadDashboardData();
 
     // Log dashboard view to Passport
-    logEvent('companon.dashboard.viewed', {
+    logEvent('companon.dashboard.viewed' as any, {
       brand_id: brand.id,
       time_range: timeRange,
     }, ['coliseum']);
@@ -110,27 +108,27 @@ export default function DashboardOverview({ brand }: DashboardOverviewProps) {
   // ============================================================================
 
   const handleBuildAudience = () => {
-    logEvent('companon.quick_action', {
+    logEvent('companon.quick_action' as any, {
       action: 'build_audience',
       brand_id: brand.id,
     }, ['coliseum']);
-    router.push('/companon/dna-builder');
+    navigate('/companon/dashboard/dna-builder');
   };
 
   const handleLaunchCampaign = () => {
-    logEvent('companon.quick_action', {
+    logEvent('companon.quick_action' as any, {
       action: 'launch_campaign',
       brand_id: brand.id,
     }, ['coliseum']);
-    router.push('/companon/campaigns/new');
+    navigate('/companon/dashboard/campaigns/new');
   };
 
   const handleViewAnalytics = () => {
-    logEvent('companon.quick_action', {
+    logEvent('companon.quick_action' as any, {
       action: 'view_analytics',
       brand_id: brand.id,
     }, ['coliseum']);
-    router.push('/companon/analytics');
+    navigate('/companon/dashboard/analytics');
   };
 
   // ============================================================================

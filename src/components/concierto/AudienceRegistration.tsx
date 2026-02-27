@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import ProfilePhotoUpload from './ProfilePhotoUpload'
+import { syncAttendeeFromRegistration } from '../../lib/concierto/attendeeConversion'
 
 interface EventInfo {
   id: string
@@ -164,6 +165,27 @@ const AudienceRegistration: React.FC = () => {
         setExistingMember(data)
         setEditToken(registrationToken)
         console.log('✅ Audience member registered successfully')
+
+        // Sync to conversion pipeline
+        if (data.email) {
+          try {
+            await syncAttendeeFromRegistration(
+              event.id,
+              'fan',
+              {
+                id: data.id,
+                email: data.email,
+                name: data.name,
+                phone: data.phone || null
+              },
+              'registration_form'
+            )
+            console.log('✅ Attendee synced to conversion pipeline')
+          } catch (conversionError) {
+            console.warn('⚠️ Conversion sync failed (non-critical):', conversionError)
+            // Don't fail registration if conversion sync fails
+          }
+        }
       }
 
       setIsRegistered(true)

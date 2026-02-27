@@ -35,13 +35,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { usePassport } from '../../hooks/usePassport'
 import { PassportEntry, PassportEventCategory } from '../../types/passport'
+import { DNASimulator } from '../trinity/mediaid/DNASimulator'
+import { PassportTimeline } from './PassportTimeline'
 
 interface PassportViewerProps {
   userId?: string  // For admin viewing other users
   onClose?: () => void
 }
 
-type TabType = 'timeline' | 'dna' | 'coliseum' | 'treasury'
+type TabType = 'timeline' | 'dna' | 'simulator' | 'coliseum' | 'treasury'
 
 export function PassportViewer({ userId, onClose }: PassportViewerProps) {
   const navigate = useNavigate()
@@ -178,6 +180,7 @@ export function PassportViewer({ userId, onClose }: PassportViewerProps) {
             {[
               { id: 'timeline', label: 'Timeline', icon: '📅' },
               { id: 'dna', label: 'DNA Log', icon: '🧬' },
+              { id: 'simulator', label: 'Simulator', icon: '🔬' },
               { id: 'coliseum', label: 'Coliseum', icon: '🏆' },
               { id: 'treasury', label: 'Treasury', icon: '💰' }
             ].map((tab) => {
@@ -189,11 +192,10 @@ export function PassportViewer({ userId, onClose }: PassportViewerProps) {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveTab(tab.id as TabType)}
-                  className={`relative flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50'
-                      : 'bg-slate-800/50 text-slate-400 border border-transparent hover:bg-slate-800/80 hover:text-slate-300'
-                  }`}
+                  className={`relative flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${isActive
+                    ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/50'
+                    : 'bg-slate-800/50 text-slate-400 border border-transparent hover:bg-slate-800/80 hover:text-slate-300'
+                    }`}
                 >
                   <span className="text-lg">{tab.icon}</span>
                   <span className="text-sm font-medium">{tab.label}</span>
@@ -212,37 +214,49 @@ export function PassportViewer({ userId, onClose }: PassportViewerProps) {
         </div>
 
         {/* Stats Bar */}
-        <div className="border-b border-cyan-500/20 bg-slate-900/30 backdrop-blur px-6 py-4">
-          <div className="grid grid-cols-4 gap-4">
-            <StatCard label="Total Events" value={entries.length} color="cyan" />
-            <StatCard
-              label="DNA Processed"
-              value={entries.filter(e => e.processed_by_mediaid).length}
-              color="blue"
-            />
-            <StatCard
-              label="Activity Score"
-              value={entries.filter(e => e.processed_by_coliseum).length}
-              color="purple"
-            />
-            <StatCard
-              label="Treasury Events"
-              value={entries.filter(e => e.event_category === 'transaction').length}
-              color="green"
-            />
+        {activeTab !== 'simulator' && (
+          <div className="border-b border-cyan-500/20 bg-slate-900/30 backdrop-blur px-6 py-4">
+            <div className="grid grid-cols-4 gap-4">
+              <StatCard label="Total Events" value={entries.length} color="cyan" />
+              <StatCard
+                label="DNA Processed"
+                value={entries.filter(e => e.processed_by_mediaid).length}
+                color="blue"
+              />
+              <StatCard
+                label="Activity Score"
+                value={entries.filter(e => e.processed_by_coliseum).length}
+                color="purple"
+              />
+              <StatCard
+                label="Treasury Events"
+                value={entries.filter(e => e.event_category === 'transaction').length}
+                color="green"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Content */}
-        <div className="relative h-[calc(100%-280px)] overflow-y-auto">
-          {loading ? (
+        <div className={`relative ${activeTab === 'simulator' ? 'h-[calc(100%-140px)]' : 'h-[calc(100%-280px)]'} overflow-y-auto`}>
+          {activeTab === 'simulator' ? (
+            <div className="p-6 h-full">
+              <DNASimulator />
+            </div>
+          ) : loading ? (
             <LoadingState />
           ) : error ? (
             <ErrorState error={error} />
           ) : filteredEntries.length === 0 ? (
             <EmptyState tab={activeTab} />
           ) : (
-            <EventTimeline entries={filteredEntries} />
+            <div className="p-6">
+              <PassportTimeline
+                entries={filteredEntries}
+                groupBy="date"
+                onStampClick={(entry) => console.log('Stamp clicked:', entry)}
+              />
+            </div>
           )}
         </div>
       </motion.div>
@@ -407,11 +421,10 @@ function EventIcon({ eventType, category }: { eventType: string; category: strin
 
 function ProcessBadge({ label, processed }: { label: string; processed: boolean }) {
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-      processed
-        ? 'bg-green-500/20 text-green-400 border border-green-500/40'
-        : 'bg-slate-700/50 text-slate-500 border border-slate-700'
-    }`}>
+    <span className={`px-2 py-0.5 rounded text-xs font-medium ${processed
+      ? 'bg-green-500/20 text-green-400 border border-green-500/40'
+      : 'bg-slate-700/50 text-slate-500 border border-slate-700'
+      }`}>
       {label} {processed ? '✓' : '○'}
     </span>
   )
@@ -453,6 +466,7 @@ function EmptyState({ tab }: { tab: TabType }) {
   const messages = {
     timeline: 'No events recorded yet',
     dna: 'No DNA evolution events',
+    simulator: 'Simulator ready',
     coliseum: 'No activity tracked',
     treasury: 'No transactions yet'
   }

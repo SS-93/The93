@@ -23,12 +23,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@/lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function CompanonLanding() {
-  const router = useRouter();
-  const { data: user } = useUser();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-[#121212] text-white">
@@ -54,7 +54,7 @@ export default function CompanonLanding() {
             {/* Auth Actions */}
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => navigate('/')}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 ← Back to Home
@@ -67,7 +67,7 @@ export default function CompanonLanding() {
                     <div className="font-medium">{user.email}</div>
                   </div>
                   <button
-                    onClick={() => router.push('/companon/dashboard')}
+                    onClick={() => navigate('/companon/dashboard')}
                     className="bg-[#3B82F6] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#2563EB] transition-colors"
                   >
                     Go to Dashboard
@@ -75,7 +75,7 @@ export default function CompanonLanding() {
                 </div>
               ) : (
                 <button
-                  onClick={() => router.push('/auth/login?redirect=/companon/dashboard')}
+                  onClick={() => navigate('/auth/login?redirect=/companon/dashboard')}
                   className="bg-[#3B82F6] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#2563EB] transition-colors"
                 >
                   Sign In
@@ -112,7 +112,7 @@ export default function CompanonLanding() {
 
           {user ? (
             <motion.button
-              onClick={() => router.push('/companon/dashboard')}
+              onClick={() => navigate('/companon/dashboard')}
               className="bg-[#3B82F6] text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#2563EB] transition-all duration-200 shadow-lg shadow-blue-500/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export default function CompanonLanding() {
             </motion.button>
           ) : (
             <motion.button
-              onClick={() => router.push('/auth/login?redirect=/companon/dashboard')}
+              onClick={() => navigate('/auth/login?redirect=/companon/dashboard')}
               className="bg-[#3B82F6] text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#2563EB] transition-all duration-200 shadow-lg shadow-blue-500/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

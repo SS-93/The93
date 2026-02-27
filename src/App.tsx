@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
 import stripePromise from './lib/stripeClient'
 import { AuthProvider } from './hooks/useAuth'
+import { BadgeProvider } from './hooks/useBadges'
 import { AudioPlayerProvider } from './context/AudioPlayerContext'
 import AppLayout from './components/AppLayout'
 import PlayerPage from './components/player/PlayerPage'
@@ -18,11 +19,8 @@ import { SmartRouteGuard } from './components/SmartRouteGuard'
 import { AutoRouter } from './components/AutoRouter'
 import OnboardingFlow from './components/OnboardingFlow'
 import WelcomePage from './components/auth/WelcomePage'
-import SignInForm from './components/auth/SignInForm'
+import UnifiedAuthPage from './components/auth/UnifiedAuthPage'
 import ResetPasswordForm from './components/auth/ResetPasswordForm'
-import ArtistLogin from './components/auth/ArtistLogin'
-import BrandLogin from './components/auth/BrandLogin'
-import DeveloperLogin from './components/auth/DeveloperLogin'
 import DeveloperDashboard from './components/DeveloperDashboard'
 import TestDashboard from './components/TestDashboard'
 import UniversalSettingsPanel from './components/settings/UniversalSettingsPanel'
@@ -33,6 +31,11 @@ import ListeningHistoryPortal from './components/ListeningHistoryPortal'
 import ConciertoRoutes from './components/concierto/ConciertoRoutes'
 import HostAdminDashboard from './components/concierto/HostAdminDashboard'
 import { DIADashboard } from './components/dia/DIADashboard'
+// Denver Spotlight (standalone — no AppLayout)
+import SpotlightHome from './components/dnvrspotlight/SpotlightHome'
+import VotingPage from './components/dnvrspotlight/VotingPage'
+import HallOfFame from './components/dnvrspotlight/HallOfFame'
+import DNVRSpotlightDashboard from './routes/dnvr-spotlight-dashboard'
 import { AdminLogin } from './components/auth/AdminLogin'
 import { PassportViewer } from './components/passport/PassportViewer'
 import TestCheckoutPage from './routes/test-checkout'
@@ -41,6 +44,9 @@ import TreasuryAdminDashboard from './routes/admin-treasury'
 import CheckoutSuccessPage from './routes/checkout-success'
 import CheckoutCancelPage from './routes/checkout-cancel'
 import WalletPage from './routes/wallet'
+import ColiseumDashboard from './routes/coliseum-dashboard'
+import DNASimulatorRoute from './routes/dna-simulator'
+import GlobalCharts from './components/coliseum/pages/GlobalCharts'
 
 // Mock data for the BTI route
 const mockBTIContent = [
@@ -86,37 +92,40 @@ const LandingPage: React.FC = () => (
       <p className="text-2xl text-gray-400 mb-12">
         The underground's home for exclusive content and privacy-first brand collaboration
       </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-        <div className="glass p-8 rounded-2xl">
-          <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Fans</h3>
-          <p className="text-gray-400 mb-6">Discover underground artists and unlock exclusive content</p>
-          <a href="/welcome" className="bg-accent-yellow text-black px-6 py-3 rounded-xl font-bold hover:bg-accent-yellow/90 transition-colors inline-block">
-            Fan Login
-          </a>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="glass p-6 rounded-2xl border border-purple-500/20">
+          <div className="text-3xl mb-3">🎵</div>
+          <h3 className="text-lg font-bold text-purple-400 mb-2">Fan Badge</h3>
+          <p className="text-gray-400 text-sm">Discover artists, stream music, attend events</p>
         </div>
-        <div className="glass p-8 rounded-2xl">
-          <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Artists</h3>
-          <p className="text-gray-400 mb-6">Monetize your work with daily drops and subscriber tiers</p>
-          <a href="/artist/login" className="bg-green-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-green-600 transition-colors inline-block">
-            Artist Portal
-          </a>
+        <div className="glass p-6 rounded-2xl border border-green-500/20">
+          <div className="text-3xl mb-3">🎤</div>
+          <h3 className="text-lg font-bold text-green-400 mb-2">Artist Badge</h3>
+          <p className="text-gray-400 text-sm">Upload music, manage events, grow your audience</p>
         </div>
-        <div className="glass p-8 rounded-2xl">
-          <h3 className="text-2xl font-bold text-accent-yellow mb-4">For Brands</h3>
-          <p className="text-gray-400 mb-6">Connect with engaged communities through MediaID</p>
-          <a href="/brand/login" className="bg-blue-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors inline-block">
-            Brand Portal
-          </a>
+        <div className="glass p-6 rounded-2xl border border-blue-500/20">
+          <div className="text-3xl mb-3">🏢</div>
+          <h3 className="text-lg font-bold text-blue-400 mb-2">Brand Badge</h3>
+          <p className="text-gray-400 text-sm">Create campaigns and partner with artists</p>
         </div>
-        <div className="glass p-8 rounded-2xl border border-purple-200/20">
-          <h3 className="text-2xl font-bold text-purple-400 mb-4">For Developers</h3>
-          <p className="text-gray-400 mb-6">Build privacy-first experiences with MediaID APIs</p>
-          <a href="/developer/login" className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:from-purple-600 hover:to-purple-700 transition-colors inline-block">
-            Developer Portal
-          </a>
+        <div className="glass p-6 rounded-2xl border border-amber-500/20">
+          <div className="text-3xl mb-3">👨‍💻</div>
+          <h3 className="text-lg font-bold text-amber-400 mb-2">Developer Badge</h3>
+          <p className="text-gray-400 text-sm">Build integrations with MediaID APIs</p>
         </div>
       </div>
+
+      <div className="space-y-4 max-w-md mx-auto mb-8">
+        <a href="/signup" className="block w-full bg-accent-yellow text-black px-8 py-4 rounded-xl font-bold hover:bg-accent-yellow/90 transition-colors text-center">
+          Create Your Account
+        </a>
+        <a href="/login" className="block w-full glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors text-center">
+          Sign In to Dashboard
+        </a>
+      </div>
+
+      <p className="text-gray-600 text-xs mb-6">One account · Multiple badges · Unlimited possibilities</p>
 
       <div className="space-y-4">
         <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -129,13 +138,10 @@ const LandingPage: React.FC = () => (
           <a href="/catalog" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
             Explore Artists
           </a>
-          <a href="/welcome" className="glass border border-white/20 px-8 py-4 rounded-xl font-bold hover:border-accent-yellow/50 transition-colors">
-            General Login
-          </a>
         </div>
-        
+
         <div className="text-sm text-gray-500">
-          Demo Links: 
+          Demo Links:
           <a href="/bucket-demo" className="text-accent-yellow hover:underline ml-2">Bucket Demo</a> |
           <a href="/locker-demo" className="text-accent-yellow hover:underline ml-2">Locker Demo</a> |
           <a href="/BTI" className="text-accent-yellow hover:underline ml-2">BTI Artist</a> |
@@ -239,230 +245,256 @@ const router = createBrowserRouter([
           </SmartRouteGuard>
         )
       },
-  {
-    path: '/auto-route',
-    element: <AutoRouter />,
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/welcome',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <WelcomePage />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/login',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
-          <SignInForm 
-            onSuccess={(user) => {
-              // Use auto-router to handle smart routing
+      {
+        path: '/auto-route',
+        element: <AutoRouter />,
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/welcome',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <WelcomePage />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/login',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <UnifiedAuthPage
+              defaultMode="signin"
+              onSuccess={() => { window.location.href = '/auto-route' }}
+              onBack={() => { window.location.href = '/welcome' }}
+            />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/signup',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <UnifiedAuthPage
+              defaultMode="signup"
+              onSuccess={() => { window.location.href = '/auto-route' }}
+              onBack={() => { window.location.href = '/welcome' }}
+            />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/reset-password',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <ResetPasswordForm />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Legacy role-specific login routes → redirect to unified login
+      {
+        path: '/artist/login',
+        element: <UnifiedAuthPage defaultMode="signin" onSuccess={() => { window.location.href = '/auto-route' }} onBack={() => { window.location.href = '/welcome' }} />,
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/brand/login',
+        element: <UnifiedAuthPage defaultMode="signin" onSuccess={() => { window.location.href = '/auto-route' }} onBack={() => { window.location.href = '/welcome' }} />,
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/developer/login',
+        element: <UnifiedAuthPage defaultMode="signin" onSuccess={() => { window.location.href = '/auto-route' }} onBack={() => { window.location.href = '/welcome' }} />,
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/catalog',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <UserCatalog />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/onboarding',
+        element: (
+          <SmartRouteGuard requireAuth={true} requireOnboarding={false}>
+            <OnboardingFlow onComplete={() => {
+              // After onboarding completion, use auto-router
               window.location.href = '/auto-route'
-            }}
-            onBack={() => window.location.href = '/welcome'}
+            }} />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Demo Routes (Public Access)
+      {
+        path: '/bucket-demo',
+        element: <BucketDemo />,
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/locker-demo',
+        element: <LockerDemo />,
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/BTI',
+        element: (
+          <BucketTemplateUI
+            userRole="fan"
+            artistName="Kendrick Lamar"
+            contentItems={mockBTIContent}
+            onDownload={(item) => console.log('Download:', item)}
           />
-        </div>
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/reset-password',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <ResetPasswordForm />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Separate login flows
-  {
-    path: '/artist/login',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <ArtistLogin />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/brand/login',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <BrandLogin />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/developer/login',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <DeveloperLogin />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/catalog',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <UserCatalog />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/onboarding',
-    element: (
-      <SmartRouteGuard requireAuth={true} requireOnboarding={false}>
-        <OnboardingFlow onComplete={() => {
-          // After onboarding completion, use auto-router
-          window.location.href = '/auto-route'
-        }} />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Demo Routes (Public Access)
-  {
-    path: '/bucket-demo',
-    element: <BucketDemo />,
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/locker-demo',
-    element: <LockerDemo />,
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/BTI',
-    element: (
-      <BucketTemplateUI 
-        userRole="fan" 
-        artistName="Kendrick Lamar" 
-        contentItems={mockBTIContent}
-        onDownload={(item) => console.log('Download:', item)}
-      />
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Protected Dashboard Routes
-  {
-    path: '/dashboard/fan',
-    element: (
-      <SmartRouteGuard allowedRoles={['fan', 'admin']} requireAuth={true} requireOnboarding={true}>
-        <DashboardWrapper initialRole="fan" />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/dashboard/artist',
-    element: (
-      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
-        <DashboardWrapper initialRole="artist" />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/dashboard/brand',
-    element: (
-      <SmartRouteGuard allowedRoles={['brand', 'admin']} requireAuth={true} requireOnboarding={true}>
-        <DashboardWrapper initialRole="brand" />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/dashboard/developer',
-    element: (
-      <SmartRouteGuard allowedRoles={['developer', 'admin']} requireAuth={true} requireOnboarding={true}>
-        <DashboardWrapper initialRole="developer" />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Settings Route
-  {
-    path: '/settings',
-    element: (
-      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
-        <UniversalSettingsPanel />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Player Route
-  {
-    path: '/player',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <PlayerPage />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Discovery Route
-  {
-    path: '/discover',
-    element: (
-      <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
-        <DiscoveryPage />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Recents/Listening History Route
-  {
-    path: '/recents',
-    element: (
-      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
-        <ListeningHistoryPortal />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Upload System Routes
-  {
-    path: '/upload',
-    element: (
-      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
-        <DedicatedUploadPage />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  {
-    path: '/upload/library',
-    element: (
-      <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
-        <ContentLibraryManager />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Host Admin Dashboard - /host/dashboard
-  {
-    path: '/host/dashboard',
-    element: (
-      <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
-        <HostAdminDashboard />
-      </SmartRouteGuard>
-    ),
-    errorElement: <ErrorBoundary />
-  },
-  // Concierto Event Management & Voting System - buckets.media/events/*
-  {
-    path: '/events/*',
-    element: <ConciertoRoutes />,
-    errorElement: <ErrorBoundary />
-  },
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Protected Dashboard Routes
+      {
+        path: '/dashboard/fan',
+        element: (
+          <SmartRouteGuard requiredBadge={['fan', 'admin']} requireAuth={true} requireOnboarding={true}>
+            <DashboardWrapper initialRole="fan" />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/dashboard/artist',
+        element: (
+          <SmartRouteGuard requiredBadge={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+            <DashboardWrapper initialRole="artist" />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/dashboard/brand',
+        element: (
+          <SmartRouteGuard requiredBadge={['brand', 'admin']} requireAuth={true} requireOnboarding={true}>
+            <DashboardWrapper initialRole="brand" />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/dashboard/developer',
+        element: (
+          <SmartRouteGuard requiredBadge={['developer', 'admin']} requireAuth={true} requireOnboarding={true}>
+            <DashboardWrapper initialRole="developer" />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Settings Route
+      {
+        path: '/settings',
+        element: (
+          <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+            <UniversalSettingsPanel />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Player Route
+      {
+        path: '/player',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <PlayerPage />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Discovery Route
+      {
+        path: '/discover',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <DiscoveryPage />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Coliseum Analytics Routes
+      {
+        path: '/coliseum',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <ColiseumDashboard />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/coliseum/global',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <GlobalCharts />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // DNA Simulator Route (Dev Tool)
+      {
+        path: '/dna/simulator',
+        element: (
+          <SmartRouteGuard requireAuth={false} requireOnboarding={false}>
+            <DNASimulatorRoute />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Recents/Listening History Route
+      {
+        path: '/recents',
+        element: (
+          <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+            <ListeningHistoryPortal />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Upload System Routes
+      {
+        path: '/upload',
+        element: (
+          <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+            <DedicatedUploadPage />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      {
+        path: '/upload/library',
+        element: (
+          <SmartRouteGuard allowedRoles={['artist', 'admin']} requireAuth={true} requireOnboarding={true}>
+            <ContentLibraryManager />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Host Admin Dashboard - /host/dashboard
+      {
+        path: '/host/dashboard',
+        element: (
+          <SmartRouteGuard requireAuth={true} requireOnboarding={true}>
+            <HostAdminDashboard />
+          </SmartRouteGuard>
+        ),
+        errorElement: <ErrorBoundary />
+      },
+      // Concierto Event Management & Voting System - buckets.media/events/*
+      {
+        path: '/events/*',
+        element: <ConciertoRoutes />,
+        errorElement: <ErrorBoundary />
+      },
       // Unauthorized access
       {
         path: '/unauthorized',
@@ -479,7 +511,28 @@ const router = createBrowserRouter([
         )
       }
     ]
-  }
+  },
+  // Denver Spotlight Routes — standalone, no AppLayout wrapper
+  {
+    path: '/DNVRSpotlight',
+    element: <SpotlightHome />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/DNVRSpotlight/vote',
+    element: <VotingPage />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/DNVRSpotlight/dashboard',
+    element: <DNVRSpotlightDashboard />,
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: '/DNVRSpotlight/HallofFame',
+    element: <HallOfFame />,
+    errorElement: <ErrorBoundary />
+  },
 ])
 
 function App() {
@@ -491,11 +544,13 @@ function App() {
   return (
     <Elements stripe={stripePromise}>
       <AuthProvider>
-        <AudioPlayerProvider>
-          <div className="min-h-screen bg-black text-white">
-            <RouterProvider router={router} />
-          </div>
-        </AudioPlayerProvider>
+        <BadgeProvider>
+          <AudioPlayerProvider>
+            <div className="min-h-screen bg-black text-white">
+              <RouterProvider router={router} />
+            </div>
+          </AudioPlayerProvider>
+        </BadgeProvider>
       </AuthProvider>
     </Elements>
   )

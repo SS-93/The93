@@ -40,11 +40,49 @@
  * - FunnelVisualization.tsx (conversion funnels)
  * - MetricsIngestion.tsx (admin monitoring)
  * 
- * DATABASE TABLES:
- * - coliseum_metrics (all tracked events)
- * - coliseum_leaderboards (cached rankings)
- * - coliseum_funnels (funnel definitions and data)
- * - coliseum_reports (generated analytics reports)
+ * ============================================================================
+ * COLISEUM ANALYTICS SYSTEM - DATABASE ARCHITECTURE
+ *
+ * ============================================================================
+ * PRODUCTION TABLES (Exist and Active):
+ * ============================================================================
+ *
+ * - coliseum_domain_strength
+ *   Purpose: Aggregated A/T/G/C strength scores per artist per time range
+ *   Updated by: Edge Function processor
+ *
+ * - coliseum_dna_mutations
+ *   Purpose: Individual mutation log from each Passport event
+ *   Source: passport_entries with event_type = 'audio_play', etc.
+ *
+ * - passport_entries
+ *   Purpose: All user events across platform
+ *   Tracking: coliseum_processed_at column (nullable)
+ *
+ * ============================================================================
+ * MATERIALIZED VIEWS (15 total - for leaderboard queries):
+ * ============================================================================
+ *
+ * Pattern: coliseum_leaderboard_{domain}_{timeRange}
+ *
+ * Domains: a, t, g, c, composite
+ * Time Ranges: 7d, 30d, alltime
+ *
+ * Examples:
+ * - coliseum_leaderboard_a_7d (Cultural domain, 7-day)
+ * - coliseum_leaderboard_t_30d (Behavioral, 30-day)
+ * - coliseum_leaderboard_composite_alltime (Overall, all-time)
+ *
+ * ============================================================================
+ * DEPRECATED / NEVER EXISTED (DO NOT USE):
+ * ============================================================================
+ *
+ * - coliseum_metrics ❌ (legacy design, never created)
+ * - coliseum_leaderboards ❌ (replaced by materialized views)
+ * - coliseum_artist_rankings ❌ (incorrect view name)
+ * - coliseum_domain_rankings ❌ (incorrect view name)
+ *
+ * Last updated: February 1, 2026
  * 
  * =============================================================================
  */

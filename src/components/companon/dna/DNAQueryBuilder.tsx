@@ -31,13 +31,8 @@
  * - Save segment to CRM workflow
  */
 
-'use client';
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSupabaseClient } from '@/lib/supabaseClient';
-import { usePassport } from '@/hooks/usePassport';
-import { debounce } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import DNAFilterPanel from './DNAFilterPanel';
 import DNAPreviewPanel from './DNAPreviewPanel';
 import DNAHeatMap from './DNAHeatMap';
@@ -55,9 +50,7 @@ interface DNAQueryBuilderProps {
 }
 
 export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
-  const router = useRouter();
-  const supabase = useSupabaseClient();
-  const { logEvent } = usePassport();
+  const navigate = useNavigate();
 
   // ============================================================================
   // STATE
@@ -209,7 +202,7 @@ export default function DNAQueryBuilder({ brand }: DNAQueryBuilderProps) {
       setShowSaveModal(false);
 
       // Navigate to CRM with new segment highlighted
-      router.push(`/companon/crm?highlight=${data.id}`);
+      navigate(`/companon/crm?highlight=${data.id}`);
 
     } catch (err) {
       console.error('Save segment error:', err);
